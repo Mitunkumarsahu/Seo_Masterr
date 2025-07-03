@@ -1,21 +1,17 @@
-import './App.css'
-import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import NavBar from './components/NavBar'
-import Footer from './components/Footer'
-
+// App.jsx
+import "./App.css";
+import NavBar from "./components/NavBar";
+import Footer from "./components/Footer";
+import RouteGenerator from "./routes/RouteGenerator";
 
 function App() {
   return (
     <>
-    <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    <Footer />
+      <NavBar />
+      <RouteGenerator />
+      <Footer />
     </>
-  )
+  );
 }
 
-export default App
-
+export default App;
