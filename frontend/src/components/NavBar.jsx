@@ -15,7 +15,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton'; 
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
-import { ChevronDown, Menu as MenuIcon } from "lucide-react";
+import { ChevronDown, Menu as MenuIcon } from "lucide-react";import { NavLink, useLocation } from "react-router-dom"; // ← Import this
 
 const COLORS = {
   blue800: "#1e3a8a",
@@ -26,47 +26,45 @@ const COLORS = {
   slate600: "#475569",
   slate700: "#334155",
 };
-
 export default function NavBar() {
   const [servicesAnchorEl, setServicesAnchorEl] = useState(null);
-  const [aboutAnchorEl, setAboutAnchorEl] = useState(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const location = useLocation();
 
-  const handleMenuOpen = (event, setter) => {
-    setter(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setServicesAnchorEl(null);
-    setAboutAnchorEl(null);
-  };
-
+  const handleMenuOpen = (event, setter) => setter(event.currentTarget);
+  const handleMenuClose = () => setServicesAnchorEl(null);
   const toggleDrawer = () => setMobileDrawerOpen((prev) => !prev);
+
+  const navLinks = [
+    { label: "Home", to: "/" },
+    { label: "Blog", to: "/blog" },
+    { label: "Services", to: "/service", isDropdown: true },
+    { label: "About Us", to: "/about-us" },
+    { label: "Contact Us", to: "/contact" },
+  ];
+
+  const getLinkStyle = (to) => ({
+    color: location.pathname === to ? COLORS.green400 : "white",
+    fontWeight: location.pathname === to ? "bold" : "normal",
+    "&:hover": { color: COLORS.green400 },
+  });
 
   return (
     <>
       <AppBar position="sticky" elevation={0} sx={{ bgcolor: COLORS.blue800 }}>
         <Toolbar sx={{ minHeight: 64 }}>
           {/* Logo */}
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}
-          >
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                bgcolor: "white",
-                borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Typography
-                variant="h6"
-                component="span"
-                sx={{ color: COLORS.blue800, fontWeight: "bold" }}
-              >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
+            <Box sx={{
+              width: 40,
+              height: 40,
+              bgcolor: "white",
+              borderRadius: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              <Typography variant="h6" component="span" sx={{ color: COLORS.blue800, fontWeight: "bold" }}>
                 S
               </Typography>
             </Box>
@@ -75,29 +73,15 @@ export default function NavBar() {
             </Typography>
           </Box>
 
-          {/* Desktop Nav Links */}
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              alignItems: "center",
-              gap: 4,
-              mr: 4,
-            }}
-          >
-            <Button
-              href="#"
-              sx={{ color: "white", "&:hover": { color: COLORS.green400 } }}
-            >
-              Home
-            </Button>
-            <Button
-              href="#"
-              sx={{ color: "white", "&:hover": { color: COLORS.green400 } }}
-            >
-              Blog
-            </Button>
+          {/* Desktop Nav */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 4, mr: 4 }}>
+            <NavLink to="/" style={{ textDecoration: "none" }}>
+              <Button sx={getLinkStyle("/")}>Home</Button>
+            </NavLink>
+            <NavLink to="/blog" style={{ textDecoration: "none" }}>
+              <Button sx={getLinkStyle("/blog")}>Blog</Button>
+            </NavLink>
 
-            {/* Services Dropdown */}
             <Button
               sx={{ color: "white", "&:hover": { color: COLORS.green400 } }}
               endIcon={<ChevronDown size={16} />}
@@ -111,96 +95,36 @@ export default function NavBar() {
               onClose={handleMenuClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
               transformOrigin={{ vertical: "top", horizontal: "left" }}
-              PaperProps={{
-                sx: { width: 200, bgcolor: "white", color: COLORS.slate600 },
-              }}
+              PaperProps={{ sx: { width: 200, bgcolor: "white", color: COLORS.slate600 } }}
               disableScrollLock
             >
-              {[
-                "Web Development",
-                "Mobile Apps",
-                "UI/UX Design",
-                "SEO Services",
-              ].map((txt) => (
-                <MenuItem
-                  key={txt}
-                  component="a"
-                  href="#"
-                  onClick={handleMenuClose}
-                  sx={{ "&:hover": { bgcolor: COLORS.slate200 } }}
-                >
+              {["Web Development", "Mobile Apps", "UI/UX Design", "SEO Services"].map((txt) => (
+                <MenuItem key={txt} component={NavLink} to={`/${txt.toLowerCase().replace(/ /g, "-")}`} onClick={handleMenuClose}>
                   {txt}
                 </MenuItem>
               ))}
             </Menu>
 
-            {/* About Us Dropdown */}
-            <Button
-              sx={{ color: "white", "&:hover": { color: COLORS.green400 } }}
-              endIcon={<ChevronDown size={16} />}
-              onClick={(e) => handleMenuOpen(e, setAboutAnchorEl)}
-            >
-              About Us
-            </Button>
-            <Menu
-              anchorEl={aboutAnchorEl}
-              open={Boolean(aboutAnchorEl)}
-              onClose={handleMenuClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              transformOrigin={{ vertical: "top", horizontal: "left" }}
-              PaperProps={{
-                sx: { width: 200, bgcolor: "white", color: COLORS.slate600 },
-              }}
-              disableScrollLock
-            >
-              {["Our Team", "Our Story", "Mission & Vision", "Careers"].map(
-                (txt) => (
-                  <MenuItem
-                    key={txt}
-                    component="a"
-                    href="#"
-                    onClick={handleMenuClose}
-                    sx={{ "&:hover": { bgcolor: COLORS.slate200 } }}
-                  >
-                    {txt}
-                  </MenuItem>
-                )
-              )}
-            </Menu>
-
-            <Button
-              href="#"
-              sx={{ color: "white", "&:hover": { color: COLORS.green400 } }}
-            >
-              Contact&nbsp;Us
-            </Button>
+            <NavLink to="/about-us" style={{ textDecoration: "none" }}>
+              <Button sx={getLinkStyle("/about-us")}>About Us</Button>
+            </NavLink>
+            <NavLink to="/contact" style={{ textDecoration: "none" }}>
+              <Button sx={getLinkStyle("/contact")}>Contact&nbsp;Us</Button>
+            </NavLink>
           </Box>
 
-          {/* Desktop Auth */}
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Button
-              variant="outlined"
-              sx={{
-                color: "white",
-                borderColor: "white",
-                "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-              }}
-            >
+          {/* Auth Buttons */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
+            <Button variant="outlined" sx={{
+              color: "white", borderColor: "white",
+              "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+            }}>
               Login
             </Button>
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: COLORS.green500,
-                "&:hover": { bgcolor: COLORS.green600 },
-              }}
-            >
+            <Button variant="contained" sx={{
+              bgcolor: COLORS.green500,
+              "&:hover": { bgcolor: COLORS.green600 },
+            }}>
               Sign&nbsp;Up
             </Button>
           </Box>
@@ -221,54 +145,40 @@ export default function NavBar() {
         anchor="left"
         open={mobileDrawerOpen}
         onClose={toggleDrawer}
-        PaperProps={{
-          sx: { width: 260, bgcolor: COLORS.blue800, color: "white" },
-        }}
+        PaperProps={{ sx: { width: 260, bgcolor: COLORS.blue800, color: "white" } }}
       >
         <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Menu
-          </Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>Menu</Typography>
           <Divider sx={{ borderColor: COLORS.slate700, mb: 2 }} />
           <List>
-            {["Home", "Blog", "Services", "About Us", "Contact Us"].map(
-              (txt) => (
-                <ListItem key={txt} disablePadding>
-                  <ListItemButton
-                    component="a"
-                    href="#"
-                    onClick={toggleDrawer}
-                    sx={{
-                      "&:hover": { bgcolor: COLORS.slate700 },
-                    }}
-                  >
-                    <ListItemText primary={txt} />
-                  </ListItemButton>
-                </ListItem>
-              )
-            )}
+            {navLinks.map(({ label, to }) => (
+              <ListItem key={label} disablePadding>
+                <ListItemButton
+                  component={NavLink}
+                  to={to}
+                  onClick={toggleDrawer}
+                  sx={{
+                    "&.active": { bgcolor: COLORS.slate700 },
+                    "&:hover": { bgcolor: COLORS.slate700 },
+                  }}
+                >
+                  <ListItemText primary={label} />
+                </ListItemButton>
+              </ListItem>
+            ))}
           </List>
           <Divider sx={{ borderColor: COLORS.slate700, my: 2 }} />
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{
-                color: "white",
-                borderColor: "white",
-                "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-              }}
-            >
+            <Button fullWidth variant="outlined" sx={{
+              color: "white", borderColor: "white",
+              "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+            }}>
               Login
             </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{
-                bgcolor: COLORS.green500,
-                "&:hover": { bgcolor: COLORS.green600 },
-              }}
-            >
+            <Button fullWidth variant="contained" sx={{
+              bgcolor: COLORS.green500,
+              "&:hover": { bgcolor: COLORS.green600 },
+            }}>
               Sign&nbsp;Up
             </Button>
           </Box>
