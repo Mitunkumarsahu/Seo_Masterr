@@ -37,7 +37,7 @@ export default function NavBar() {
 
   const navLinks = [
     { label: "Home", to: "/" },
-    { label: "Blog", to: "/blog" },
+    { label: "Blog", to: "/blogs" },
     { label: "Services", to: "/service", isDropdown: true },
     { label: "About Us", to: "/about-us" },
     { label: "Contact Us", to: "/contact" },
@@ -78,8 +78,8 @@ export default function NavBar() {
             <NavLink to="/" style={{ textDecoration: "none" }}>
               <Button sx={getLinkStyle("/")}>Home</Button>
             </NavLink>
-            <NavLink to="/blog" style={{ textDecoration: "none" }}>
-              <Button sx={getLinkStyle("/blog")}>Blog</Button>
+            <NavLink to="/blogs" style={{ textDecoration: "none" }}>
+              <Button sx={getLinkStyle("/blogs")}>Blog</Button>
             </NavLink>
 
             <Button

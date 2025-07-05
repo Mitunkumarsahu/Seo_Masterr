@@ -359,20 +359,171 @@ const style = {
       px: 2,
       py: 4,
     },
-    aboutHeadinng:{
+    aboutHeadinng: {
       color: COLORS.primary,
-      fontWeight: 'bold',
+      fontWeight: "bold",
       mb: 3,
-      textAlign: 'center',
+      textAlign: "center",
     },
-    aboutDescription:{
-      color: '#767F88',
+    aboutDescription: {
+      color: "#767F88",
       maxWidth: 900,
-      textAlign: 'center',
-      fontSize: '1.1rem',
+      textAlign: "center",
+      fontSize: "1.1rem",
       lineHeight: 1.7,
+    },
+    cardsWrapper: {
+      bgcolor: '#F1F2F4',
+      py: { xs: 6, md: 8 },
+    },
+    gridSpacing: { xs: 9, md: 18 },
+    gridJustify: "space-around",
+
+    featureCardRoot: {
+      maxWidth: 500,
+      mx: "auto",
+    },
+    featureImage: {
+      bgcolor: "#cfcfcf",
+      height: { xs: 320, sm: 350 },
+      mb: 3,
+      borderRadius: 1,
+    },
+    featureTitle: {
+      fontWeight: 700,
+      color: "#0d2142",
+      mb: 1,
+    },
+    featureText: {
+      color: "text.secondary",
+      lineHeight: 1.6,
+      mb: 2,
+    },
+
+    /* ---------- CTA ---------- */
+    ctaWrapper: {
+      textAlign: "center",
+      mt: 6,
+    },
+    ctaButton: {
+      bgcolor: COLORS.secondary,
+      "&:hover": { bgcolor: "#0e9f6e" },
+      px: 4,
+      fontWeight: 700,
+      "&:hover": { bgcolor: "#07a764" },
+    },
+    
+  },
+  circleFeatureSection: {
+    sectionWrapper: {
+      py: { xs: 6, md: 10 },
+      textAlign: "center",
+    },
+    heading: {
+      fontWeight: 700,
+      color: COLORS.primary,
+      mb: 4
+    },
+    featureItem: {
+      maxWidth: 300,
+      mx: "auto"
+    },
+    circle: {
+      width: 64,
+      height: 64,
+      bgcolor: "#dcdcdc",
+      borderRadius: "50%",
+      mx: "auto",
+      mb: 2
+    },
+    featureTitle: {
+      fontWeight: 700,
+      color: "#0d2142",
+      mb: 1
+    },
+    featureDescription: {
+      color: "text.secondary",
+      fontSize: 14,
+      lineHeight: 1.6
+    },
+    ctaWrapper: {
+      textAlign: "center",
+      mt: 6
+    },
+    ctaButton: {
+      bgcolor: "#08c177",
+      px: 4,
+      fontWeight: 700,
+      "&:hover": { bgcolor: "#07a764" }
     }
   },
+
+  /*blogpage*/
+
+  blogPage: {
+    pageWrapper: { pb: 10 },
+
+    heading: {
+      textAlign: "center",
+      fontWeight: 700,
+      color: "#0d2142",
+      mt: 2,
+      mb: 4
+    },
+
+    /* category pills / tabs */
+    catBarWrapper: {
+      display: "flex",
+      justifyContent: "center",
+      flexWrap: "wrap",
+      gap: 3,
+      borderBottom: "1px solid #e0e0e0",
+      pb: 2,
+      mb: 6
+    },
+    catChip: {
+      fontWeight: 600,
+      color: "#0d2142",
+      cursor: "pointer",
+      "&.active": {
+        borderBottom: "2px solid #0d2142"
+      }
+    },
+
+    /* cards */
+    cardRoot: { maxWidth: 360, mx: "auto" },
+    cardMedia: { height: 140, bgcolor: "#cfcfcf" },
+    cardTitle: { fontWeight: 700, color: "#0d2142", mt: 1, mb: 1 },
+    cardExcerpt: { color: "text.secondary", fontSize: 14 },
+    learnMore: { mt: 2, fontWeight: 700, color: "#0d66ff", cursor: "pointer" },
+
+    cardFooter: {
+      display: "flex",
+      alignItems: "center",
+      pt: 2,
+      fontSize: 14,
+      color: "text.secondary"
+    },
+    avatar: { width: 20, height: 20, bgcolor: "#cfcfcf", mr: 1 },
+
+    /* dark CTA strip */
+    ctaStrip: {
+      bgcolor: "#002d5b",
+      color: "#fff",
+      py: { xs: 6, md: 8 },
+      textAlign: "center",
+      mt: 8,
+      mb: 8
+    },
+    ctaText: { maxWidth: 700, mx: "auto", mb: 3, lineHeight: 1.7 },
+    ctaBtn: {
+      bgcolor: "#08c177",
+      px: 4,
+      fontWeight: 700,
+      "&:hover": { bgcolor: "#07a764" }
+    }
+  }
+  
 };
 
 /* Animation variant reused by Testimonial cards */
