@@ -40,7 +40,7 @@ export default function NavBar() {
     { label: "Blog", to: "/blogs" },
     { label: "Services", to: "/service", isDropdown: true },
     { label: "About Us", to: "/about-us" },
-    { label: "Contact Us", to: "/contact" },
+    { label: "Contact Us", to: "/contact-us" },
   ];
 
   const getLinkStyle = (to) => ({
@@ -108,8 +108,8 @@ export default function NavBar() {
             <NavLink to="/about-us" style={{ textDecoration: "none" }}>
               <Button sx={getLinkStyle("/about-us")}>About Us</Button>
             </NavLink>
-            <NavLink to="/contact" style={{ textDecoration: "none" }}>
-              <Button sx={getLinkStyle("/contact")}>Contact&nbsp;Us</Button>
+            <NavLink to="/contact-us" style={{ textDecoration: "none" }}>
+              <Button sx={getLinkStyle("/contact-us")}>Contact&nbsp;Us</Button>
             </NavLink>
           </Box>
 
