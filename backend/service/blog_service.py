@@ -1,0 +1,97 @@
+from sqlalchemy.orm import Session
+from models.blog import Blog, BlogContent, BlogCategory, ContentType, blog_category_association
+from schemas.blog import BlogCreate, BlogContentCreate, BlogCategoryCreate
+
+def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
+    # Create blog
+    db_blog = Blog(
+        title=blog_data.title,
+        slug=blog_data.slug,
+        meta_description=blog_data.meta_description,
+        is_active=blog_data.is_active,
+        featured_image=blog_data.featured_image,
+        published_at=blog_data.published_at,
+        author_id=author_id
+    )
+    db.add(db_blog)
+    db.commit()
+    db.refresh(db_blog)
+    
+    # Add categories
+    if blog_data.category_ids:
+        for category_id in blog_data.category_ids:
+            # Verify category exists
+            category = db.query(BlogCategory).get(category_id)
+            if category:
+                db_blog.categories.append(category)
+    
+    # Add contents
+    if blog_data.contents:
+        for content in blog_data.contents:
+            db_content = BlogContent(
+                blog_id=db_blog.id,
+                order=content.order,
+                content_type=ContentType[content.content_type.upper()],
+                content=content.content,
+                image_url=content.image_url
+            )
+            db.add(db_content)
+    
+    db.commit()
+    db.refresh(db_blog)
+    return db_blog
+
+def get_blog(db: Session, blog_id: int):
+    return db.query(Blog).filter(Blog.id == blog_id).first()
+
+def get_blogs(db: Session):
+    return db.query(Blog).all()
+
+def update_blog(db: Session, blog_id: int, blog_data: BlogCreate):
+    db_blog = get_blog(db, blog_id)
+    if not db_blog:
+        return None
+    
+    # Update blog fields
+    db_blog.title = blog_data.title
+    db_blog.slug = blog_data.slug
+    db_blog.meta_description = blog_data.meta_description
+    db_blog.is_active = blog_data.is_active
+    db_blog.featured_image = blog_data.featured_image
+    db_blog.published_at = blog_data.published_at
+    
+    # Update categories
+    db_blog.categories = []
+    if blog_data.category_ids:
+        for category_id in blog_data.category_ids:
+            category = db.query(BlogCategory).get(category_id)
+            if category:
+                db_blog.categories.append(category)
+    
+    # Clear existing contents
+    db.query(BlogContent).filter(BlogContent.blog_id == blog_id).delete()
+    
+    # Add new contents
+    if blog_data.contents:
+        for content in blog_data.contents:
+            db_content = BlogContent(
+                blog_id=db_blog.id,
+                order=content.order,
+                content_type=ContentType[content.content_type.upper()],
+                content=content.content,
+                image_url=content.image_url
+            )
+            db.add(db_content)
+    
+    db.commit()
+    db.refresh(db_blog)
+    return db_blog
+
+def delete_blog(db: Session, blog_id: int):
+    db_blog = get_blog(db, blog_id)
+    if db_blog:
+        db.delete(db_blog)
+        db.commit()
+
+def create_category(db: Session, category_data: BlogCategoryCreate):
+    db_category = Blo

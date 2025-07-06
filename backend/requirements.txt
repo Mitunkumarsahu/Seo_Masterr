@@ -11,3 +11,4 @@ cryptography
 # Admin Panel & UI
 starlette-admin
 sqlalchemy-utils
+itsdangerous

@@ -3,7 +3,7 @@ from utils.db import Base, engine, SessionLocal
 from models import user
 from routes import auth
 from service.auth_service import create_user, get_user_by_email, verify_password
-from models.user import Role, User
+from models.user import User
 from schemas.user import UserCreate
 from starlette_admin.contrib.sqla import Admin, ModelView
 from starlette.requests import Request
@@ -14,6 +14,8 @@ from typing import List
 from starlette.middleware.sessions import SessionMiddleware
 from email_validator import validate_email, EmailNotValidError
 import os
+from fastapi.responses import RedirectResponse
+from fastapi import status
 
 class DatabaseAuthProvider(AuthProvider):
     def get_db(self):
@@ -23,6 +25,40 @@ class DatabaseAuthProvider(AuthProvider):
             return db
         finally:
             pass  
+
+    # async def login(
+    #     self,
+    #     username: str,
+    #     password: str,
+    #     remember_me: bool,
+    #     request: Request,
+    #     response: Response,
+    # ) -> Response:
+    #     if len(username) < 3:
+    #         raise FormValidationError({"username": "Ensure username has at least 03 characters"})
+
+    #     db = self.get_db()
+    #     try:
+    #         try:
+    #             print(f"Validating email: {username}")
+    #             user = get_user_by_email(db, username)
+    #         except EmailNotValidError:
+    #             user = db.query(User).filter(User.username == username).first()
+
+    #         if user:
+    #             print(f"User found: {user.username}")
+    #             if verify_password(password, user.password):
+    #                 request.session.update({"user_id": user.id})
+    #                 return response
+    #             else:
+    #                 print("Password mismatch")
+    #         else:
+    #             print("User not found")
+
+    #         raise LoginFailed("Invalid username or password")
+    #     finally:
+    #         db.close()
+
 
     async def login(
         self,
@@ -47,7 +83,23 @@ class DatabaseAuthProvider(AuthProvider):
                 print(f"User found: {user.username}")
                 if verify_password(password, user.password):
                     request.session.update({"user_id": user.id})
-                    return response
+
+                    # ✅ Redirect based on permission
+                    if user.is_super_admin:
+                        redirect_path = "/admin/user/list"  # Super admin default tab
+                    elif user.is_editor:
+                        # Check permissions
+                        perm_names = {perm.name for perm in user.permissions}
+                        if "manage_services" in perm_names:
+                            redirect_path = "/admin/model/service"
+                        elif "manage_blogs" in perm_names:
+                            redirect_path = "/admin/model/blog"
+                        else:
+                            redirect_path = "/admin"  # default fallback
+                    else:
+                        redirect_path = "/admin"
+
+                    return RedirectResponse(url=redirect_path, status_code=status.HTTP_302_FOUND)
                 else:
                     print("Password mismatch")
             else:
@@ -91,9 +143,9 @@ class DatabaseAuthProvider(AuthProvider):
 
     def get_user_roles(self, user: User) -> List[str]:
         role_permissions = {
-            Role.super_admin: ["read", "create", "edit", "delete", "action_make_published"],
-            Role.admin: ["read", "create", "edit", "action_make_published"],
-            Role.user: ["read"],
+            # Role.super_admin: ["read", "create", "edit", "delete", "action_make_published"],
+            # Role.admin: ["read", "create", "edit", "action_make_published"],
+            # Role.user: ["read"],
         }
         return role_permissions.get(user.role, ["read"])
 
