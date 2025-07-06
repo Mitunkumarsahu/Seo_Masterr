@@ -8,3 +8,6 @@ python-dotenv
 email-validator
 python-multipart
 cryptography
+# Admin Panel & UI
+starlette-admin
+sqlalchemy-utils
