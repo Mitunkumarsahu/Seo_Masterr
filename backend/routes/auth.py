@@ -9,11 +9,11 @@ from jose import JWTError, jwt
 from models.user import User
 from utils.auth import SECRET_KEY, ALGORITHM
 from utils.db import get_db
+from sqlalchemy import or_
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
@@ -23,13 +23,17 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        identifier: str = payload.get("sub")
+        if identifier is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    user = get_user_by_email(db, username)
+    # Try both email and username
+    user = db.query(User).filter(
+        or_(User.email == identifier, User.username == identifier)
+    ).first()
+    
     if user is None:
         raise credentials_exception
     return user
@@ -61,7 +65,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_access_token({"sub": user.username})
+    token = create_access_token({"sub": user.email})  
     return {"access_token": token, "token_type": "bearer"}
 
 @router.get("/protected", response_model=UserOut)

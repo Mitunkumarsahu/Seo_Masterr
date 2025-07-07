@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from models.blog import Blog, BlogContent, BlogCategory, ContentType, blog_category_association
 from schemas.blog import BlogCreate, BlogContentCreate, BlogCategoryCreate
+from sqlalchemy.orm import selectinload
 
 def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
     # Create blog
@@ -38,14 +39,36 @@ def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
             db.add(db_content)
     
     db.commit()
+    # db.refresh(db_blog)
+    # return db_blog
     db.refresh(db_blog)
+    db_blog = db.query(Blog).options(
+        selectinload(Blog.author),
+        selectinload(Blog.contents),
+        selectinload(Blog.categories)
+    ).filter(Blog.id == db_blog.id).first()
+    
     return db_blog
 
+# def get_blog(db: Session, blog_id: int):
+#     return db.query(Blog).filter(Blog.id == blog_id).first()
+
+# def get_blogs(db: Session):
+#     return db.query(Blog).all()
+
 def get_blog(db: Session, blog_id: int):
-    return db.query(Blog).filter(Blog.id == blog_id).first()
+    return db.query(Blog).options(
+        selectinload(Blog.author),
+        selectinload(Blog.contents),
+        selectinload(Blog.categories)
+    ).filter(Blog.id == blog_id).first()
 
 def get_blogs(db: Session):
-    return db.query(Blog).all()
+    return db.query(Blog).options(
+        selectinload(Blog.author),
+        selectinload(Blog.contents),
+        selectinload(Blog.categories)
+    ).all()
 
 def update_blog(db: Session, blog_id: int, blog_data: BlogCreate):
     db_blog = get_blog(db, blog_id)
@@ -84,7 +107,15 @@ def update_blog(db: Session, blog_id: int, blog_data: BlogCreate):
             db.add(db_content)
     
     db.commit()
+    # db.refresh(db_blog)
+    # return db_blog
     db.refresh(db_blog)
+    db_blog = db.query(Blog).options(
+        selectinload(Blog.author),
+        selectinload(Blog.contents),
+        selectinload(Blog.categories)
+    ).filter(Blog.id == blog_id).first()
+    
     return db_blog
 
 def delete_blog(db: Session, blog_id: int):

@@ -2,6 +2,7 @@ from pydantic import BaseModel, HttpUrl
 from enum import Enum
 from typing import Optional, List
 from datetime import datetime
+from pydantic import field_validator
 
 class ContentType(str, Enum):
     H1 = "h1"
@@ -57,6 +58,16 @@ class BlogBase(BaseModel):
 class BlogCreate(BlogBase):
     contents: Optional[List[BlogContentCreate]] = None
 
+# class BlogOut(BlogBase):
+#     id: int
+#     contents: List[BlogContentOut] = []
+#     categories: List[BlogCategoryOut] = []
+#     author: Optional[str] = None
+
+#     class Config:
+#         from_attributes = True
+
+
 class BlogOut(BlogBase):
     id: int
     contents: List[BlogContentOut] = []
@@ -65,3 +76,10 @@ class BlogOut(BlogBase):
 
     class Config:
         from_attributes = True
+
+    @field_validator('author', mode='before')
+    def convert_author(cls, v):
+        # Convert User object to username string
+        if hasattr(v, 'username'):
+            return v.username
+        return v

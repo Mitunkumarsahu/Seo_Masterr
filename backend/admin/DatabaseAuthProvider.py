@@ -16,6 +16,7 @@ from email_validator import validate_email, EmailNotValidError
 import os
 from fastapi.responses import RedirectResponse
 from fastapi import status
+from sqlalchemy.orm import selectinload
 
 class DatabaseAuthProvider(AuthProvider):
     def get_db(self):
@@ -77,26 +78,42 @@ class DatabaseAuthProvider(AuthProvider):
                 print(f"Validating email: {username}")
                 user = get_user_by_email(db, username)
             except EmailNotValidError:
-                user = db.query(User).filter(User.username == username).first()
+                # user = db.query(User).filter(User.username == username).first()
+                user = db.query(User).options(selectinload(User.permissions)).filter(...).first()
 
             if user:
                 print(f"User found: {user.username}")
                 if verify_password(password, user.password):
                     request.session.update({"user_id": user.id})
 
-                    # ✅ Redirect based on permission
+                    # # ✅ Redirect based on permission
+                    # if user.is_super_admin:
+                    #     redirect_path = "/admin/user/list"  # Super admin default tab
+                    # elif user.is_editor:
+                    #     # Check permissions
+                    #     perm_names = {perm.name for perm in user.permissions}
+                    #     if "manage_services" in perm_names:
+                    #         redirect_path = "/admin/model/service"
+                    #     elif "manage_blogs" in perm_names:
+                    #         redirect_path = "/admin/model/blog"
+                    #     else:
+                    #         redirect_path = "/admin"  # default fallback
+                    # else:
+                    #     redirect_path = "/admin"
+
+                    # Modified login redirect logic
                     if user.is_super_admin:
-                        redirect_path = "/admin/user/list"  # Super admin default tab
+                        redirect_path = "/admin/user/list"
                     elif user.is_editor:
-                        # Check permissions
                         perm_names = {perm.name for perm in user.permissions}
+                        
                         if "manage_services" in perm_names:
                             redirect_path = "/admin/model/service"
                         elif "manage_blogs" in perm_names:
                             redirect_path = "/admin/model/blog"
                         else:
-                            redirect_path = "/admin"  # default fallback
-                    else:
+                            redirect_path = "/admin"
+                    else:  # Regular user
                         redirect_path = "/admin"
 
                     return RedirectResponse(url=redirect_path, status_code=status.HTTP_302_FOUND)
@@ -114,7 +131,8 @@ class DatabaseAuthProvider(AuthProvider):
         if user_id:
             db = self.get_db()
             try:
-                user = db.query(User).filter(User.id == user_id).first()
+                # user = db.query(User).filter(User.id == user_id).first()
+                user = db.query(User).options(selectinload(User.permissions)).filter(User.id == user_id).first()
                 if user:
                     request.state.user = user
                     return True
