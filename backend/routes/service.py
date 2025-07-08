@@ -8,6 +8,8 @@ from service.auth_service import has_permission
 from routes.auth import require_permission
 import uuid
 import os
+from typing import List
+
 
 router = APIRouter(prefix="/services", tags=["Services"])
 
@@ -40,7 +42,7 @@ def create_new_service(
 ):
     return create_service(db, service)
 
-@router.get("/", response_model=list[ServiceOut])
+@router.get("/", response_model=List[ServiceOut])
 def list_services(db: Session = Depends(get_db)):
     return get_services(db)
 

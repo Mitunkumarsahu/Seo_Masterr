@@ -8,6 +8,8 @@ from service.auth_service import has_permission
 from routes.auth import require_permission
 import uuid
 import os
+from typing import List
+
 
 router = APIRouter(prefix="/blogs", tags=["Blogs"])
 
@@ -40,7 +42,7 @@ def create_new_blog(
 ):
     return create_blog(db, blog, current_user.id)
 
-@router.get("/", response_model=list[BlogOut])
+@router.get("/", response_model=List[BlogOut])
 def list_blogs(db: Session = Depends(get_db)):
     return get_blogs(db)
 
@@ -78,6 +80,6 @@ def create_blog_category(
 ):
     return create_category(db, category)
 
-@router.get("/categories", response_model=list[BlogCategoryOut])
+@router.get("/categories", response_model=List[BlogCategoryOut])
 def list_blog_categories(db: Session = Depends(get_db)):
     return get_categories(db)
