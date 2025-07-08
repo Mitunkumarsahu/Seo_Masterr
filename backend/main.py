@@ -182,8 +182,8 @@ from fastapi import FastAPI
 import os
 from utils.db import Base, engine, SessionLocal
 from models.user import User, Permission
-from models.service import Service, ServiceContent, ContentType as ServiceContentType
-from models.blog import Blog, BlogContent, BlogCategory, ContentType as BlogContentType
+from models.service import Service, ContentType as ServiceContentType
+from models.blog import Blog, BlogCategory, ContentType as BlogContentType
 from routes import auth, service, blog
 from starlette_admin.contrib.sqla import Admin, ModelView
 from schemas.user import UserCreate
@@ -195,6 +195,9 @@ from fastapi.staticfiles import StaticFiles
 from admin.DatabaseAuthProvider import DatabaseAuthProvider
 from fastapi.requests import Request
 from utils.auth import hash_password, verify_password
+# from starlette_admin.fields import WysiwygField 
+from starlette_admin.fields import TinyMCEEditorField
+
 
 app = FastAPI()
 
@@ -262,17 +265,17 @@ class UserView(BaseModelView):
 class PermissionView(BaseModelView):
     identity = "permission"
 
-class ServiceView(BaseModelView):
-    identity = "service"
-    fields = [
-        fields.IntegerField("id"),
-        fields.StringField("title"),
-        fields.StringField("slug"),
-        fields.StringField("meta_description"),
-        fields.BooleanField("is_active"),
-        # Match identity to ServiceContentView
-        fields.HasMany("contents", identity="service_content")
-    ]
+# class ServiceView(BaseModelView):
+#     identity = "service"
+#     fields = [
+#         fields.IntegerField("id"),
+#         fields.StringField("title"),
+#         fields.StringField("slug"),
+#         fields.StringField("meta_description"),
+#         fields.BooleanField("is_active"),
+#         # Match identity to ServiceContentView
+#         fields.HasMany("contents", identity="service_content")
+#     ]
 
 class ServiceContentView(BaseModelView):
     identity = "service_content"
@@ -285,6 +288,22 @@ class ServiceContentView(BaseModelView):
         fields.StringField("image_url")
     ]
 
+# class BlogView(BaseModelView):
+#     identity = "blog"
+#     fields = [
+#         fields.IntegerField("id"),
+#         fields.StringField("title"),
+#         fields.StringField("slug"),
+#         fields.TextAreaField("meta_description"),
+#         fields.BooleanField("is_active"),
+#         fields.StringField("featured_image"),
+#         fields.DateTimeField("published_at"),
+#         fields.HasOne("author", identity="user"),
+#         # Match identities to content and category views
+#         fields.HasMany("contents", identity="blog_content"),
+#         fields.HasMany("categories", identity="blog_category")
+#     ]
+
 class BlogView(BaseModelView):
     identity = "blog"
     fields = [
@@ -296,9 +315,55 @@ class BlogView(BaseModelView):
         fields.StringField("featured_image"),
         fields.DateTimeField("published_at"),
         fields.HasOne("author", identity="user"),
-        # Match identities to content and category views
-        fields.HasMany("contents", identity="blog_content"),
-        fields.HasMany("categories", identity="blog_category")
+        fields.HasMany("categories", identity="blog_category"),
+        # WysiwygField("content")  # Rich text editor
+        # TinyMCEEditorField("content")  # Rich text editor
+        TinyMCEEditorField(
+            "content",
+            extra_options={
+                "toolbar": (
+                    "undo redo | styles | bold italic underline | "
+                    "alignleft aligncenter alignright alignjustify | "
+                    "outdent indent | formatselect"
+                ),
+                "menubar": "file edit view insert format",
+                "plugins": (
+                    "lists link image charmap preview anchor "
+                    "searchreplace visualblocks code fullscreen "
+                    "insertdatetime media table help wordcount"
+                )
+            }
+        )
+
+    ]
+
+class ServiceView(BaseModelView):
+    identity = "service"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("title"),
+        fields.StringField("slug"),
+        fields.StringField("meta_description"),
+        fields.BooleanField("is_active"),
+        # WysiwygField("content")  # Rich text editor
+        # TinyMCEEditorField("content")  # Rich text editor
+        TinyMCEEditorField(
+            "content",
+            extra_options={
+                "toolbar": (
+                    "undo redo | styles | bold italic underline | "
+                    "alignleft aligncenter alignright alignjustify | "
+                    "outdent indent | formatselect"
+                ),
+                "menubar": "file edit view insert format",
+                "plugins": (
+                    "lists link image charmap preview anchor "
+                    "searchreplace visualblocks code fullscreen "
+                    "insertdatetime media table help wordcount"
+                )
+            }
+        )
+
     ]
 
 class BlogContentView(BaseModelView):
@@ -331,9 +396,9 @@ admin = Admin(
 admin.add_view(UserView(User, icon="fa fa-user"))
 admin.add_view(PermissionView(Permission, icon="fa fa-key"))
 admin.add_view(ServiceView(Service, icon="fa fa-server"))
-admin.add_view(ServiceContentView(ServiceContent, icon="fa fa-list"))
+# admin.add_view(ServiceContentView(ServiceContent, icon="fa fa-list"))
 admin.add_view(BlogView(Blog, icon="fa fa-newspaper"))
-admin.add_view(BlogContentView(BlogContent, icon="fa fa-list-alt"))
+# admin.add_view(BlogContentView(BlogContent, icon="fa fa-list-alt"))
 admin.add_view(BlogCategoryView(BlogCategory, icon="fa fa-tag"))
 
 admin.mount_to(app)

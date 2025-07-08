@@ -1,10 +1,62 @@
+# from sqlalchemy.orm import Session
+# from models.blog import Blog, BlogContent, BlogCategory, ContentType, blog_category_association
+# from schemas.blog import BlogCreate, BlogContentCreate, BlogCategoryCreate
+# from sqlalchemy.orm import selectinload
+
+# def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
+#     # Create blog
+#     db_blog = Blog(
+#         title=blog_data.title,
+#         slug=blog_data.slug,
+#         meta_description=blog_data.meta_description,
+#         is_active=blog_data.is_active,
+#         featured_image=blog_data.featured_image,
+#         published_at=blog_data.published_at,
+#         author_id=author_id
+#     )
+#     db.add(db_blog)
+#     db.commit()
+#     db.refresh(db_blog)
+    
+#     # Add categories
+#     if blog_data.category_ids:
+#         for category_id in blog_data.category_ids:
+#             # Verify category exists
+#             category = db.query(BlogCategory).get(category_id)
+#             if category:
+#                 db_blog.categories.append(category)
+    
+#     # Add contents
+#     if blog_data.contents:
+#         for content in blog_data.contents:
+#             db_content = BlogContent(
+#                 blog_id=db_blog.id,
+#                 order=content.order,
+#                 content_type=ContentType[content.content_type.upper()],
+#                 content=content.content,
+#                 image_url=content.image_url
+#             )
+#             db.add(db_content)
+    
+#     db.commit()
+#     # db.refresh(db_blog)
+#     # return db_blog
+#     db.refresh(db_blog)
+#     db_blog = db.query(Blog).options(
+#         selectinload(Blog.author),
+#         selectinload(Blog.contents),
+#         selectinload(Blog.categories)
+#     ).filter(Blog.id == db_blog.id).first()
+    
+#     return db_blog
+
+
 from sqlalchemy.orm import Session
-from models.blog import Blog, BlogContent, BlogCategory, ContentType, blog_category_association
-from schemas.blog import BlogCreate, BlogContentCreate, BlogCategoryCreate
+from models.blog import Blog, BlogCategory, blog_category_association
+from schemas.blog import BlogCreate, BlogCategoryCreate
 from sqlalchemy.orm import selectinload
 
 def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
-    # Create blog
     db_blog = Blog(
         title=blog_data.title,
         slug=blog_data.slug,
@@ -12,7 +64,8 @@ def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
         is_active=blog_data.is_active,
         featured_image=blog_data.featured_image,
         published_at=blog_data.published_at,
-        author_id=author_id
+        author_id=author_id,
+        content=blog_data.content  # Add this
     )
     db.add(db_blog)
     db.commit()
@@ -21,34 +74,16 @@ def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
     # Add categories
     if blog_data.category_ids:
         for category_id in blog_data.category_ids:
-            # Verify category exists
             category = db.query(BlogCategory).get(category_id)
             if category:
                 db_blog.categories.append(category)
     
-    # Add contents
-    if blog_data.contents:
-        for content in blog_data.contents:
-            db_content = BlogContent(
-                blog_id=db_blog.id,
-                order=content.order,
-                content_type=ContentType[content.content_type.upper()],
-                content=content.content,
-                image_url=content.image_url
-            )
-            db.add(db_content)
-    
     db.commit()
-    # db.refresh(db_blog)
-    # return db_blog
     db.refresh(db_blog)
-    db_blog = db.query(Blog).options(
+    return db.query(Blog).options(
         selectinload(Blog.author),
-        selectinload(Blog.contents),
         selectinload(Blog.categories)
     ).filter(Blog.id == db_blog.id).first()
-    
-    return db_blog
 
 # def get_blog(db: Session, blog_id: int):
 #     return db.query(Blog).filter(Blog.id == blog_id).first()
@@ -56,19 +91,33 @@ def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
 # def get_blogs(db: Session):
 #     return db.query(Blog).all()
 
+# def get_blog(db: Session, blog_id: int):
+#     return db.query(Blog).options(
+#         selectinload(Blog.author),
+#         selectinload(Blog.contents),
+#         selectinload(Blog.categories)
+#     ).filter(Blog.id == blog_id).first()
+
+# def get_blogs(db: Session):
+#     return db.query(Blog).options(
+#         selectinload(Blog.author),
+#         selectinload(Blog.content),
+#         selectinload(Blog.categories)
+#     ).all()
+
 def get_blog(db: Session, blog_id: int):
     return db.query(Blog).options(
         selectinload(Blog.author),
-        selectinload(Blog.contents),
         selectinload(Blog.categories)
     ).filter(Blog.id == blog_id).first()
+
 
 def get_blogs(db: Session):
     return db.query(Blog).options(
         selectinload(Blog.author),
-        selectinload(Blog.contents),
         selectinload(Blog.categories)
     ).all()
+
 
 def update_blog(db: Session, blog_id: int, blog_data: BlogCreate):
     db_blog = get_blog(db, blog_id)

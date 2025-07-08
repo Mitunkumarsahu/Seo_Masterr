@@ -1,33 +1,51 @@
+# from sqlalchemy.orm import Session
+# from models.service import Service, ServiceContent, ContentType
+# from schemas.service import ServiceCreate, ServiceContentCreate
+
+# def create_service(db: Session, service_data: ServiceCreate):
+#     # Create service
+#     db_service = Service(
+#         title=service_data.title,
+#         slug=service_data.slug,
+#         meta_description=service_data.meta_description,
+#         is_active=service_data.is_active
+#     )
+#     db.add(db_service)
+#     db.commit()
+#     db.refresh(db_service)
+    
+#     # Add contents
+#     if service_data.contents:
+#         for content in service_data.contents:
+#             db_content = ServiceContent(
+#                 service_id=db_service.id,
+#                 order=content.order,
+#                 content_type=ContentType[content.content_type.upper()],
+#                 content=content.content,
+#                 image_url=content.image_url
+#             )
+#             db.add(db_content)
+#         db.commit()
+#         db.refresh(db_service)
+    
+#     return db_service
+
+
 from sqlalchemy.orm import Session
-from models.service import Service, ServiceContent, ContentType
-from schemas.service import ServiceCreate, ServiceContentCreate
+from models.service import Service
+from schemas.service import ServiceCreate
 
 def create_service(db: Session, service_data: ServiceCreate):
-    # Create service
     db_service = Service(
         title=service_data.title,
         slug=service_data.slug,
         meta_description=service_data.meta_description,
-        is_active=service_data.is_active
+        is_active=service_data.is_active,
+        content=service_data.content  # Add this
     )
     db.add(db_service)
     db.commit()
     db.refresh(db_service)
-    
-    # Add contents
-    if service_data.contents:
-        for content in service_data.contents:
-            db_content = ServiceContent(
-                service_id=db_service.id,
-                order=content.order,
-                content_type=ContentType[content.content_type.upper()],
-                content=content.content,
-                image_url=content.image_url
-            )
-            db.add(db_content)
-        db.commit()
-        db.refresh(db_service)
-    
     return db_service
 
 def get_service(db: Session, service_id: int):

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
-from schemas.blog import BlogCreate, BlogOut, BlogContentCreate, BlogContentOut, BlogCategoryCreate, BlogCategoryOut
+from schemas.blog import BlogCreate, BlogOut, BlogCategoryCreate, BlogCategoryOut
 from service.blog_service import create_blog, get_blog, get_blogs, update_blog, delete_blog, create_category
 from utils.db import get_db
 from models.user import User

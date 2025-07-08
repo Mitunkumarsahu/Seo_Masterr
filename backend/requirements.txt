@@ -12,3 +12,4 @@ cryptography
 starlette-admin
 sqlalchemy-utils
 itsdangerous
+starlette-admin[tinymce]

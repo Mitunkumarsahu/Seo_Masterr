@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
-from schemas.service import ServiceCreate, ServiceOut, ServiceContentCreate, ServiceContentOut
+from schemas.service import ServiceCreate, ServiceOut
 from service.service_service import create_service, get_service, get_services, update_service, delete_service
 from utils.db import get_db
 from models.user import User
