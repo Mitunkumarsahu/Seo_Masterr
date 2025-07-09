@@ -31,6 +31,8 @@ from models.best_works import BestWork
 from routes import best_works
 from models.why_choose_us import WhyChooseUs
 from routes import why_choose_us
+from models.process_step import ProcessStep
+from routes import process_step
 
 
 app = FastAPI()
@@ -57,6 +59,7 @@ app.include_router(home_feature.router)
 app.include_router(faq.router)
 app.include_router(best_works.router)
 app.include_router(why_choose_us.router)
+app.include_router(process_step.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -83,6 +86,7 @@ class BaseModelView(ModelView):
             "faq": "manage_faqs",
             "best_work": "manage_best_works",
             "why_choose_us": "manage_why_choose_us",
+            "process_step": "manage_process_steps",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -315,6 +319,17 @@ class WhyChooseUsView(BaseModelView):
         return data
  
 
+class ProcessStepView(BaseModelView):
+    identity = "process_step"
+    fields = [
+        fields.IntegerField("id"),
+        # fields.StringField("title", required=True),
+        fields.StringField("heading", required=True),
+        fields.TextAreaField("description", required=True),
+        fields.IntegerField("order"),
+        fields.BooleanField("is_active"),
+    ]
+
 
 # Admin Setup
 admin = Admin(
@@ -337,6 +352,7 @@ admin.add_view(HomeFeatureView(HomeFeature, icon="fa fa-star", name="Home Featur
 admin.add_view(FAQView(FAQ, icon="fa fa-question-circle", name="FAQs"))
 admin.add_view(BestWorkView(BestWork, icon="fa fa-star", name="Best Works"))
 admin.add_view(WhyChooseUsView(WhyChooseUs, icon="fa fa-question-circle", name="Why Choose Us"))
+admin.add_view(ProcessStepView(ProcessStep, icon="fa fa-list-ol", name="Process Steps"))
 
 admin.mount_to(app)
 
@@ -356,6 +372,7 @@ def on_startup():
         ("manage_faqs", "Manage FAQs"),
         ("manage_best_works", "Manage Best Works"),
         ("manage_why_choose_us", "Manage Why Choose Us section"),
+        ("manage_process_steps", "Manage Process Steps"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
