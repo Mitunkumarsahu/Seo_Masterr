@@ -27,7 +27,8 @@ from schemas.social_media import SocialMediaCreate  # Add this
 from service.social_media_service import create_social_media
 from models.home_feature import HomeFeature
 from models.faq import FAQ
-from models.faq import FAQ
+from models.best_works import BestWork
+from routes import best_works
 
 
 app = FastAPI()
@@ -52,6 +53,7 @@ app.include_router(testimonial.router)
 app.include_router(social_media.router)
 app.include_router(home_feature.router)
 app.include_router(faq.router)
+app.include_router(best_works.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -76,6 +78,7 @@ class BaseModelView(ModelView):
             "service_type": "manage_services",
             "home_feature": "manage_home_features",
             "faq": "manage_faqs",
+            "best_work": "manage_best_works",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -273,6 +276,18 @@ class FAQView(BaseModelView):
         fields.IntegerField("order"),
         fields.BooleanField("is_active"),
     ]
+
+class BestWorkView(BaseModelView):
+    identity = "best_work"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("title"),
+        fields.StringField("image_url"),
+        fields.TextAreaField("description"),
+        fields.IntegerField("order"),
+        fields.BooleanField("is_active"),
+    ]
+    
     
 
 
@@ -295,6 +310,7 @@ admin.add_view(TestimonialView(Testimonial, icon="fa fa-quote-left"))
 admin.add_view(SocialMediaView(SocialMedia, icon="fa fa-share-alt"))
 admin.add_view(HomeFeatureView(HomeFeature, icon="fa fa-star", name="Home Features"))
 admin.add_view(FAQView(FAQ, icon="fa fa-question-circle", name="FAQs"))
+admin.add_view(BestWorkView(BestWork, icon="fa fa-star", name="Best Works"))
 
 admin.mount_to(app)
 
@@ -312,6 +328,7 @@ def on_startup():
         ("manage_social_media", "Manage social media links"),
         ("manage_home_features", "Manage home features"),
         ("manage_faqs", "Manage FAQs"),
+        ("manage_best_works", "Manage Best Works"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
