@@ -184,7 +184,7 @@ from utils.db import Base, engine, SessionLocal
 from models.user import User, Permission
 from models.service import Service, ContentType as ServiceContentType
 from models.blog import Blog, BlogCategory, ContentType as BlogContentType
-from routes import auth, service, blog, testimonial
+from routes import auth, service, blog, testimonial, social_media
 from starlette_admin.contrib.sqla import Admin, ModelView
 from schemas.user import UserCreate
 from service.auth_service import create_user as create_user_service, get_user_by_email
@@ -200,6 +200,9 @@ from starlette_admin.fields import TinyMCEEditorField
 from models.testimonial import Testimonial  
 from schemas.testimonial import TestimonialCreate  
 from service.testimonial_service import create_testimonial  
+from models.social_media import SocialMedia, SocialPlatform  # Add this
+from schemas.social_media import SocialMediaCreate  # Add this
+from service.social_media_service import create_social_media
 
 
 app = FastAPI()
@@ -221,6 +224,7 @@ app.include_router(auth.router)
 app.include_router(service.router)
 app.include_router(blog.router)
 app.include_router(testimonial.router)
+app.include_router(social_media.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -241,6 +245,7 @@ class BaseModelView(ModelView):
             "blog_content": "manage_blogs",
             "blog_category": "manage_blogs",
             "testimonial": "manage_testimonials",
+            "social_media": "manage_social_media",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -405,6 +410,19 @@ class TestimonialView(BaseModelView):
         fields.IntegerField("order"),
     ]
 
+class SocialMediaView(BaseModelView):
+    identity = "social_media"
+    fields = [
+        fields.IntegerField("id"),
+        fields.EnumField("platform", enum=SocialPlatform, select2=False),
+        fields.StringField("url"),
+        fields.StringField("icon_class"),
+        fields.BooleanField("is_active"),
+        fields.IntegerField("order"),
+        fields.StringField("alt_text"),
+        fields.StringField("title_text"),
+    ]
+
 # Admin Setup
 admin = Admin(
     engine,
@@ -420,6 +438,7 @@ admin.add_view(BlogView(Blog, icon="fa fa-newspaper"))
 # admin.add_view(BlogContentView(BlogContent, icon="fa fa-list-alt"))
 admin.add_view(BlogCategoryView(BlogCategory, icon="fa fa-tag"))
 admin.add_view(TestimonialView(Testimonial, icon="fa fa-quote-left"))
+admin.add_view(SocialMediaView(SocialMedia, icon="fa fa-share-alt"))
 
 admin.mount_to(app)
 
@@ -434,6 +453,7 @@ def on_startup():
         ("manage_blogs", "Manage blog content"),
         ("manage_users", "Manage users"),
         ("manage_testimonials", "Manage testimonials"),
+        ("manage_social_media", "Manage social media links"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
