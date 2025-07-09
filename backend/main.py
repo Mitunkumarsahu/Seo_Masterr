@@ -39,6 +39,8 @@ from models.contact_hero import ContactHero
 from routes import contact_hero
 from models.subscription import Subscription
 from routes import subscription
+from models.contact_info import ContactInfo
+from routes import contact_info
 
 
 app = FastAPI()
@@ -69,6 +71,7 @@ app.include_router(process_step.router)
 app.include_router(about_hero.router)
 app.include_router(contact_hero.router)
 app.include_router(subscription.router)
+app.include_router(contact_info.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -382,6 +385,40 @@ class SubscriptionView(BaseModelView):
         return False
     
 
+class ContactInfoView(BaseModelView):
+    identity = "contact_info"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("section_title", required=True),
+        fields.TextAreaField("address", required=True),
+        fields.StringField("email", required=True),
+        fields.TextAreaField(
+            "phone_numbers", 
+            required=True,
+            help_text="Enter phone numbers, one per line"
+        ),
+        fields.StringField("toll_free", help_text="Toll-free number"),
+        fields.TextAreaField(
+            "map_embed", 
+            help_text="Paste Google Maps iframe embed code here"
+        ),
+        fields.BooleanField("is_active"),
+    ]
+    
+    async def validate(self, request: Request, data: dict) -> dict:
+        # Validate phone numbers
+        phones = data.get("phone_numbers", "")
+        if not phones.strip():
+            raise FormValidationError({"phone_numbers": "At least one phone number is required"})
+        
+        # Validate email format (simple check)
+        email = data.get("email", "")
+        if "@" not in email or "." not in email:
+            raise FormValidationError({"email": "Invalid email format"})
+        
+        return data
+
+
 # Admin Setup
 admin = Admin(
     engine,
@@ -407,6 +444,7 @@ admin.add_view(ProcessStepView(ProcessStep, icon="fa fa-list-ol", name="Process 
 admin.add_view(AboutHeroView(AboutHero, icon="fa fa-image", name="About Hero"))
 admin.add_view(ContactHeroView(ContactHero, icon="fa fa-address-card", name="Contact Hero"))
 admin.add_view(SubscriptionView(Subscription, icon="fa fa-envelope", name="Subscriptions"))
+admin.add_view(ContactInfoView(ContactInfo, icon="fa fa-address-book", name="Contact Info"))
 
 admin.mount_to(app)
 
@@ -430,6 +468,7 @@ def on_startup():
         ("manage_about_hero", "Manage About Page Hero"),
         ("manage_contact_hero", "Manage Contact Page Hero"),
         ("manage_subscriptions", "Manage subscriptions"),
+        ("manage_contact_info", "Manage contact information"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
