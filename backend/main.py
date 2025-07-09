@@ -184,7 +184,7 @@ from utils.db import Base, engine, SessionLocal
 from models.user import User, Permission
 from models.service import Service, ContentType as ServiceContentType
 from models.blog import Blog, BlogCategory, ContentType as BlogContentType
-from routes import auth, service, blog
+from routes import auth, service, blog, testimonial
 from starlette_admin.contrib.sqla import Admin, ModelView
 from schemas.user import UserCreate
 from service.auth_service import create_user as create_user_service, get_user_by_email
@@ -197,6 +197,9 @@ from fastapi.requests import Request
 from utils.auth import hash_password, verify_password
 # from starlette_admin.fields import WysiwygField 
 from starlette_admin.fields import TinyMCEEditorField
+from models.testimonial import Testimonial  
+from schemas.testimonial import TestimonialCreate  
+from service.testimonial_service import create_testimonial  
 
 
 app = FastAPI()
@@ -217,6 +220,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.include_router(auth.router)
 app.include_router(service.router)
 app.include_router(blog.router)
+app.include_router(testimonial.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -236,6 +240,7 @@ class BaseModelView(ModelView):
             "blog": "manage_blogs",
             "blog_content": "manage_blogs",
             "blog_category": "manage_blogs",
+            "testimonial": "manage_testimonials",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -386,6 +391,20 @@ class BlogCategoryView(BaseModelView):
         fields.TextAreaField("description")
     ]
 
+
+class TestimonialView(BaseModelView):
+    identity = "testimonial"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("client_name"),
+        fields.StringField("client_title"),
+        fields.StringField("company"),
+        fields.TextAreaField("content"),
+        fields.StringField("image_url"),
+        fields.BooleanField("is_active"),
+        fields.IntegerField("order"),
+    ]
+
 # Admin Setup
 admin = Admin(
     engine,
@@ -400,6 +419,7 @@ admin.add_view(ServiceView(Service, icon="fa fa-server"))
 admin.add_view(BlogView(Blog, icon="fa fa-newspaper"))
 # admin.add_view(BlogContentView(BlogContent, icon="fa fa-list-alt"))
 admin.add_view(BlogCategoryView(BlogCategory, icon="fa fa-tag"))
+admin.add_view(TestimonialView(Testimonial, icon="fa fa-quote-left"))
 
 admin.mount_to(app)
 
@@ -413,6 +433,7 @@ def on_startup():
         ("manage_services", "Manage services content"),
         ("manage_blogs", "Manage blog content"),
         ("manage_users", "Manage users"),
+        ("manage_testimonials", "Manage testimonials"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():

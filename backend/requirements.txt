@@ -12,3 +12,4 @@ cryptography
 starlette-admin
 itsdangerous
 starlette-admin[tinymce]
+python-multipart 
