@@ -5,7 +5,7 @@ from models.user import User, Permission
 from models.service import Service, ServiceType
 from models.service import ServiceType
 from models.blog import Blog, BlogCategory, ContentType as BlogContentType
-from routes import auth, service, blog, testimonial, social_media, home_feature
+from routes import auth, service, blog, testimonial, social_media, home_feature, faq
 from starlette_admin.contrib.sqla import Admin, ModelView
 from schemas.user import UserCreate
 from service.auth_service import create_user as create_user_service, get_user_by_email
@@ -26,6 +26,8 @@ from models.social_media import SocialMedia, SocialPlatform  # Add this
 from schemas.social_media import SocialMediaCreate  # Add this
 from service.social_media_service import create_social_media
 from models.home_feature import HomeFeature
+from models.faq import FAQ
+from models.faq import FAQ
 
 
 app = FastAPI()
@@ -49,6 +51,7 @@ app.include_router(blog.router)
 app.include_router(testimonial.router)
 app.include_router(social_media.router)
 app.include_router(home_feature.router)
+app.include_router(faq.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -72,6 +75,7 @@ class BaseModelView(ModelView):
             "social_media": "manage_social_media",
             "service_type": "manage_services",
             "home_feature": "manage_home_features",
+            "faq": "manage_faqs",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -260,6 +264,18 @@ class HomeFeatureView(BaseModelView):
         return data
 
 
+class FAQView(BaseModelView):
+    identity = "faq"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("question"),
+        fields.TextAreaField("answer"),
+        fields.IntegerField("order"),
+        fields.BooleanField("is_active"),
+    ]
+    
+
+
 # Admin Setup
 admin = Admin(
     engine,
@@ -278,6 +294,7 @@ admin.add_view(BlogView(Blog, icon="fa fa-newspaper"))
 admin.add_view(TestimonialView(Testimonial, icon="fa fa-quote-left"))
 admin.add_view(SocialMediaView(SocialMedia, icon="fa fa-share-alt"))
 admin.add_view(HomeFeatureView(HomeFeature, icon="fa fa-star", name="Home Features"))
+admin.add_view(FAQView(FAQ, icon="fa fa-question-circle", name="FAQs"))
 
 admin.mount_to(app)
 
@@ -294,6 +311,7 @@ def on_startup():
         ("manage_testimonials", "Manage testimonials"),
         ("manage_social_media", "Manage social media links"),
         ("manage_home_features", "Manage home features"),
+        ("manage_faqs", "Manage FAQs"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
