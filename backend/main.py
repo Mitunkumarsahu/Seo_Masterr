@@ -37,6 +37,8 @@ from models.about_hero import AboutHero
 from routes import about_hero
 from models.contact_hero import ContactHero
 from routes import contact_hero
+from models.subscription import Subscription
+from routes import subscription
 
 
 app = FastAPI()
@@ -66,6 +68,7 @@ app.include_router(why_choose_us.router)
 app.include_router(process_step.router)
 app.include_router(about_hero.router)
 app.include_router(contact_hero.router)
+app.include_router(subscription.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -95,6 +98,7 @@ class BaseModelView(ModelView):
             "process_step": "manage_process_steps",
             "about_hero": "manage_about_hero",
             "contact_hero": "manage_contact_hero",
+            "subscription": "manage_subscriptions",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -361,6 +365,22 @@ class ContactHeroView(BaseModelView):
     ]
 
 
+class SubscriptionView(BaseModelView):
+    identity = "subscription"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("email"),
+        fields.DateTimeField("created_at"),
+    ]
+    
+    # Disable create/delete from admin panel (use API instead)
+    def can_create(self, request: Request) -> bool:
+        return False
+    
+    # Optional: Disable editing
+    def can_edit(self, request: Request) -> bool:
+        return False
+    
 
 # Admin Setup
 admin = Admin(
@@ -386,6 +406,7 @@ admin.add_view(WhyChooseUsView(WhyChooseUs, icon="fa fa-question-circle", name="
 admin.add_view(ProcessStepView(ProcessStep, icon="fa fa-list-ol", name="Process Steps"))
 admin.add_view(AboutHeroView(AboutHero, icon="fa fa-image", name="About Hero"))
 admin.add_view(ContactHeroView(ContactHero, icon="fa fa-address-card", name="Contact Hero"))
+admin.add_view(SubscriptionView(Subscription, icon="fa fa-envelope", name="Subscriptions"))
 
 admin.mount_to(app)
 
@@ -408,6 +429,7 @@ def on_startup():
         ("manage_process_steps", "Manage Process Steps"),
         ("manage_about_hero", "Manage About Page Hero"),
         ("manage_contact_hero", "Manage Contact Page Hero"),
+        ("manage_subscriptions", "Manage subscriptions"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
