@@ -29,6 +29,8 @@ from models.home_feature import HomeFeature
 from models.faq import FAQ
 from models.best_works import BestWork
 from routes import best_works
+from models.why_choose_us import WhyChooseUs
+from routes import why_choose_us
 
 
 app = FastAPI()
@@ -54,6 +56,7 @@ app.include_router(social_media.router)
 app.include_router(home_feature.router)
 app.include_router(faq.router)
 app.include_router(best_works.router)
+app.include_router(why_choose_us.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -79,6 +82,7 @@ class BaseModelView(ModelView):
             "home_feature": "manage_home_features",
             "faq": "manage_faqs",
             "best_work": "manage_best_works",
+            "why_choose_us": "manage_why_choose_us",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -288,7 +292,28 @@ class BestWorkView(BaseModelView):
         fields.BooleanField("is_active"),
     ]
     
+class WhyChooseUsView(BaseModelView):
+    identity = "why_choose_us"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("heading", required=True),
+        fields.TextAreaField("description", required=True),
+        fields.StringField("image_url"),
+        fields.TextAreaField(
+            "points", 
+            required=True,
+            help_text="Enter each point on a new line"
+        ),
+        fields.BooleanField("is_active"),
+    ]
     
+    async def validate(self, request: Request, data: dict) -> dict:
+        # Ensure at least one point is provided
+        points = data.get("points", "").split("\n")
+        if not any(point.strip() for point in points):
+            raise FormValidationError({"points": "At least one point is required"})
+        return data
+ 
 
 
 # Admin Setup
@@ -311,6 +336,7 @@ admin.add_view(SocialMediaView(SocialMedia, icon="fa fa-share-alt"))
 admin.add_view(HomeFeatureView(HomeFeature, icon="fa fa-star", name="Home Features"))
 admin.add_view(FAQView(FAQ, icon="fa fa-question-circle", name="FAQs"))
 admin.add_view(BestWorkView(BestWork, icon="fa fa-star", name="Best Works"))
+admin.add_view(WhyChooseUsView(WhyChooseUs, icon="fa fa-question-circle", name="Why Choose Us"))
 
 admin.mount_to(app)
 
@@ -329,6 +355,7 @@ def on_startup():
         ("manage_home_features", "Manage home features"),
         ("manage_faqs", "Manage FAQs"),
         ("manage_best_works", "Manage Best Works"),
+        ("manage_why_choose_us", "Manage Why Choose Us section"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
