@@ -41,6 +41,8 @@ from models.subscription import Subscription
 from routes import subscription
 from models.contact_info import ContactInfo
 from routes import contact_info
+from models.contact_inquiry import ContactInquiry
+from routes import contact_inquiry
 
 
 app = FastAPI()
@@ -72,6 +74,7 @@ app.include_router(about_hero.router)
 app.include_router(contact_hero.router)
 app.include_router(subscription.router)
 app.include_router(contact_info.router)
+app.include_router(contact_inquiry.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -102,6 +105,7 @@ class BaseModelView(ModelView):
             "about_hero": "manage_about_hero",
             "contact_hero": "manage_contact_hero",
             "subscription": "manage_subscriptions",
+            "contact_inquiry": "manage_contact_inquiries",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -419,6 +423,29 @@ class ContactInfoView(BaseModelView):
         return data
 
 
+class ContactInquiryView(BaseModelView):
+    identity = "contact_inquiry"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("name"),
+        fields.StringField("email"),
+        fields.StringField("phone"),
+        fields.TextAreaField("message"),
+        fields.DateTimeField("created_at"),
+        fields.BooleanField("is_read"),
+    ]
+    
+    # Disable creating inquiries from admin panel (only via public API)
+    def can_create(self, request: Request) -> bool:
+        return False
+    
+    # Customize list view to highlight unread messages
+    def get_list_value(self, request: Request, obj: ContactInquiry, field: str):
+        value = super().get_list_value(request, obj, field)
+        if field == "is_read" and not obj.is_read:
+            return f'<strong style="color: red;">UNREAD</strong>'
+        return value
+
 # Admin Setup
 admin = Admin(
     engine,
@@ -445,6 +472,7 @@ admin.add_view(AboutHeroView(AboutHero, icon="fa fa-image", name="About Hero"))
 admin.add_view(ContactHeroView(ContactHero, icon="fa fa-address-card", name="Contact Hero"))
 admin.add_view(SubscriptionView(Subscription, icon="fa fa-envelope", name="Subscriptions"))
 admin.add_view(ContactInfoView(ContactInfo, icon="fa fa-address-book", name="Contact Info"))
+admin.add_view(ContactInquiryView(ContactInquiry, icon="fa fa-envelope", name="Contact Inquiries"))
 
 admin.mount_to(app)
 
@@ -469,6 +497,7 @@ def on_startup():
         ("manage_contact_hero", "Manage Contact Page Hero"),
         ("manage_subscriptions", "Manage subscriptions"),
         ("manage_contact_info", "Manage contact information"),
+        ("manage_contact_inquiries", "Manage contact inquiries"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
