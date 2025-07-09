@@ -9,6 +9,8 @@ from routes.auth import require_permission
 import uuid
 import os
 from typing import List
+from schemas.service import ServiceTypeCreate, ServiceTypeOut
+from service.service_service import create_service_type, get_service_types, get_service_type
 
 
 router = APIRouter(prefix="/services", tags=["Services"])
@@ -46,6 +48,30 @@ def create_new_service(
 def list_services(db: Session = Depends(get_db)):
     return get_services(db)
 
+
+
+@router.post("/types", response_model=ServiceTypeOut)
+def create_new_service_type(
+    service_type: ServiceTypeCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_permission("manage_services"))
+):
+    return create_service_type(db, service_type)
+
+@router.get("/types", response_model=List[ServiceTypeOut])
+def list_service_types(db: Session = Depends(get_db)):
+    return get_service_types(db)
+
+@router.get("/types/{type_id}", response_model=ServiceTypeOut)
+def get_service_type_by_id(type_id: int, db: Session = Depends(get_db)):
+    service_type = get_service_type(db, type_id)
+    if not service_type:
+        raise HTTPException(status_code=404, detail="Service type not found")
+    return service_type
+
+
+
+
 @router.get("/{service_id}", response_model=ServiceOut)
 def get_service_by_id(service_id: int, db: Session = Depends(get_db)):
     service = get_service(db, service_id)
@@ -70,3 +96,7 @@ def delete_existing_service(
 ):
     delete_service(db, service_id)
     return
+
+
+
+

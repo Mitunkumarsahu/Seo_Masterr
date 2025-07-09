@@ -1,41 +1,16 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Enum, Boolean
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from utils.db import Base
-import enum
 from sqlalchemy.dialects.mysql import LONGTEXT
 
-class ContentType(enum.Enum):
-    H1 = "h1"
-    H2 = "h2"
-    H3 = "h3"
-    PARAGRAPH = "paragraph"
-    BULLET = "bullet"
-    IMAGE = "image"
-    BOLD = "bold"
-    ITALIC = "italic"
-
-# class Service(Base):
-#     __tablename__ = "services"
+class ServiceType(Base):
+    __tablename__ = "service_types"
     
-#     id = Column(Integer, primary_key=True, index=True)
-#     title = Column(String(255), nullable=False)
-#     slug = Column(String(255), unique=True, nullable=False)
-#     meta_description = Column(Text)
-#     is_active = Column(Boolean, default=True)
-#     contents = relationship("ServiceContent", back_populates="service", cascade="all, delete-orphan")
-
-# class ServiceContent(Base):
-#     __tablename__ = "service_contents"
-    
-#     id = Column(Integer, primary_key=True, index=True)
-#     service_id = Column(Integer, ForeignKey("services.id"))
-#     order = Column(Integer, nullable=False, default=0)
-#     content_type = Column(Enum(ContentType), nullable=False)
-#     content = Column(Text, nullable=False)
-#     image_url = Column(String(255), nullable=True)  # For image content
-    
-#     service = relationship("Service", back_populates="contents")
-
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    slug = Column(String(100), unique=True, nullable=False)
+    description = Column(Text, nullable=True)
+    is_active = Column(Boolean, default=True)
 
 class Service(Base):
     __tablename__ = "services"
@@ -46,4 +21,8 @@ class Service(Base):
     meta_description = Column(Text)
     is_active = Column(Boolean, default=True)
     content = Column(LONGTEXT, nullable=True)
-    image_url = Column(String(512), nullable=True)  # stores image path or URL
+    image_url = Column(String(512), nullable=True)
+    
+    # Add relationship to service_type
+    service_type_id = Column(Integer, ForeignKey("service_types.id"))
+    service_type = relationship("ServiceType", backref="services")
