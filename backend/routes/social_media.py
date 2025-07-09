@@ -11,6 +11,7 @@ from service.social_media_service import (
 from utils.db import get_db
 from models.user import User
 from routes.auth import require_permission
+from typing import List
 
 router = APIRouter(prefix="/social-media", tags=["Social Media"])
 
@@ -22,7 +23,7 @@ def create_new_social_link(
 ):
     return create_social_media(db, social_media)
 
-@router.get("/", response_model=list[SocialMediaOut])
+@router.get("/", response_model=List[SocialMediaOut])
 def list_all_social_links(db: Session = Depends(get_db)):
     return get_all_social_media(db)
 

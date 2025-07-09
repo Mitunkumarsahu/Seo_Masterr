@@ -55,6 +55,8 @@ class ServiceBase(BaseModel):
     meta_description: Optional[str] = None
     is_active: bool = True
     content: str  # Add this field
+    image_url: Optional[HttpUrl] = None  # 👈 Add this
+
 
 class ServiceCreate(ServiceBase):
     pass

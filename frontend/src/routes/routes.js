@@ -4,6 +4,7 @@ import BlogPage from "../pages/BlogPage";
 import ContactUsPage from "../pages/ContactUsPage";
 import Dashboard from "../pages/Dashboard";
 import Home from "../pages/Home";
+import Services from "../pages/Services";
 
 const routes = {
   "routes": [
@@ -27,6 +28,12 @@ const routes = {
       "path": "/blogs",
       "component": BlogPage,
       "type": "public"
+    },
+    {
+      "path":"/services",
+      "component":Services,
+      "type":"public"
+
     },
     {
       "path": "/blog/:id",

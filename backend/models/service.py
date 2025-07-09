@@ -45,4 +45,5 @@ class Service(Base):
     slug = Column(String(255), unique=True, nullable=False)
     meta_description = Column(Text)
     is_active = Column(Boolean, default=True)
-    content = Column(LONGTEXT, nullable=True) 
+    content = Column(LONGTEXT, nullable=True)
+    image_url = Column(String(512), nullable=True)  # stores image path or URL

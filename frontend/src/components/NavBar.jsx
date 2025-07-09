@@ -38,7 +38,7 @@ export default function NavBar() {
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Blog", to: "/blogs" },
-    { label: "Services", to: "/service", isDropdown: true },
+    { label: "Services", to: "/services", isDropdown: true },
     { label: "About Us", to: "/about-us" },
     { label: "Contact Us", to: "/contact-us" },
   ];
@@ -82,28 +82,10 @@ export default function NavBar() {
               <Button sx={getLinkStyle("/blogs")}>Blog</Button>
             </NavLink>
 
-            <Button
-              sx={{ color: "white", "&:hover": { color: COLORS.green400 } }}
-              endIcon={<ChevronDown size={16} />}
-              onClick={(e) => handleMenuOpen(e, setServicesAnchorEl)}
-            >
-              Services
-            </Button>
-            <Menu
-              anchorEl={servicesAnchorEl}
-              open={Boolean(servicesAnchorEl)}
-              onClose={handleMenuClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              transformOrigin={{ vertical: "top", horizontal: "left" }}
-              PaperProps={{ sx: { width: 200, bgcolor: "white", color: COLORS.slate600 } }}
-              disableScrollLock
-            >
-              {["Web Development", "Mobile Apps", "UI/UX Design", "SEO Services"].map((txt) => (
-                <MenuItem key={txt} component={NavLink} to={`/${txt.toLowerCase().replace(/ /g, "-")}`} onClick={handleMenuClose}>
-                  {txt}
-                </MenuItem>
-              ))}
-            </Menu>
+           <NavLink to="/services" style={{ textDecoration: "none" }}>
+            <Button sx={getLinkStyle("/services")}>Services</Button>
+            </NavLink>
+
 
             <NavLink to="/about-us" style={{ textDecoration: "none" }}>
               <Button sx={getLinkStyle("/about-us")}>About Us</Button>

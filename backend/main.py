@@ -355,8 +355,7 @@ class ServiceView(BaseModelView):
         fields.StringField("slug"),
         fields.StringField("meta_description"),
         fields.BooleanField("is_active"),
-        # WysiwygField("content")  # Rich text editor
-        # TinyMCEEditorField("content")  # Rich text editor
+        fields.StringField("image_url"),
         TinyMCEEditorField(
             "content",
             extra_options={

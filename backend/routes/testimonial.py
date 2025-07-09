@@ -13,6 +13,7 @@ from models.user import User
 from routes.auth import require_permission
 import uuid
 import os
+from typing import List
 
 router = APIRouter(prefix="/testimonials", tags=["Testimonials"])
 
@@ -43,7 +44,7 @@ def create_new_testimonial(
 ):
     return create_testimonial(db, testimonial)
 
-@router.get("/", response_model=list[TestimonialOut])
+@router.get("/", response_model=List[TestimonialOut])
 def list_testimonials(db: Session = Depends(get_db)):
     return get_testimonials(db)
 
