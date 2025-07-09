@@ -5,7 +5,7 @@ from models.user import User, Permission
 from models.service import Service, ServiceType
 from models.service import ServiceType
 from models.blog import Blog, BlogCategory, ContentType as BlogContentType
-from routes import auth, service, blog, testimonial, social_media
+from routes import auth, service, blog, testimonial, social_media, home_feature
 from starlette_admin.contrib.sqla import Admin, ModelView
 from schemas.user import UserCreate
 from service.auth_service import create_user as create_user_service, get_user_by_email
@@ -18,12 +18,14 @@ from fastapi.requests import Request
 from utils.auth import hash_password, verify_password
 # from starlette_admin.fields import WysiwygField 
 from starlette_admin.fields import TinyMCEEditorField
+from starlette_admin.exceptions import FormValidationError
 from models.testimonial import Testimonial  
 from schemas.testimonial import TestimonialCreate  
 from service.testimonial_service import create_testimonial  
 from models.social_media import SocialMedia, SocialPlatform  # Add this
 from schemas.social_media import SocialMediaCreate  # Add this
 from service.social_media_service import create_social_media
+from models.home_feature import HomeFeature
 
 
 app = FastAPI()
@@ -46,6 +48,7 @@ app.include_router(service.router)
 app.include_router(blog.router)
 app.include_router(testimonial.router)
 app.include_router(social_media.router)
+app.include_router(home_feature.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -68,6 +71,7 @@ class BaseModelView(ModelView):
             "testimonial": "manage_testimonials",
             "social_media": "manage_social_media",
             "service_type": "manage_services",
+            "home_feature": "manage_home_features",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -220,6 +224,42 @@ class SocialMediaView(BaseModelView):
         fields.StringField("title_text"),
     ]
 
+
+class HomeFeatureView(BaseModelView):
+    identity = "home_feature"
+    fields = [
+        fields.IntegerField("id", read_only=True),
+        fields.IntegerField("position"),
+        fields.StringField("heading"),
+        fields.TextAreaField("description"),
+        fields.StringField("image_url"),
+    ]
+    
+    def can_create(self, request: Request) -> bool:
+        return True
+    
+    def can_delete(self, request: Request) -> bool:
+        return True
+    
+    # Corrected validate method with proper parameters
+    async def validate(self, request: Request, data: dict) -> dict:
+        """
+        Validate feature data
+        """
+        # Ensure position is between 1-3
+        position = data.get("position")
+        if position not in [1, 2, 3]:
+            raise FormValidationError({"position": "Position must be 1, 2, or 3"})
+        
+        # Ensure all required fields are present
+        required_fields = ["position", "heading", "description", "image_url"]
+        for field in required_fields:
+            if not data.get(field):
+                raise FormValidationError({field: "This field is required"})
+                
+        return data
+
+
 # Admin Setup
 admin = Admin(
     engine,
@@ -237,6 +277,7 @@ admin.add_view(BlogView(Blog, icon="fa fa-newspaper"))
 # admin.add_view(BlogContentView(BlogContent, icon="fa fa-list-alt"))
 admin.add_view(TestimonialView(Testimonial, icon="fa fa-quote-left"))
 admin.add_view(SocialMediaView(SocialMedia, icon="fa fa-share-alt"))
+admin.add_view(HomeFeatureView(HomeFeature, icon="fa fa-star", name="Home Features"))
 
 admin.mount_to(app)
 
@@ -252,6 +293,7 @@ def on_startup():
         ("manage_users", "Manage users"),
         ("manage_testimonials", "Manage testimonials"),
         ("manage_social_media", "Manage social media links"),
+        ("manage_home_features", "Manage home features"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
