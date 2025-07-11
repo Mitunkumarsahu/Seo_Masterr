@@ -1,39 +1,33 @@
 import {
-    Box,
-    Button,
-    Typography,
-    useMediaQuery,
-    useTheme,
+  Box,
+  Button,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import React from "react";
-import  style  from "../styles/Styles";
+import style from "../styles/Styles";
 
-
-export default function HeroSection() {
+export default function HeroSection({ data }) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // (kept for future use)
   const styles = style.heroSection;
+
+  if (!data) return null; // or loading UI
 
   return (
     <Box sx={styles.heroContainer}>
       {/* Left Section */}
       <Box sx={styles.leftSection}>
         <Typography component="h1" sx={styles.title}>
-          Lorem Ipsum
-          <br />
-          Has Been The
-          <br />
-          Industry's Standard
+          {data.heading}
         </Typography>
 
         <Typography sx={styles.description}>
-          Lorem Ipsum has been the industry's standard dummy text ever since the
-          1500s, when an unknown printer took a galley of type and scrambled it
-          to make a type specimen book.
+          {data.description}
         </Typography>
 
         <Button variant="contained" sx={styles.button}>
-          Lorem Ipsum Has
+          Learn More
         </Button>
       </Box>
 
@@ -41,7 +35,7 @@ export default function HeroSection() {
       <Box sx={styles.rightSection}>
         <Box
           component="img"
-          src="https://plus.unsplash.com/premium_photo-1749319835913-a76b7506ee12?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          src={data.image_url}
           alt="Hero Image"
           sx={styles.heroImage}
         />

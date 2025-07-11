@@ -8,48 +8,50 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useApi from "../hooks/useApi";
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
   const [serviceTypes, setServiceTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("all");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch("http://127.0.0.1:8000/services/");
-        const data = await res.json();
-        setServices(data);
-        setFilteredServices(data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching services:", err);
-        setError("Failed to fetch services.");
-        setLoading(false);
-      }
-    };
-    fetchServices();
-  }, []);
+  const {
+    apiCall: getServices,
+    loading: servicesLoading,
+    error: servicesError,
+    data: servicesData,
+  } = useApi();
+
+  const {
+    apiCall: getServiceTypes,
+    loading: serviceTypesLoading,
+    error: serviceTypesError,
+    data: serviceTypesData,
+  } = useApi();
 
   useEffect(() => {
-    const fetchTypes = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/services/types");
-        const data = await res.json();
-        setServiceTypes(data);
-      } catch (err) {
-        console.error("Error fetching service types:", err);
-      }
-    };
-    fetchTypes();
+    getServices("http://127.0.0.1:8000/services/");
+    getServiceTypes("http://127.0.0.1:8000/services/types");
   }, []);
+
+  // Set services when data is received
+  useEffect(() => {
+    if (servicesData) {
+      setServices(servicesData);
+      setFilteredServices(servicesData);
+    }
+  }, [servicesData]);
+
+  // Set service types when data is received
+  useEffect(() => {
+    if (serviceTypesData) {
+      setServiceTypes(serviceTypesData);
+    }
+  }, [serviceTypesData]);
 
   useEffect(() => {
     if (selectedType === "all") {
@@ -61,6 +63,9 @@ const Services = () => {
       setFilteredServices(filtered);
     }
   }, [selectedType, services]);
+
+  const loading = servicesLoading || serviceTypesLoading;
+  const error = servicesError || serviceTypesError;
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>

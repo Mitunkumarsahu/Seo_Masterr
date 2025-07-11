@@ -8,44 +8,53 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
+import useApi from "../hooks/useApi";
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 6;
   const navigate = useNavigate();
 
+  // API hooks for blogs and categories
+  const {
+    apiCall: getBlogs,
+    loading: blogsLoading,
+    error: blogsError,
+    data: blogsData,
+  } = useApi();
+
+  const {
+    apiCall: getCategories,
+    loading: categoriesLoading,
+    error: categoriesError,
+    data: categoriesData,
+  } = useApi();
 
   // Fetch blogs and categories
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [blogsRes, categoriesRes] = await Promise.all([
-          fetch("http://127.0.0.1:8000/blogs/"),
-          fetch("http://127.0.0.1:8000/blogs/categories"),
-        ]);
-
-        const blogsData = await blogsRes.json();
-        const categoriesData = await categoriesRes.json();
-
-        setBlogs(blogsData);
-        setFilteredBlogs(blogsData);
-        setCategories(categoriesData);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error loading blogs or categories:", err);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    getBlogs("http://127.0.0.1:8000/blogs/");
+    getCategories("http://127.0.0.1:8000/blogs/categories");
   }, []);
+
+  // Set blogs when data is received
+  useEffect(() => {
+    if (blogsData) {
+      setBlogs(blogsData);
+      setFilteredBlogs(blogsData);
+    }
+  }, [blogsData]);
+
+  // Set categories when data is received
+  useEffect(() => {
+    if (categoriesData) {
+      setCategories(categoriesData);
+    }
+  }, [categoriesData]);
 
   // Filter blogs by category
   useEffect(() => {
@@ -68,6 +77,8 @@ const BlogPage = () => {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
+
+  const loading = blogsLoading || categoriesLoading;
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
@@ -245,6 +256,5 @@ const CategoryTab = ({ label, selected, onClick }) => (
     {label}
   </Button>
 );
-
 
 export default BlogPage;

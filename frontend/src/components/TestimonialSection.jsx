@@ -1,33 +1,40 @@
-import React from 'react';
-import { Box, Typography, Grid, Avatar, Paper, Stack } from '@mui/material';
+import React, { useEffect } from 'react';
+import {
+  Avatar,
+  Box,
+  Typography,
+  Grid,
+  Paper,
+  Stack,
+} from '@mui/material';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import StarIcon from '@mui/icons-material/Star';
 import { motion } from 'framer-motion';
-import style, { cardMotion } from '../styles/Styles'; // Import styles
-
-const testimonials = [
-  {
-    name: 'Sarah Johnson',
-    title: 'CEO · TechCorp',
-    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    quote: 'Smile helped us scale our digital presence. Their team is amazing and very professional.',
-  },
-  {
-    name: 'James Miller',
-    title: 'Founder · Startly',
-    avatar: 'https://randomuser.me/api/portraits/men/65.jpg',
-    quote: 'The designs and development were top‑notch. We loved working with them!',
-  },
-  {
-    name: 'Emily Brown',
-    title: 'Head of Marketing · CreativeEdge',
-    avatar: 'https://randomuser.me/api/portraits/women/79.jpg',
-    quote: 'Highly recommend Smile. Their service exceeded our expectations in every way.',
-  },
-];
+import style, { cardMotion } from '../styles/Styles'; // Keep styles as is
+import useApi from '../hooks/useApi';
 
 export default function TestimonialSection() {
-    const styles = style.testimonialSection;
+  const styles = style.testimonialSection;
+
+  const {
+    apiCall: getTestimonials,
+    data,
+    loading,
+    error,
+  } = useApi();
+
+  useEffect(() => {
+    getTestimonials('http://127.0.0.1:8000/testimonials/');
+  }, []);
+
+  const testimonials = (data || [])
+    .filter((t) => t.is_active)
+    .sort((a, b) => a.order - b.order);
+
+  if (loading) return <Typography align="center">Loading testimonials...</Typography>;
+  if (error) return <Typography align="center" color="error">Failed to load testimonials.</Typography>;
+  if (testimonials.length === 0) return null;
+
   return (
     <Box sx={styles.wrapper}>
       <Typography variant="h5" sx={styles.headline}>
@@ -37,7 +44,7 @@ export default function TestimonialSection() {
       <Grid container spacing={4} justifyContent="center">
         {testimonials.map((t, i) => (
           <Grid
-            key={i}
+            key={t.id}
             item
             xs={12}
             sm={6}
@@ -54,16 +61,16 @@ export default function TestimonialSection() {
               <FormatQuoteIcon sx={styles.quoteIcon} />
 
               <Typography variant="body2" sx={styles.quoteText}>
-                “{t.quote}”
+                “{t.content}”
               </Typography>
 
-              <Avatar src={t.avatar} alt={t.name} sx={styles.avatar} />
+              <Avatar src={t.image_url} alt={t.client_name} sx={styles.avatar} />
 
               <Typography variant="subtitle2" sx={styles.name}>
-                {t.name}
+                {t.client_name}
               </Typography>
               <Typography variant="caption" sx={styles.title}>
-                {t.title}
+                {t.client_title} · {t.company}
               </Typography>
 
               <Stack direction="row" spacing={0.5} sx={styles.stars}>

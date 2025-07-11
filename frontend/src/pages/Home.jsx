@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import HeroSection from '../components/HeroSection';
 import HomeServiceCards from '../components/HomeServiceCards';
 import FeatureSection from '../components/FeatureSection';
@@ -8,49 +8,31 @@ import HomeFooterSearch from '../components/HomeFooterSearch';
 import useApi from '../hooks/useApi';
 
 export default function Home() {
+  const { apiCall: getHomeFeatures, loading, error, data } = useApi();
 
-                /* Demo api testing
+  useEffect(() => {
+    const fetchFeatures = async () => {
+      try {
+        await getHomeFeatures('http://127.0.0.1:8000/home-features/');
+      } catch (error) {
+        console.error('Failed to fetch home features:', error);
+      }
+    };
 
-                          // const {apiCall:getUserDetails, loading:userLoading, error:userError, data:userData} = useApi();
+    fetchFeatures();
+  }, []);
 
-                          // useEffect(() => {
-
-                          //   if(userLoading) {
-                          //     console.log('Loading user details...');
-                          //   }
-                          //   if(userError) {
-                          //     console.error('Error fetching user details:', userError);
-                          //   }
-                          //   if(userData) {
-                          //     console.log('User details fetched successfully:', userData);
-                          //   }
-
-                          // },[userData,userError]);
-
-                          // useEffect(() => {
-                          //   const fetchUserDetails = async () => {
-                          //     try {
-                          //       await getUserDetails('https://fake-json-api.mock.beeceptor.com/users');
-                          //     } catch (error) {
-                          //       console.error('Failed to fetch user details:', error);
-                          //     }
-                          //   };
-
-                          //   fetchUserDetails();
-                          // }, []);
-                          
-                */
+  const position1Data = data?.find(item => item.position === 1);
+  const position2Data = data?.find(item => item.position === 2);
 
   return (
-   //hero section
-   <>
-   <HeroSection />
-   <HomeServiceCards />
-   <FeatureSection />
-   <HomeAboutusSection />
-   <TestimonialSection/>
-   <HomeFooterSearch/>
-   </>
-
+    <>
+      <HeroSection data={position1Data} />
+      <HomeServiceCards />
+      <FeatureSection />
+      <HomeAboutusSection data={position2Data} />
+      <TestimonialSection />
+      <HomeFooterSearch />
+    </>
   );
 }
