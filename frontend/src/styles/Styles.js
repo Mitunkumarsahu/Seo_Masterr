@@ -250,7 +250,7 @@ const style = {
   /* ───────────────────── Feature Section ─────────────────── */
   featureSection: {
     wrapper: {
-      bgcolor: COLORS.navyBg,
+      bgcolor: COLORS.primary,
       color: COLORS.white,
       py: 6,
       px: 2,
@@ -403,7 +403,7 @@ const style = {
       px: 5,
       py: 2.5,
       textTransform: "uppercase",
-      borderRadius: 50,
+      borderRadius: 5,
       width: "fit-content",
       position: "relative",
       overflow: "hidden",
@@ -522,31 +522,6 @@ const style = {
       background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
       position: "relative",
       overflow: "hidden",
-      "&::before": {
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(30, 58, 138, 0.1) 0%, transparent 50%)",
-        pointerEvents: "none",
-      },
-      "&::after": {
-        content: '""',
-        position: "absolute",
-        top: "-50%",
-        left: "-50%",
-        width: "200%",
-        height: "200%",
-        background: "conic-gradient(from 0deg, transparent, rgba(16, 185, 129, 0.05), transparent 90deg)",
-        animation: "testimonialRotate 30s linear infinite",
-        pointerEvents: "none",
-      },
-      "@keyframes testimonialRotate": {
-        "0%": { transform: "rotate(0deg)" },
-        "100%": { transform: "rotate(360deg)" },
-      },
     },
     headline: {
       textAlign: "center",
