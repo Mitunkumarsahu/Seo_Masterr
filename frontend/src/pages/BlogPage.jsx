@@ -1,198 +1,250 @@
-// src/pages/BlogPage.jsx
+import React, { useEffect, useState } from "react";
 import {
-  Avatar,
   Box,
-  Button,
   Container,
-  Typography
+  Typography,
+  Button,
+  Pagination,
+  CircularProgress,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-const POSTS = [
-  { id: 1, category: "Lorem", title: "Lorem Ipsum", excerpt: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", author: "Lorem Ipsum" },
-  { id: 2, category: "Ipsum", title: "Lorem Ipsum", excerpt: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", author: "Lorem Ipsum" },
-  { id: 3, category: "Has Been", title: "Lorem Ipsum", excerpt: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", author: "Lorem Ipsum" },
-  { id: 4, category: "Lorem", title: "Lorem Ipsum", excerpt: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", author: "Lorem Ipsum" },
-  { id: 5, category: "Ipsum", title: "Lorem Ipsum", excerpt: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", author: "Lorem Ipsum" },
-  { id: 6, category: "The Industry's", title: "Lorem Ipsum", excerpt: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", author: "Lorem Ipsum" }
-];
-
 const BlogPage = () => {
-  const categories = useMemo(() => ["All", ...new Set(POSTS.map(p => p.category))], []);
-  const [activeCat, setActiveCat] = useState("All");
-  const visiblePosts = activeCat === "All" ? POSTS : POSTS.filter(p => p.category === activeCat);
+  const [blogs, setBlogs] = useState([]);
+  const [filteredBlogs, setFilteredBlogs] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  return (
-    <Box sx={{ backgroundColor: "#fff" }}>
-      <Container maxWidth="xl" sx={{ py: 8 }}>
-        {/* Heading */}
-        <Typography variant="h3" fontWeight="bold" textAlign="center" mb={6}>
-          Lorem Ipsum Has
-        </Typography>
-
-        {/* Category Bar */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 4,
-            mb: 8,
-            flexWrap: "wrap"
-          }}
-        >
-          {categories.map(cat => (
-            <Typography
-              key={cat}
-              onClick={() => setActiveCat(cat)}
-              sx={{
-                cursor: "pointer",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                borderBottom: activeCat === cat ? "2px solid #000" : "2px solid transparent",
-                pb: 1,
-                color: activeCat === cat ? "#000" : "#888",
-                "&:hover": { color: "#000" }
-              }}
-            >
-              {cat}
-            </Typography>
-          ))}
-        </Box>
-
-        {/* First 3 Blog Cards */}
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
-            justifyContent: "space-around",
-            mb: 8,
-            px: 2
-          }}
-        >
-          {visiblePosts.slice(0, 3).map(post => (
-            <Box
-              key={post.id}
-              sx={{
-                flex: "1 1 360px",
-                maxWidth: "380px"
-              }}
-            >
-              <BlogCard post={post} />
-            </Box>
-          ))}
-        </Box>
-      </Container>
-
-      {/* CTA Section */}
-      <Box sx={{ backgroundColor: "#0b2a4d", py: 8, px: 2 }}>
-        <Container maxWidth="md">
-          <Typography variant="body1" sx={{ color: "#fff", textAlign: "center", mb: 4 }}>
-            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-            when an unknown printer took a galley of type and scrambled it to make a type
-            specimen book. It has survived not only five centuries, but also the leap into
-            electronic typesetting, remaining essentially unchanged.
-          </Typography>
-          <Box display="flex" justifyContent="center">
-            <Button
-              variant="contained"
-              sx={{ backgroundColor: "#00C896", px: 5, py: 2 }}
-            >
-              LOREM IPSUM
-            </Button>
-          </Box>
-        </Container>
-      </Box>
-
-      {/* Remaining Blog Cards */}
-      <Container maxWidth="xl" sx={{ py: 8 }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
-            justifyContent: "space-around",
-            px: 2
-          }}
-        >
-          {visiblePosts.slice(3).map(post => (
-            <Box
-              key={post.id}
-              sx={{
-                flex: "1 1 360px",
-                maxWidth: "380px"
-              }}
-            >
-              <BlogCard post={post} />
-            </Box>
-          ))}
-        </Box>
-      </Container>
-    </Box>
-  );
-};
-
-
-const BlogCard = ({ post }) => {
+  const ITEMS_PER_PAGE = 6;
   const navigate = useNavigate();
 
+
+  // Fetch blogs and categories
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [blogsRes, categoriesRes] = await Promise.all([
+          fetch("http://127.0.0.1:8000/blogs/"),
+          fetch("http://127.0.0.1:8000/blogs/categories"),
+        ]);
+
+        const blogsData = await blogsRes.json();
+        const categoriesData = await categoriesRes.json();
+
+        setBlogs(blogsData);
+        setFilteredBlogs(blogsData);
+        setCategories(categoriesData);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error loading blogs or categories:", err);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter blogs by category
+  useEffect(() => {
+    setCurrentPage(1); // Reset to page 1 on category change
+    if (selectedCategory === "all") {
+      setFilteredBlogs(blogs);
+    } else {
+      const filtered = blogs.filter((blog) =>
+        blog.categories?.some((cat) => cat.slug === selectedCategory)
+      );
+      setFilteredBlogs(filtered);
+    }
+  }, [selectedCategory, blogs]);
+
+  const paginatedBlogs = filteredBlogs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   return (
-    <Box
-      sx={{
-        border: "1px solid #e0e0e0",
-        borderRadius: "12px",
-        backgroundColor: "#fff",
-        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.06)",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        transition: "transform 0.2s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-6px)"
-        }
-      }}
-    >
-      <Box sx={{ height: 200, width: "100%", backgroundColor: "#ccc" }} />
-
-      <Box sx={{ p: 3, display: "flex", flexDirection: "column", height: "100%" }}>
-        <Typography variant="caption" sx={{ color: "#0d66ff", fontWeight: 700, mb: 0.8 }}>
-          {post.category}
-        </Typography>
-
-        <Typography variant="h5" fontWeight="bold" sx={{ mb: 1.5 }}>
-          {post.title}
-        </Typography>
-
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
-          {post.excerpt}
-        </Typography>
-
+    <Box sx={{ backgroundColor: "#f9f9f9" }}>
+      {/* Header */}
+      <Box
+        sx={{
+          background: "linear-gradient(to top, rgba(12, 47, 88, 1), rgba(12, 47, 88, 0))",
+          py: 6,
+          textAlign: "center",
+        }}
+      >
         <Typography
-          variant="body2"
-          sx={{
-            color: "#0d66ff",
-            fontWeight: 600,
-            mb: 2,
-            cursor: "pointer",
-            "&:hover": { textDecoration: "underline" }
-          }}
-          onClick={() => navigate(`/blog/${post.id}`)}
+          variant="h3"
+          fontWeight="bold"
+          sx={{ color: "#fff", mb: 2 }}
         >
-          LEARN MORE →
+          Blogs
         </Typography>
-
-        <Box sx={{ display: "flex", alignItems: "center", mt: "auto" }}>
-          <Avatar sx={{ width: 28, height: 28, mr: 1.5, bgcolor: "#ccc" }} />
-          <Typography variant="body2" color="text.primary">
-            {post.author}
-          </Typography>
-        </Box>
       </Box>
+
+      <Container maxWidth="xl" sx={{ py: 6 }}>
+        {/* Category Tabs */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            justifyContent: "center",
+            mb: 6,
+          }}
+        >
+          <CategoryTab
+            label="All"
+            selected={selectedCategory === "all"}
+            onClick={() => setSelectedCategory("all")}
+          />
+          {categories.map((cat) => (
+            <CategoryTab
+              key={cat.id}
+              label={cat.name}
+              selected={selectedCategory === cat.slug}
+              onClick={() => setSelectedCategory(cat.slug)}
+            />
+          ))}
+        </Box>
+
+        {/* Blog List */}
+        {loading ? (
+          <Box display="flex" justifyContent="center" mt={6}>
+            <CircularProgress />
+          </Box>
+        ) : filteredBlogs.length === 0 ? (
+          <Typography textAlign="center" mt={4}>
+            No blogs found for this category.
+          </Typography>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              gap: 3,
+            }}
+          >
+            {paginatedBlogs.map((blog) => (
+              <Box
+                key={blog.id}
+                sx={{
+                  flex: "1 1 calc(33.33% - 2rem)",
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
+                  px: 3,
+                  py: 2,
+                  minWidth: "250px",
+                  maxWidth: "calc(33.33% - 2rem)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  transition: "0.3s",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                  },
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: "#00C896", fontWeight: 600 }}
+                >
+                  {blog.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#333", mt: 1, mb: 2 }}
+                >
+                  {blog.meta_description}
+                </Typography>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "gray", fontWeight: 500 }}
+                  >
+                    {blog.author}
+                  </Typography>
+                  <Box
+                    sx={{
+                      width: "30px",
+                      height: "30px",
+                      borderRadius: "50%",
+                      backgroundColor: "#ddd",
+                    }}
+                  />
+                </Box>
+
+                {/* New Read More Button */}
+                <Button
+                  variant="outlined"
+                  sx={{ mt: 2, alignSelf: "flex-start", borderRadius: "20px" }}
+                  onClick={() => navigate(`/blog/${blog.id}`)}
+                >
+                  Read More
+                </Button>
+              </Box>
+            ))}
+          </Box>
+        )}
+
+        {/* Conditional Pagination */}
+        {filteredBlogs.length > ITEMS_PER_PAGE && (
+          <Box sx={{ mt: 6, display: "flex", justifyContent: "center" }}>
+            <Pagination
+              count={Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE)}
+              page={currentPage}
+              onChange={handlePageChange}
+              shape="rounded"
+              color="primary"
+            />
+          </Box>
+        )}
+      </Container>
     </Box>
   );
 };
+
+// Category Tab Button Component
+const CategoryTab = ({ label, selected, onClick }) => (
+  <Button
+    onClick={onClick}
+    variant="outlined"
+    size="small"
+    sx={{
+      backgroundColor: selected ? "#0C2F58" : "#ffffff",
+      color: selected ? "#fff" : "#0C2F58",
+      border: "1px solid #0C2F58",
+      fontWeight: 700,
+      fontSize: "0.75rem",
+      borderRadius: "20px",
+      px: 2.5,
+      py: 0.75,
+      textTransform: "capitalize",
+      minWidth: "auto",
+      "&:hover": {
+        backgroundColor: selected ? "#092342" : "#e0eaff",
+        borderColor: "#0C2F58",
+      },
+    }}
+  >
+    {label}
+  </Button>
+);
 
 
 export default BlogPage;

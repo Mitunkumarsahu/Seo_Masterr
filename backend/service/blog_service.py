@@ -174,4 +174,15 @@ def delete_blog(db: Session, blog_id: int):
         db.commit()
 
 def create_category(db: Session, category_data: BlogCategoryCreate):
-    db_category = Blo
+    db_category = BlogCategory(
+        name=category_data.name,
+        slug=category_data.slug,
+        description=category_data.description
+    )
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category
+
+def get_categories(db: Session):
+    return db.query(BlogCategory).all()
