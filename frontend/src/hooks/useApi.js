@@ -1,48 +1,98 @@
-// hooks/useApi.js
-import { useState } from 'react'
+// // hooks/useApi.js
+// import { useState } from 'react'
+
+// const useApi = () => {
+//   const [loading, setLoading] = useState(false)
+//   const [error, setError] = useState(null)
+//   const [data, setData] = useState(null)
+
+//   const apiCall = async (url, method = 'GET', bodyData = null, customHeaders = {}) => {
+//     setLoading(true)
+//     setError(null)
+//     setData(null)
+
+//     try {
+//       const config = {
+//         method,
+//         headers: {
+//           'Content-Type': 'application/json',
+//           ...customHeaders, // merge dynamic headers
+//         },
+//       }
+
+//       if (bodyData && ['POST', 'PUT', 'PATCH'].includes(method)) {
+//         config.body = JSON.stringify(bodyData)
+//       }
+
+//       const response = await fetch(url, config)
+
+//       if (!response.ok) {
+//         const errorText = await response.text()
+//         throw new Error(`Error ${response.status}: ${errorText}`)
+//       }
+
+//       const result = await response.json()
+//       setData(result)
+//       return result
+//     } catch (err) {
+//       setError(err.message)
+//       throw err
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   return { apiCall, loading, error, data }
+// }
+
+// export default useApi
+
+
+
+import { useState, useCallback } from 'react';
 
 const useApi = () => {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
 
-  const apiCall = async (url, method = 'GET', bodyData = null, customHeaders = {}) => {
-    setLoading(true)
-    setError(null)
-    setData(null)
+  const apiCall = useCallback(async (url, method = 'GET', bodyData = null, customHeaders = {}) => {
+    setLoading(true);
+    setError(null);
+    setData(null);
 
     try {
       const config = {
         method,
         headers: {
           'Content-Type': 'application/json',
-          ...customHeaders, // merge dynamic headers
+          ...customHeaders,
         },
-      }
+      };
 
       if (bodyData && ['POST', 'PUT', 'PATCH'].includes(method)) {
-        config.body = JSON.stringify(bodyData)
+        config.body = JSON.stringify(bodyData);
       }
 
-      const response = await fetch(url, config)
+      const response = await fetch(url, config);
 
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Error ${response.status}: ${errorText}`)
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
       }
 
-      const result = await response.json()
-      setData(result)
-      return result
+      const result = await response.json();
+      setData(result);
+      return result;
     } catch (err) {
-      setError(err.message)
-      throw err
+      setError(err.message);
+      throw err;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []); // <== useCallback dependency array
 
-  return { apiCall, loading, error, data }
-}
+  return { apiCall, loading, error, data };
+};
 
-export default useApi
+export default useApi;

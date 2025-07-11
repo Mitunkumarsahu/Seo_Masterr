@@ -848,6 +848,23 @@ const style = {
       lineHeight: 1.6,
       mb: 2,
     },
+    container: {
+      px: { xs: 2, sm: 4, md: 8 },
+      py: { xs: 4, sm: 6, md: 8 },
+      backgroundColor: '#f7f9fc',
+    },
+    accordion: {
+      mb: 2,
+      borderRadius: 2,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+      '&:before': { display: 'none' },
+      transition: 'all 0.3s ease-in-out',
+    },
+    summary: {
+      '& .MuiAccordionSummary-content': {
+        marginY: 1,
+      },
+    },
 
     /* ---------- CTA ---------- */
     ctaWrapper: {
