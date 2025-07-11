@@ -43,6 +43,8 @@ from models.contact_info import ContactInfo
 from routes import contact_info
 from models.contact_inquiry import ContactInquiry
 from routes import contact_inquiry
+from models.achievement import Achievement
+from routes import achievement
 
 
 app = FastAPI()
@@ -75,6 +77,7 @@ app.include_router(contact_hero.router)
 app.include_router(subscription.router)
 app.include_router(contact_info.router)
 app.include_router(contact_inquiry.router)
+app.include_router(achievement.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -106,6 +109,7 @@ class BaseModelView(ModelView):
             "contact_hero": "manage_contact_hero",
             "subscription": "manage_subscriptions",
             "contact_inquiry": "manage_contact_inquiries",
+            "achievement": "manage_achievements",
         }
         
         required_perm = permission_map.get(self.identity)
@@ -445,6 +449,17 @@ class ContactInquiryView(BaseModelView):
         if field == "is_read" and not obj.is_read:
             return f'<strong style="color: red;">UNREAD</strong>'
         return value
+    
+
+class AchievementView(BaseModelView):
+    identity = "achievement"
+    fields = [
+        fields.IntegerField("id"),
+        fields.StringField("title", required=True),
+        fields.IntegerField("count", required=True),
+        fields.StringField("image_url"),
+    ]
+
 
 # Admin Setup
 admin = Admin(
@@ -464,6 +479,7 @@ admin.add_view(BlogView(Blog, icon="fa fa-newspaper"))
 admin.add_view(TestimonialView(Testimonial, icon="fa fa-quote-left"))
 admin.add_view(SocialMediaView(SocialMedia, icon="fa fa-share-alt"))
 admin.add_view(HomeFeatureView(HomeFeature, icon="fa fa-star", name="Home Features"))
+admin.add_view(AchievementView(Achievement, icon="fa fa-trophy", name="Achievements"))
 admin.add_view(FAQView(FAQ, icon="fa fa-question-circle", name="FAQs"))
 admin.add_view(BestWorkView(BestWork, icon="fa fa-star", name="Best Works"))
 admin.add_view(WhyChooseUsView(WhyChooseUs, icon="fa fa-question-circle", name="Why Choose Us"))
@@ -498,6 +514,7 @@ def on_startup():
         ("manage_subscriptions", "Manage subscriptions"),
         ("manage_contact_info", "Manage contact information"),
         ("manage_contact_inquiries", "Manage contact inquiries"),
+        ("manage_achievements", "Manage achievements"),
     ]
     for name, desc in required_permissions:
         if not db.query(Permission).filter(Permission.name == name).first():
