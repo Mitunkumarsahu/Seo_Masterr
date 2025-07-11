@@ -16,6 +16,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import { ChevronDown, Menu as MenuIcon } from "lucide-react";import { NavLink, useLocation } from "react-router-dom"; // ← Import this
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import AuthModal from './AuthModal';
+
 
 const COLORS = {
   blue800: "#1e3a8a",
@@ -29,6 +32,8 @@ const COLORS = {
 export default function NavBar() {
   const [servicesAnchorEl, setServicesAnchorEl] = useState(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
   const location = useLocation();
 
   const handleMenuOpen = (event, setter) => setter(event.currentTarget);
@@ -51,6 +56,7 @@ export default function NavBar() {
 
   return (
     <>
+    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <AppBar position="sticky" elevation={0} sx={{ bgcolor: COLORS.blue800 }}>
         <Toolbar sx={{ minHeight: 64 }}>
           {/* Logo */}
@@ -97,7 +103,7 @@ export default function NavBar() {
 
           {/* Auth Buttons */}
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
-            <Button variant="outlined" sx={{
+            {/* <Button variant="outlined" sx={{
               color: "white", borderColor: "white",
               "&:hover": { bgcolor: "white", color: COLORS.blue800 },
             }}>
@@ -108,8 +114,33 @@ export default function NavBar() {
               "&:hover": { bgcolor: COLORS.green600 },
             }}>
               Sign&nbsp;Up
+            </Button> */}
+
+            <Button
+              variant="outlined"
+              onClick={() => setAuthModalOpen(true)}
+              sx={{
+                color: "white",
+                borderColor: "white",
+                "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+              }}
+            >
+              Login
             </Button>
+            <Button
+              variant="contained"
+              onClick={() => setAuthModalOpen(true)}
+              sx={{
+                bgcolor: COLORS.green500,
+                "&:hover": { bgcolor: COLORS.green600 },
+              }}
+            >
+              Sign&nbsp;Up
+            </Button>
+
           </Box>
+
+          
 
           {/* Mobile Toggle */}
           <IconButton
@@ -151,7 +182,7 @@ export default function NavBar() {
           </List>
           <Divider sx={{ borderColor: COLORS.slate700, my: 2 }} />
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button fullWidth variant="outlined" sx={{
+            {/* <Button fullWidth variant="outlined" sx={{
               color: "white", borderColor: "white",
               "&:hover": { bgcolor: "white", color: COLORS.blue800 },
             }}>
@@ -162,10 +193,45 @@ export default function NavBar() {
               "&:hover": { bgcolor: COLORS.green600 },
             }}>
               Sign&nbsp;Up
-            </Button>
+            </Button> */}
+            <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => {
+              setAuthModalOpen(true);
+              toggleDrawer();
+            }}
+            sx={{
+              color: "white",
+              borderColor: "white",
+              "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+            }}
+          >
+            Login
+          </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => {
+              setAuthModalOpen(true);
+              toggleDrawer();
+            }}
+            sx={{
+              bgcolor: COLORS.green500,
+              "&:hover": { bgcolor: COLORS.green600 },
+            }}
+          >
+            Sign&nbsp;Up
+          </Button>
           </Box>
+          
+
         </Box>
       </Drawer>
+
+
+      <AuthModal open={authModalOpen} handleClose={() => setAuthModalOpen(false)} />
+    </GoogleOAuthProvider>
     </>
   );
 }
