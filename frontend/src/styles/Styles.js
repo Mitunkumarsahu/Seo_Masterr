@@ -102,6 +102,10 @@ const style = {
       color: COLORS.primary,
       fontWeight: "bold",
       fontSize: { xs: "20px", sm: "24px", md: "28px" },
+      background: 'linear-gradient(45deg, #0C2F58, #1a5490)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
     },
     scrollContainer: {
       display: "flex",
@@ -116,7 +120,7 @@ const style = {
         height: "8px",
       },
       "&::-webkit-scrollbar-thumb": {
-        backgroundColor: COLORS.greyThumb,
+        background: 'linear-gradient(45deg, #0C2F58, #1a5490)',
         mt: 2,
         borderRadius: "4px",
       },
@@ -131,18 +135,70 @@ const style = {
       borderRadius: 2,
       p: 2,
       flexShrink: 0,
+      position: "relative",
+      overflow: "hidden",
+      backgroundColor: "#fff",
       boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
+      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        bottom: "-100%",
+        left: 0,
+        width: "100%",
+        height: "100%",
+        background: "linear-gradient(to top, #0C2F58, #1a5490)",
+        borderTopLeftRadius: "80% 20%",
+        borderTopRightRadius: "80% 20%",
+        zIndex: 1,
+        transition: "bottom 0.5s ease-in-out",
+      },
+  
+      "&:hover::after": {
+        bottom: "0%",
+      },
+  
+      "&:hover": {
+        transform: "translateY(-8px) scale(1.02)",
+        boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
+  
+        "& .avatar": {
+          transform: "scale(1.1) rotate(5deg)",
+        },
+        "& .arrow": {
+          transform: "translateX(8px)",
+        },
+        "& .card-title, & .card-description, & .card-link": {
+          color: "#ffffff !important",
+          WebkitTextFillColor: "#ffffff !important",
+          background: "none !important",
+        },
+      },
     },
     avatar: {
       width: 64,
       height: 64,
       bgcolor: COLORS.greyLight,
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
     },
-    cardTitle: { fontSize: "16px", fontWeight: "bold" },
-    cardDescription: { color: "#6b7280", fontSize: "14px" },
+    cardTitle: {
+      fontSize: "16px",
+      fontWeight: "bold",
+      background: 'linear-gradient(45deg, #0C2F58, #1a5490)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+    },
+    cardDescription: {
+      color: "#6b7280",
+      fontSize: "14px",
+      lineHeight: 1.6,
+    },
     link: {
       display: "inline-flex",
       alignItems: "center",
@@ -150,9 +206,47 @@ const style = {
       fontWeight: 600,
       color: COLORS.accentBlue,
       textTransform: "lowercase",
+      position: "relative",
+      overflow: "hidden",
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: "-100%",
+        width: "100%",
+        height: "100%",
+        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
+        transition: "left 0.6s",
+      },
+      "&:hover::before": {
+        left: "100%",
+      },
+    },
+    loadingSpinner: {
+      width: 40,
+      height: 40,
+      border: "4px solid #f3f3f3",
+      borderTop: "4px solid #0C2F58",
+      borderRadius: "50%",
+      animation: "spin 1s linear infinite",
+      "@keyframes spin": {
+        "0%": { transform: "rotate(0deg)" },
+        "100%": { transform: "rotate(360deg)" },
+      },
+    },
+    loadingContainer: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "200px",
+    },
+    arrowIcon: {
+      fontSize: "18px",
+      ml: 0.5,
+      transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     },
   },
-
+  
   /* ───────────────────── Feature Section ─────────────────── */
   featureSection: {
     wrapper: {
