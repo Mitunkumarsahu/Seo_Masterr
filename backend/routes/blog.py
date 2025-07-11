@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
-from schemas.blog import BlogCreate, BlogOut, BlogCategoryCreate, BlogCategoryOut
+from schemas.blog import BlogCreate, BlogOut, BlogCategoryCreate, BlogCategoryOut, PaginatedBlogs
 from service.blog_service import create_blog, get_blog, get_blogs, update_blog, delete_blog, create_category,get_categories
 from utils.db import get_db
 from models.user import User
@@ -42,9 +42,23 @@ def create_new_blog(
 ):
     return create_blog(db, blog, current_user.id)
 
-@router.get("/", response_model=List[BlogOut])
-def list_blogs(db: Session = Depends(get_db)):
-    return get_blogs(db)
+# @router.get("/", response_model=List[BlogOut])
+# def list_blogs(db: Session = Depends(get_db)):
+#     return get_blogs(db)
+
+@router.get("/", response_model=PaginatedBlogs)  # Changed response model
+def list_blogs(
+    db: Session = Depends(get_db),
+    page: int = 1,
+    page_size: int = 10
+):
+    total, blogs = get_blogs(db, page, page_size)
+    return {
+        "items": blogs,
+        "total": total,
+        "page": page,
+        "page_size": page_size
+    }
 
 @router.get("/categories", response_model=List[BlogCategoryOut])
 def list_blog_categories(db: Session = Depends(get_db)):

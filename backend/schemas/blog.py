@@ -43,3 +43,12 @@ class BlogOut(BlogBase):
         if hasattr(v, 'username'):
             return v.username
         return v
+    
+
+
+# Add to schemas/blog.py
+class PaginatedBlogs(BaseModel):
+    items: List[BlogOut]
+    total: int
+    page: int
+    page_size: int
