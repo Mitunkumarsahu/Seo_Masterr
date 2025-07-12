@@ -18,6 +18,41 @@ import style from '../styles/Styles';
 import useApi from '../hooks/useApi';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { motion } from 'framer-motion'
+
+const MotionBox = motion(Box)
+const MotionTypography = motion(Typography);
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: 'easeOut',
+    },
+  },
+};
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut', delay },
+  }),
+};
+
 
 
 const AboutUs = () => {
@@ -28,46 +63,77 @@ const AboutUs = () => {
   const styles = style.aboutUsSection;
   const featuresStyles = style.circleFeatureSection;
 
-  const { apiCall, loading } = useApi();
-  const [heroData, setHeroData] = useState(null);
+  const HeroSection = () => {
+    const { apiCall, loading } = useApi();
+    const [heroData, setHeroData] = useState(null);
 
-  useEffect(() => {
-    const fetchHero = async () => {
-      try {
-        const res = await apiCall('http://localhost:8000/about-hero/?active_only=true');
-        if (res && res.length > 0) {
-          setHeroData(res[0]); 
+    useEffect(() => {
+      const fetchHero = async () => {
+        try {
+          const res = await apiCall('http://localhost:8000/about-hero/?active_only=true');
+          if (res && res.length > 0) {
+            setHeroData(res[0]);
+          }
+        } catch (err) {
+          console.error('Failed to fetch about-hero:', err);
         }
-      } catch (err) {
-        console.error('Failed to fetch about-hero:', err);
-      }
-    };
-    fetchHero();
-  }, [apiCall]);
+      };
+      fetchHero();
+    }, [apiCall]);
 
-  if (loading || !heroData) {
+    if (loading || !heroData) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-        <CircularProgress />
-      </Box>
+      <MotionBox
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
+        sx={{
+          position: 'relative',
+          height: { xs: 'auto', md: '60vh' },
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          px: 2,
+          py: { xs: 6, md: 0 },
+          textAlign: 'center',
+          backgroundImage: `linear-gradient(to right, rgba(20, 30, 48, 0.85), rgba(36, 59, 85, 0.85)), url(${heroData.image_url})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          color: 'white',
+        }}
+      >
+        <MotionBox
+          maxWidth="900px"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 1 }}
+        >
+          <Typography variant="h3" fontWeight="bold" gutterBottom>
+            {heroData.title || 'Services'}
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: '1.2rem',
+              lineHeight: 1.8,
+              mt: 2,
+              color: 'rgba(255, 255, 255, 0.9)',
+            }}
+          >
+            {heroData.description}
+          </Typography>
+        </MotionBox>
+      </MotionBox>
     );
-  }
-
-  // const FeatureCard = () => (
-  //   <Box sx={styles.featureCardRoot}>
-  //     <Box sx={styles.featureImage} />
-  //     <Typography variant="h5" component="h3" sx={styles.featureTitle}>
-  //       Lorem Ipsum
-  //     </Typography>
-
-  //     <Typography variant="body2" sx={styles.featureText}>
-  //       Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s,
-  //       when an unknown printer took a galley of type and scrambled it to make a type
-  //       specimen book. It has survived not only five centuries
-  //     </Typography>
-  //   </Box>
-  // );
-
+  };
 
 
   const ProcessSteps = () => {
@@ -107,16 +173,20 @@ const AboutUs = () => {
       <Box
         sx={{
           backgroundColor: '#f6f8ff',
-          px: { xs: 2, sm: 4, md: 8 }, // 64px padding on md+
+          px: { xs: 2, sm: 4, md: 8 },
           py: { xs: 6, md: 10 },
         }}
       >
         <Container maxWidth="lg">
-          <Typography variant="h4" fontWeight="bold" textAlign="center" mb={6} color='#1e3a8a'>
+          <Typography variant="h4" fontWeight="bold" textAlign="center" mb={6} color="#1e3a8a">
             Process We Follow
           </Typography>
 
-          <Box
+          <MotionBox
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.2 }}
             sx={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -124,45 +194,45 @@ const AboutUs = () => {
               gap: { xs: 4, sm: 4, md: 6 },
             }}
           >
-            {steps.map((step, index) => (
-              <Fade in key={step.id} timeout={800 + index * 150}>
-                <Box
+            {steps.map((step) => (
+              <motion.div
+                key={step.id}
+                variants={itemVariants}
+                style={{
+                  flex: isMd
+                    ? '0 1 calc(33.333% - 32px)'
+                    : isSm
+                    ? '0 1 calc(50% - 16px)'
+                    : '0 1 100%',
+                  position: 'relative',
+                  padding: '8px',
+                }}
+              >
+                <Typography
+                  variant="h2"
+                  fontWeight="bold"
                   sx={{
-                    flex: isMd
-                      ? '0 1 calc(33.333% - 32px)'
-                      : isSm
-                      ? '0 1 calc(50% - 16px)'
-                      : '0 1 100%',
-                    position: 'relative',
-                    p: 1,
+                    position: 'absolute',
+                    top: -30,
+                    left: 0,
+                    fontSize: { xs: 64, sm: 80, md: 100 },
+                    opacity: 0.08,
+                    lineHeight: 1,
+                    userSelect: 'none',
                   }}
                 >
-                  <Typography
-                    variant="h2"
-                    fontWeight="bold"
-                    sx={{
-                      position: 'absolute',
-                      top: -30,
-                      left: 0,
-                      fontSize: { xs: 64, sm: 80, md: 100 },
-                      opacity: 0.08,
-                      lineHeight: 1,
-                      userSelect: 'none',
-                    }}
-                  >
-                    {String(step.order).padStart(2, '0')}.
-                  </Typography>
+                  {String(step.order).padStart(2, '0')}.
+                </Typography>
 
-                  <Box sx={{ mt: 6 }}>
-                    <Typography variant="h6" fontWeight="bold" mb={1}>
-                      {step.heading}
-                    </Typography>
-                    <Typography color="text.secondary">{step.description}</Typography>
-                  </Box>
+                <Box sx={{ mt: 6 }}>
+                  <Typography variant="h6" fontWeight="bold" mb={1}>
+                    {step.heading}
+                  </Typography>
+                  <Typography color="text.secondary">{step.description}</Typography>
                 </Box>
-              </Fade>
+              </motion.div>
             ))}
-          </Box>
+          </MotionBox>
         </Container>
       </Box>
     );
@@ -206,24 +276,31 @@ const AboutUs = () => {
         id="why-choose-us"
         sx={{
           backgroundColor: '#f8faff',
-          px: { xs: 2, sm: 4, md: 8, lg: 8 }, 
+          px: { xs: 2, sm: 4, md: 8, lg: 8 },
           py: { xs: 6, md: 10 },
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            alignItems: 'center',
-            gap: { xs: 4, md: 8 },
-          }}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          variants={containerVariants}
         >
-          {/* Image Section */}
-          <Fade in timeout={1000}>
-            <Box
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              gap: { xs: 4, md: 8 },
+            }}
+          >
+            {/* Image Section with animation */}
+            <MotionBox
               component="img"
               src={data.image_url}
               alt="Why Choose Us"
+              variants={fadeInUp}
+              custom={0.2}
               sx={{
                 width: { xs: '100%', md: '50%' },
                 borderRadius: 3,
@@ -231,23 +308,35 @@ const AboutUs = () => {
                 objectFit: 'cover',
               }}
             />
-          </Fade>
 
-          {/* Content Section */}
-          <Fade in timeout={1200}>
+            {/* Content Section */}
             <Box sx={{ width: { xs: '100%', md: '50%' } }}>
-              <Typography variant="h4" fontWeight="bold" mb={2} color='#1e3a8a'>
+              <MotionTypography
+                variant="h4"
+                fontWeight="bold"
+                mb={2}
+                color="#1e3a8a"
+                variants={fadeInUp}
+                custom={0.3}
+              >
                 {data.heading}
-              </Typography>
+              </MotionTypography>
 
-              <Typography color="text.secondary" mb={4}>
+              <MotionTypography
+                color="text.secondary"
+                mb={4}
+                variants={fadeInUp}
+                custom={0.4}
+              >
                 {data.description}
-              </Typography>
+              </MotionTypography>
 
               <Stack spacing={2}>
                 {data.points.map((point, index) => (
-                  <Box
+                  <MotionBox
                     key={index}
+                    variants={fadeInUp}
+                    custom={0.5 + index * 0.1}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
@@ -263,15 +352,16 @@ const AboutUs = () => {
                     <Typography variant="body1" fontWeight={500}>
                       {point.trim()}
                     </Typography>
-                  </Box>
+                  </MotionBox>
                 ))}
               </Stack>
             </Box>
-          </Fade>
-        </Box>
+          </Box>
+        </motion.div>
       </Box>
     );
   };
+
 
   const FAQSection = () => {
     const { apiCall, loading } = useApi();
@@ -296,7 +386,7 @@ const AboutUs = () => {
       <Box sx={styles.container}>
         <Fade in={true} timeout={800}>
           <Box>
-            <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center" color='#1e3a8a'>
+            <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center" color="#1e3a8a">
               Frequently Asked Questions
             </Typography>
 
@@ -305,20 +395,32 @@ const AboutUs = () => {
                 <CircularProgress />
               </Box>
             ) : (
-              faqs.map((faq) => (
-                <Accordion
-                  key={faq.id}
-                  TransitionProps={{ unmountOnExit: true }}
-                  sx={styles.accordion}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={styles.summary}>
-                    <Typography fontWeight="bold">{faq.question}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography>{faq.answer}</Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.2 }}
+                variants={containerVariants}
+              >
+                {faqs.map((faq, index) => (
+                  <motion.div
+                    key={faq.id}
+                    variants={fadeInUp}
+                    custom={0.2 + index * 0.1}
+                  >
+                    <Accordion
+                      TransitionProps={{ unmountOnExit: true }}
+                      sx={styles.accordion}
+                    >
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={styles.summary}>
+                        <Typography fontWeight="bold">{faq.question}</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography>{faq.answer}</Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  </motion.div>
+                ))}
+              </motion.div>
             )}
           </Box>
         </Fade>
@@ -327,70 +429,11 @@ const AboutUs = () => {
   };
 
 
+
   return (
     <>
-    <Box
-      sx={{
-        position: 'relative',
-        height: { xs: 'auto', md: '60vh' },
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        px: 2,
-        py: { xs: 6, md: 0 },
-        textAlign: 'center',
-        backgroundImage: `linear-gradient(to right, rgba(20, 30, 48, 0.85), rgba(36, 59, 85, 0.85)), url(${heroData.image_url})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        color: 'white',
-      }}
-    >
-      <Box maxWidth="900px">
-        <Typography
-          variant="h3"
-          fontWeight="bold"
-          gutterBottom
-        >
-          {heroData.title || 'Services'}
-        </Typography>
 
-        <Typography
-          variant="body1"
-          sx={{
-            fontSize: '1.2rem',
-            lineHeight: 1.8,
-            mt: 2,
-            color: 'rgba(255, 255, 255, 0.9)',
-          }}
-        >
-          {heroData.description}
-        </Typography>
-      </Box>
-    </Box>
-
-    {/* <Box sx={styles.cardsWrapper}>
-        <Container>
-          <Grid
-            container
-            spacing={styles.gridSpacing}
-            justifyContent={styles.gridJustify}
-          >
-            <Grid item xs={12} md={6}>
-              <FeatureCard />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <FeatureCard />
-            </Grid>
-          </Grid>
-
-          <Box sx={styles.ctaWrapper}>
-            <Button size="large" variant="contained" sx={styles.ctaButton}>
-              LOREM IPSUM HAS BEEN
-            </Button>
-          </Box>
-        </Container>
-    </Box> */}
+    <HeroSection />
 
     <ProcessSteps />
 
