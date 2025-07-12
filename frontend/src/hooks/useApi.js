@@ -62,16 +62,20 @@ const useApi = () => {
     setData(null);
 
     try {
+      const isFormData = bodyData instanceof URLSearchParams;
+
       const config = {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          ...(isFormData
+            ? { 'Content-Type': 'application/x-www-form-urlencoded' }
+            : { 'Content-Type': 'application/json' }),
           ...customHeaders,
         },
       };
 
       if (bodyData && ['POST', 'PUT', 'PATCH'].includes(method)) {
-        config.body = JSON.stringify(bodyData);
+        config.body = isFormData ? bodyData : JSON.stringify(bodyData);
       }
 
       const response = await fetch(url, config);
@@ -90,7 +94,7 @@ const useApi = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // <== useCallback dependency array
+  }, []);
 
   return { apiCall, loading, error, data };
 };

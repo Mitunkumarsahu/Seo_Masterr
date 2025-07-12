@@ -27,12 +27,12 @@ const routes = {
     {
       "path": "/blogs",
       "component": BlogPage,
-      "type": "public"
+      "type": "private"
     },
     {
       "path":"/services",
       "component":Services,
-      "type":"public"
+      "type":"private"
 
     },
     {

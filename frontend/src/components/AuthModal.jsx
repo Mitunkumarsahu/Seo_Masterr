@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Modal,
   Box,
@@ -11,46 +11,46 @@ import {
   CircularProgress,
   IconButton,
   useMediaQuery
-} from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import { useTheme } from '@mui/material/styles'
-import { GoogleLogin } from '@react-oauth/google'
-import useApi from '../hooks/useApi'
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { useTheme } from "@mui/material/styles";
+import { GoogleLogin } from "@react-oauth/google";
+import useApi from "../hooks/useApi";
+import {useAuth} from "../hooks/useAuth";
+import { Snackbar, Alert } from "@mui/material";
+
 
 const AuthModal = ({ open, handleClose }) => {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [tab, setTab] = useState(0)
-  const [form, setForm] = useState({ username: '', email: '', password: '' })
-  const { apiCall, loading } = useApi()
-  const [error, setError] = useState('')
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [tab, setTab] = useState(0);
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  // const { apiCall, loading } = useApi();
+  const [error, setError] = useState("");
+  const { isAuthenticated, user, loading, login, logout } = useAuth();
+  
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async () => {
-    setError('')
+    setError("");
     try {
       if (tab === 0) {
-        const loginData = new URLSearchParams()
-        loginData.append('grant_type', 'password')
-        loginData.append('username', form.email)
-        loginData.append('password', form.password)
-        loginData.append('client_id', 'string')
-        loginData.append('client_secret', '********')
+        const loginData = new URLSearchParams();
+        loginData.append("grant_type", "password");
+        loginData.append("username", form.email);
+        loginData.append("password", form.password);
+        loginData.append("client_id", "string");
+        loginData.append("client_secret", "********");
 
-        await apiCall(
-        'http://localhost:8000/auth/login',
-        'POST',
-        loginData.toString(),
-        {
-            'Content-Type': 'application/x-www-form-urlencoded',
+        const result = await login(loginData);
+
+        if (result.success) {
+          setTimeout(() => handleClose(), 1200);
+        } else {
+          setError(result.error || "Login failed");
         }
-        )
-
-        console.log('Login success:', response)
-        handleClose()
       } else {
         await apiCall('http://localhost:8000/auth/signup', 'POST', {
           username: form.username,

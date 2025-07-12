@@ -1,24 +1,27 @@
 import React, { useState } from "react";
-
-// ——— MUI ———
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton'; 
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import { ChevronDown, Menu as MenuIcon } from "lucide-react";import { NavLink, useLocation } from "react-router-dom"; // ← Import this
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import AuthModal from './AuthModal';
-
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  Button,
+  IconButton,
+  Typography,
+  Menu,
+  MenuItem,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Divider,
+  Avatar,
+  Tooltip,
+} from "@mui/material";
+import { Menu as MenuIcon } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import AuthModal from "./AuthModal";
+import {useAuth} from "../hooks/useAuth";
 
 const COLORS = {
   blue800: "#1e3a8a",
@@ -29,21 +32,23 @@ const COLORS = {
   slate600: "#475569",
   slate700: "#334155",
 };
+
 export default function NavBar() {
-  const [servicesAnchorEl, setServicesAnchorEl] = useState(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
 
   const location = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
 
-  const handleMenuOpen = (event, setter) => setter(event.currentTarget);
-  const handleMenuClose = () => setServicesAnchorEl(null);
   const toggleDrawer = () => setMobileDrawerOpen((prev) => !prev);
+  const handleMenuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setUserMenuAnchorEl(null);
 
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Blog", to: "/blogs" },
-    { label: "Services", to: "/services", isDropdown: true },
+    { label: "Services", to: "/services" },
     { label: "About Us", to: "/about-us" },
     { label: "Contact Us", to: "/contact-us" },
   ];
@@ -56,182 +61,216 @@ export default function NavBar() {
 
   return (
     <>
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
-      <AppBar position="sticky" elevation={0} sx={{ bgcolor: COLORS.blue800 }}>
-        <Toolbar sx={{ minHeight: 64 }}>
-          {/* Logo */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
-            <Box sx={{
-              width: 40,
-              height: 40,
-              bgcolor: "white",
-              borderRadius: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <Typography variant="h6" component="span" sx={{ color: COLORS.blue800, fontWeight: "bold" }}>
-                S
+      <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+        <AppBar position="sticky" elevation={0} sx={{ bgcolor: COLORS.blue800 }}>
+          <Toolbar sx={{ minHeight: 64 }}>
+            {/* Logo */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  bgcolor: "white",
+                  borderRadius: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography variant="h6" component="span" sx={{ color: COLORS.blue800, fontWeight: "bold" }}>
+                  S
+                </Typography>
+              </Box>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                Site
               </Typography>
             </Box>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Site
+
+            {/* Desktop Nav */}
+            <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 4, mr: 4 }}>
+              {navLinks.map(({ label, to }) => (
+                <NavLink key={label} to={to} style={{ textDecoration: "none" }}>
+                  <Button sx={getLinkStyle(to)}>{label}</Button>
+                </NavLink>
+              ))}
+            </Box>
+
+            {/* Desktop Auth */}
+            <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
+              {isAuthenticated ? (
+                <>
+                  <Tooltip title="Account">
+                    <IconButton onClick={handleMenuOpen} size="small">
+                      <Avatar sx={{ bgcolor: COLORS.green500, width: 32, height: 32, fontSize: 14 }}>
+                        {user?.sub?.[0]?.toUpperCase() || "U"}
+                      </Avatar>
+                    </IconButton>
+                  </Tooltip>
+
+                  <Menu
+                    anchorEl={userMenuAnchorEl}
+                    open={Boolean(userMenuAnchorEl)}
+                    onClose={handleMenuClose}
+                    PaperProps={{
+                      sx: {
+                        mt: 1.5,
+                        minWidth: 180,
+                        boxShadow: 3,
+                      },
+                    }}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                  >
+                    <MenuItem disabled>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {user?.sub}
+                      </Typography>
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem
+                      onClick={() => {
+                        logout();
+                        handleMenuClose();
+                      }}
+                    >
+                      Logout
+                    </MenuItem>
+                  </Menu>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setAuthModalOpen(true)}
+                    sx={{
+                      color: "white",
+                      borderColor: "white",
+                      "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+                    }}
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => setAuthModalOpen(true)}
+                    sx={{
+                      bgcolor: COLORS.green500,
+                      "&:hover": { bgcolor: COLORS.green600 },
+                    }}
+                  >
+                    Sign&nbsp;Up
+                  </Button>
+                </>
+              )}
+            </Box>
+
+            {/* Mobile Toggle */}
+            <IconButton
+              onClick={toggleDrawer}
+              sx={{ display: { xs: "flex", md: "none" }, color: "white" }}
+              aria-label="open menu"
+            >
+              <MenuIcon size={24} />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
+        {/* Mobile Drawer */}
+        <Drawer
+          anchor="left"
+          open={mobileDrawerOpen}
+          onClose={toggleDrawer}
+          PaperProps={{ sx: { width: 260, bgcolor: COLORS.blue800, color: "white" } }}
+        >
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Menu
             </Typography>
+            <Divider sx={{ borderColor: COLORS.slate700, mb: 2 }} />
+            <List>
+              {navLinks.map(({ label, to }) => (
+                <ListItem key={label} disablePadding>
+                  <ListItemButton
+                    component={NavLink}
+                    to={to}
+                    onClick={toggleDrawer}
+                    sx={{
+                      "&.active": { bgcolor: COLORS.slate700 },
+                      "&:hover": { bgcolor: COLORS.slate700 },
+                    }}
+                  >
+                    <ListItemText primary={label} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+            <Divider sx={{ borderColor: COLORS.slate700, my: 2 }} />
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {isAuthenticated ? (
+                <>
+                  <Typography sx={{ fontWeight: 600, mb: 1 }}>{user?.sub}</Typography>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => {
+                      logout();
+                      toggleDrawer();
+                    }}
+                    sx={{
+                      color: "white",
+                      borderColor: "white",
+                      "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => {
+                      setAuthModalOpen(true);
+                      toggleDrawer();
+                    }}
+                    sx={{
+                      color: "white",
+                      borderColor: "white",
+                      "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+                    }}
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => {
+                      setAuthModalOpen(true);
+                      toggleDrawer();
+                    }}
+                    sx={{
+                      bgcolor: COLORS.green500,
+                      "&:hover": { bgcolor: COLORS.green600 },
+                    }}
+                  >
+                    Sign&nbsp;Up
+                  </Button>
+                </>
+              )}
+            </Box>
           </Box>
+        </Drawer>
 
-          {/* Desktop Nav */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 4, mr: 4 }}>
-            <NavLink to="/" style={{ textDecoration: "none" }}>
-              <Button sx={getLinkStyle("/")}>Home</Button>
-            </NavLink>
-            <NavLink to="/blogs" style={{ textDecoration: "none" }}>
-              <Button sx={getLinkStyle("/blogs")}>Blog</Button>
-            </NavLink>
-
-           <NavLink to="/services" style={{ textDecoration: "none" }}>
-            <Button sx={getLinkStyle("/services")}>Services</Button>
-            </NavLink>
-
-
-            <NavLink to="/about-us" style={{ textDecoration: "none" }}>
-              <Button sx={getLinkStyle("/about-us")}>About Us</Button>
-            </NavLink>
-            <NavLink to="/contact-us" style={{ textDecoration: "none" }}>
-              <Button sx={getLinkStyle("/contact-us")}>Contact&nbsp;Us</Button>
-            </NavLink>
-          </Box>
-
-          {/* Auth Buttons */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
-            {/* <Button variant="outlined" sx={{
-              color: "white", borderColor: "white",
-              "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-            }}>
-              Login
-            </Button>
-            <Button variant="contained" sx={{
-              bgcolor: COLORS.green500,
-              "&:hover": { bgcolor: COLORS.green600 },
-            }}>
-              Sign&nbsp;Up
-            </Button> */}
-
-            <Button
-              variant="outlined"
-              onClick={() => setAuthModalOpen(true)}
-              sx={{
-                color: "white",
-                borderColor: "white",
-                "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-              }}
-            >
-              Login
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => setAuthModalOpen(true)}
-              sx={{
-                bgcolor: COLORS.green500,
-                "&:hover": { bgcolor: COLORS.green600 },
-              }}
-            >
-              Sign&nbsp;Up
-            </Button>
-
-          </Box>
-
-          
-
-          {/* Mobile Toggle */}
-          <IconButton
-            onClick={toggleDrawer}
-            sx={{ display: { xs: "flex", md: "none" }, color: "white" }}
-            aria-label="open menu"
-          >
-            <MenuIcon size={24} />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
-      {/* Mobile Drawer */}
-      <Drawer
-        anchor="left"
-        open={mobileDrawerOpen}
-        onClose={toggleDrawer}
-        PaperProps={{ sx: { width: 260, bgcolor: COLORS.blue800, color: "white" } }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Menu</Typography>
-          <Divider sx={{ borderColor: COLORS.slate700, mb: 2 }} />
-          <List>
-            {navLinks.map(({ label, to }) => (
-              <ListItem key={label} disablePadding>
-                <ListItemButton
-                  component={NavLink}
-                  to={to}
-                  onClick={toggleDrawer}
-                  sx={{
-                    "&.active": { bgcolor: COLORS.slate700 },
-                    "&:hover": { bgcolor: COLORS.slate700 },
-                  }}
-                >
-                  <ListItemText primary={label} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider sx={{ borderColor: COLORS.slate700, my: 2 }} />
-          <Box sx={{ display: "flex", gap: 1 }}>
-            {/* <Button fullWidth variant="outlined" sx={{
-              color: "white", borderColor: "white",
-              "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-            }}>
-              Login
-            </Button>
-            <Button fullWidth variant="contained" sx={{
-              bgcolor: COLORS.green500,
-              "&:hover": { bgcolor: COLORS.green600 },
-            }}>
-              Sign&nbsp;Up
-            </Button> */}
-            <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => {
-              setAuthModalOpen(true);
-              toggleDrawer();
-            }}
-            sx={{
-              color: "white",
-              borderColor: "white",
-              "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-            }}
-          >
-            Login
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => {
-              setAuthModalOpen(true);
-              toggleDrawer();
-            }}
-            sx={{
-              bgcolor: COLORS.green500,
-              "&:hover": { bgcolor: COLORS.green600 },
-            }}
-          >
-            Sign&nbsp;Up
-          </Button>
-          </Box>
-          
-
-        </Box>
-      </Drawer>
-
-
-      <AuthModal open={authModalOpen} handleClose={() => setAuthModalOpen(false)} />
-    </GoogleOAuthProvider>
+        {/* Auth Modal */}
+        <AuthModal open={authModalOpen} handleClose={() => setAuthModalOpen(false)} />
+      </GoogleOAuthProvider>
     </>
   );
 }

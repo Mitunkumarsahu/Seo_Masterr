@@ -1,6 +1,6 @@
 // routes/RoleBasedRoute.jsx
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
+import  {useAuth}  from '../hooks/useAuth'
 
 const RoleBasedRoute = ({ children, requiredRoles }) => {
   const { isAuthenticated, user, loading } = useAuth()
