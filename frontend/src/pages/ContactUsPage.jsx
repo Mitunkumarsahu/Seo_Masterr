@@ -16,6 +16,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import { motion, AnimatePresence } from "framer-motion";
 import useApi from "../hooks/useApi";
+import { COLORS } from "../styles/Styles";
 
 const ContactUsPage = () => {
   const theme = useTheme();
@@ -222,7 +223,7 @@ const ContactUsPage = () => {
               size="large"
               sx={{
                 backgroundColor: "#fff",
-                color: theme.palette.primary.main,
+                color: COLORS.primary,
               }}
               onClick={() => window.open(`tel:${contactInfo?.toll_free || ""}`)}
               component={motion.button}
