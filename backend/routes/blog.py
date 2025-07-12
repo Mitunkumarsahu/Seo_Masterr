@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from schemas.blog import BlogCreate, BlogOut, BlogCategoryCreate, BlogCategoryOut, PaginatedBlogs
-from service.blog_service import create_blog, get_blog, get_blogs, update_blog, delete_blog, create_category,get_categories
+from service.blog_service import create_blog, get_blog, get_blogs, update_blog, delete_blog, create_category,get_categories, get_blogs_by_category
 from utils.db import get_db
 from models.user import User
 from service.auth_service import has_permission
 from routes.auth import require_permission
 import uuid
 import os
-from typing import List
+from typing import List, Optional
+
 
 
 router = APIRouter(prefix="/blogs", tags=["Blogs"])
@@ -46,19 +47,46 @@ def create_new_blog(
 # def list_blogs(db: Session = Depends(get_db)):
 #     return get_blogs(db)
 
-@router.get("/", response_model=PaginatedBlogs)  # Changed response model
+@router.get("/", response_model=PaginatedBlogs)
 def list_blogs(
     db: Session = Depends(get_db),
     page: int = 1,
-    page_size: int = 10
+    page_size: int = 10,
+    category_id: Optional[int] = None  # New query parameter
 ):
-    total, blogs = get_blogs(db, page, page_size)
+    total, blogs = get_blogs(
+        db, 
+        page=page, 
+        page_size=page_size,
+        category_id=category_id
+    )
     return {
         "items": blogs,
         "total": total,
         "page": page,
         "page_size": page_size
     }
+
+@router.get("/category/{category_id}", response_model=PaginatedBlogs)
+def get_blogs_by_category_id(
+    category_id: int,
+    db: Session = Depends(get_db),
+    page: int = 1,
+    page_size: int = 10
+):
+    total, blogs = get_blogs_by_category(
+        db,
+        category_id=category_id,
+        page=page,
+        page_size=page_size
+    )
+    return {
+        "items": blogs,
+        "total": total,
+        "page": page,
+        "page_size": page_size
+    }
+
 
 @router.get("/categories", response_model=List[BlogCategoryOut])
 def list_blog_categories(db: Session = Depends(get_db)):

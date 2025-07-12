@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from models.blog import Blog, BlogCategory, blog_category_association
 from schemas.blog import BlogCreate, BlogCategoryCreate
 from sqlalchemy.orm import selectinload
+from typing import List, Optional
+from fastapi import HTTPException
 
 def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
     db_blog = Blog(
@@ -47,18 +49,49 @@ def get_blog(db: Session, blog_id: int):
 #         selectinload(Blog.categories)
 #     ).all()
 
-def get_blogs(db: Session, page: int = 1, page_size: int = 10):
-    # Calculate offset
+# Add new function for category-filtered blogs
+def get_blogs_by_category(
+    db: Session, 
+    category_id: int, 
+    page: int = 1, 
+    page_size: int = 10
+):
     offset = (page - 1) * page_size
+    # Get category first
+    category = db.query(BlogCategory).get(category_id)
+    if not category:
+        return 0, []
     
-    # Get paginated results
-    blogs = db.query(Blog).options(
+    # Query blogs filtered by category
+    query = db.query(Blog).join(Blog.categories).filter(BlogCategory.id == category_id)
+    
+    total = query.count()
+    blogs = query.options(
         selectinload(Blog.author),
         selectinload(Blog.categories)
     ).offset(offset).limit(page_size).all()
     
-    # Get total count
-    total = db.query(Blog).count()
+    return total, blogs
+
+# Update existing get_blogs to handle category filter
+def get_blogs(
+    db: Session, 
+    page: int = 1, 
+    page_size: int = 10,
+    category_id: Optional[int] = None  # Add new parameter
+):
+    offset = (page - 1) * page_size
+    query = db.query(Blog)
+    
+    # Apply category filter if provided
+    if category_id is not None:
+        query = query.join(Blog.categories).filter(BlogCategory.id == category_id)
+    
+    total = query.count()
+    blogs = query.options(
+        selectinload(Blog.author),
+        selectinload(Blog.categories)
+    ).offset(offset).limit(page_size).all()
     
     return total, blogs
 
