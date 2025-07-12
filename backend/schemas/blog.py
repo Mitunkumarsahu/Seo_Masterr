@@ -52,3 +52,7 @@ class PaginatedBlogs(BaseModel):
     total: int
     page: int
     page_size: int
+
+class BlogWithRecent(BaseModel):
+    blog: BlogOut
+    recent_blogs: List[BlogOut]

@@ -4,6 +4,7 @@ from schemas.blog import BlogCreate, BlogCategoryCreate
 from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from fastapi import HTTPException
+from models.blog import ContentType  # Add this import
 
 def create_blog(db: Session, blog_data: BlogCreate, author_id: int):
     db_blog = Blog(
@@ -118,12 +119,12 @@ def update_blog(db: Session, blog_id: int, blog_data: BlogCreate):
                 db_blog.categories.append(category)
     
     # Clear existing contents
-    db.query(BlogContent).filter(BlogContent.blog_id == blog_id).delete()
+    db.query(BlogCreate).filter(BlogCreate.blog_id == blog_id).delete()
     
     # Add new contents
     if blog_data.contents:
         for content in blog_data.contents:
-            db_content = BlogContent(
+            db_content = BlogCreate(
                 blog_id=db_blog.id,
                 order=content.order,
                 content_type=ContentType[content.content_type.upper()],
@@ -149,6 +150,37 @@ def delete_blog(db: Session, blog_id: int):
     if db_blog:
         db.delete(db_blog)
         db.commit()
+
+
+def get_blog_with_recent(db: Session, blog_id: int):
+    # Get the requested blog with author and categories
+    blog = get_blog(db, blog_id)
+    if not blog:
+        return None, []
+    
+    # Get category IDs from the blog
+    category_ids = [category.id for category in blog.categories]
+    
+    recent_blogs = []
+    if category_ids:
+        # Get recent blogs from the same categories (excluding current blog)
+        recent_blogs = db.query(Blog).join(
+            blog_category_association,
+            Blog.id == blog_category_association.c.blog_id
+        ).filter(
+            blog_category_association.c.category_id.in_(category_ids),
+            Blog.id != blog_id
+        ).options(
+            selectinload(Blog.author),
+            selectinload(Blog.categories)
+        ).order_by(Blog.published_at.desc()).limit(5).all()
+    
+    return blog, recent_blogs
+
+
+
+
+
 
 def create_category(db: Session, category_data: BlogCategoryCreate):
     db_category = BlogCategory(

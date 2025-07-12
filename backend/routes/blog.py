@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
-from schemas.blog import BlogCreate, BlogOut, BlogCategoryCreate, BlogCategoryOut, PaginatedBlogs
-from service.blog_service import create_blog, get_blog, get_blogs, update_blog, delete_blog, create_category,get_categories, get_blogs_by_category
+from schemas.blog import BlogCreate, BlogOut, BlogCategoryCreate, BlogCategoryOut, PaginatedBlogs, BlogWithRecent
+from service.blog_service import create_blog, get_blog, get_blogs, update_blog, delete_blog, create_category,get_categories, get_blogs_by_category, get_blog_with_recent
 from utils.db import get_db
 from models.user import User
 from service.auth_service import has_permission
@@ -66,6 +66,21 @@ def list_blogs(
         "page": page,
         "page_size": page_size
     }
+
+@router.get("/{blog_id}/with-recent", response_model=BlogWithRecent)
+def get_blog_with_recent_blogs(
+    blog_id: int, 
+    db: Session = Depends(get_db)
+):
+    blog, recent_blogs = get_blog_with_recent(db, blog_id)
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    
+    return {
+        "blog": blog,
+        "recent_blogs": recent_blogs
+    }
+
 
 @router.get("/category/{category_id}", response_model=PaginatedBlogs)
 def get_blogs_by_category_id(
