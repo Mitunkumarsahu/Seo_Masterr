@@ -8,98 +8,96 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import useApi from "../hooks/useApi";
+import useApi from "../hooks/useApi"; // Ensure this path is correct
+
+const ITEMS_PER_PAGE = 6;
 
 const BlogPage = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [filteredBlogs, setFilteredBlogs] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const ITEMS_PER_PAGE = 6;
   const navigate = useNavigate();
 
-  // API hooks for blogs and categories
+  // Blogs API
   const {
     apiCall: getBlogs,
+    data: blogsData,
     loading: blogsLoading,
     error: blogsError,
-    data: blogsData,
   } = useApi();
 
+  // Categories API
   const {
     apiCall: getCategories,
+    data: categoriesData,
     loading: categoriesLoading,
     error: categoriesError,
-    data: categoriesData,
   } = useApi();
 
-  // Fetch blogs and categories
+  const [blogs, setBlogs] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+
   useEffect(() => {
-    getBlogs("http://127.0.0.1:8000/blogs/");
     getCategories("http://127.0.0.1:8000/blogs/categories");
   }, []);
 
-  // Set blogs when data is received
-  useEffect(() => {
-    if (blogsData) {
-      setBlogs(blogsData);
-      setFilteredBlogs(blogsData);
-    }
-  }, [blogsData]);
-
-  // Set categories when data is received
   useEffect(() => {
     if (categoriesData) {
       setCategories(categoriesData);
     }
   }, [categoriesData]);
 
-  // Filter blogs by category
   useEffect(() => {
-    setCurrentPage(1); // Reset to page 1 on category change
-    if (selectedCategory === "all") {
-      setFilteredBlogs(blogs);
-    } else {
-      const filtered = blogs.filter((blog) =>
-        blog.categories?.some((cat) => cat.slug === selectedCategory)
-      );
-      setFilteredBlogs(filtered);
+    let url = `http://127.0.0.1:8000/blogs/?page=${currentPage}&page_size=${ITEMS_PER_PAGE}`;
+    if (selectedCategory !== "all") {
+      const selectedCat = categories.find((cat) => cat.slug === selectedCategory);
+      if (selectedCat) {
+        url += `&category_id=${selectedCat.id}`;
+      }
     }
-  }, [selectedCategory, blogs]);
+    getBlogs(url);
+  }, [currentPage, selectedCategory, categories]);
 
-  const paginatedBlogs = filteredBlogs.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  useEffect(() => {
+    if (blogsData) {
+      setBlogs(blogsData.items || []);
+      setTotalPages(Math.ceil((blogsData.total || 0) / ITEMS_PER_PAGE));
+    }
+  }, [blogsData]);
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
 
-  const loading = blogsLoading || categoriesLoading;
+  const handleCategoryChange = (slug) => {
+    setSelectedCategory(slug);
+    setCurrentPage(1);
+  };
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
+         {/* <Typography variant="h3" fontWeight="bold" sx={{ color: "#000", textAlign:"center",py:4, mb: 2 }}>
+          Blogs
+        </Typography> */}
       {/* Header */}
-      <Box
+      {/* <Box
         sx={{
           background: "linear-gradient(to top, rgba(12, 47, 88, 1), rgba(12, 47, 88, 0))",
           py: 6,
           textAlign: "center",
         }}
       >
-        <Typography
-          variant="h3"
-          fontWeight="bold"
-          sx={{ color: "#fff", mb: 2 }}
-        >
+        <Typography variant="h3" fontWeight="bold" sx={{ color: "#fff", mb: 2 }}>
           Blogs
         </Typography>
-      </Box>
+      </Box> */}
 
       <Container maxWidth="xl" sx={{ py: 6 }}>
+      <Typography variant="h3" fontWeight="bold" textAlign="center" mb={5}>
+          Our Blogs
+        </Typography>
+
         {/* Category Tabs */}
         <Box
           sx={{
@@ -113,24 +111,24 @@ const BlogPage = () => {
           <CategoryTab
             label="All"
             selected={selectedCategory === "all"}
-            onClick={() => setSelectedCategory("all")}
+            onClick={() => handleCategoryChange("all")}
           />
           {categories.map((cat) => (
             <CategoryTab
               key={cat.id}
               label={cat.name}
               selected={selectedCategory === cat.slug}
-              onClick={() => setSelectedCategory(cat.slug)}
+              onClick={() => handleCategoryChange(cat.slug)}
             />
           ))}
         </Box>
 
         {/* Blog List */}
-        {loading ? (
+        {blogsLoading || categoriesLoading ? (
           <Box display="flex" justifyContent="center" mt={6}>
             <CircularProgress />
           </Box>
-        ) : filteredBlogs.length === 0 ? (
+        ) : blogs.length === 0 ? (
           <Typography textAlign="center" mt={4}>
             No blogs found for this category.
           </Typography>
@@ -143,7 +141,7 @@ const BlogPage = () => {
               gap: 3,
             }}
           >
-            {paginatedBlogs.map((blog) => (
+            {blogs.map((blog) => (
               <Box
                 key={blog.id}
                 sx={{
@@ -164,16 +162,10 @@ const BlogPage = () => {
                   },
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ color: "#00C896", fontWeight: 600 }}
-                >
+                <Typography variant="subtitle2" sx={{ color: "#00C896", fontWeight: 600 }}>
                   {blog.title}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#333", mt: 1, mb: 2 }}
-                >
+                <Typography variant="body2" sx={{ color: "#333", mt: 1, mb: 2 }}>
                   {blog.meta_description}
                 </Typography>
 
@@ -184,10 +176,7 @@ const BlogPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "gray", fontWeight: 500 }}
-                  >
+                  <Typography variant="caption" sx={{ color: "gray", fontWeight: 500 }}>
                     {blog.author}
                   </Typography>
                   <Box
@@ -200,7 +189,6 @@ const BlogPage = () => {
                   />
                 </Box>
 
-                {/* New Read More Button */}
                 <Button
                   variant="outlined"
                   sx={{ mt: 2, alignSelf: "flex-start", borderRadius: "20px" }}
@@ -213,11 +201,11 @@ const BlogPage = () => {
           </Box>
         )}
 
-        {/* Conditional Pagination */}
-        {filteredBlogs.length > ITEMS_PER_PAGE && (
+        {/* Pagination */}
+        {totalPages > 1 && (
           <Box sx={{ mt: 6, display: "flex", justifyContent: "center" }}>
             <Pagination
-              count={Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE)}
+              count={totalPages}
               page={currentPage}
               onChange={handlePageChange}
               shape="rounded"
@@ -230,7 +218,6 @@ const BlogPage = () => {
   );
 };
 
-// Category Tab Button Component
 const CategoryTab = ({ label, selected, onClick }) => (
   <Button
     onClick={onClick}

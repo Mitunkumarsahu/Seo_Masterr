@@ -9,38 +9,32 @@ import {
   Stack,
   CircularProgress,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import useApi from "../hooks/useApi"; // make sure this path is correct
 
 const BlogDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
+  const {
+    apiCall: getBlogDetail,
+    data,
+    loading,
+    error,
+  } = useApi();
 
   useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const res = await fetch(`http://127.0.0.1:8000/blogs/${id}`);
-        const data = await res.json();
-        setPost(data);
-
-        // Fetch all blogs to find related ones
-        const allBlogsRes = await fetch("http://127.0.0.1:8000/blogs/");
-        const allBlogs = await allBlogsRes.json();
-        const related = allBlogs.filter((b) => b.id !== data.id);
-        setRelatedPosts(related);
-
-        setLoading(false);
-      } catch (err) {
-        console.error("Error loading blog detail:", err);
-        setLoading(false);
-      }
-    };
-
-    fetchBlog();
+    getBlogDetail(`http://127.0.0.1:8000/blogs/${id}/with-recent`);
   }, [id]);
+
+  useEffect(() => {
+    if (data) {
+      setPost(data.blog);
+      setRelatedPosts(data.recent_blogs);
+    }
+  }, [data]);
 
   if (loading) {
     return (
@@ -50,10 +44,12 @@ const BlogDetailPage = () => {
     );
   }
 
-  if (!post) {
+  if (error || !post) {
     return (
       <Container>
-        <Typography variant="h5">Post not found.</Typography>
+        <Typography variant="h5" color="error">
+          {error ? "Something went wrong." : "Post not found."}
+        </Typography>
       </Container>
     );
   }
@@ -65,7 +61,6 @@ const BlogDetailPage = () => {
           {post.title}
         </Typography>
 
-        {/* Main Flex Layout */}
         <Box
           sx={{
             display: "flex",
@@ -73,7 +68,7 @@ const BlogDetailPage = () => {
             gap: 4,
           }}
         >
-          {/* Main Content */}
+          {/* Blog Content */}
           <Box
             sx={{
               flex: 3,
@@ -90,31 +85,13 @@ const BlogDetailPage = () => {
               sx={{ width: "100%", borderRadius: 2, mb: 2 }}
             />
 
-            {/* Social Share */}
+            {/* Social Share Buttons */}
             <Stack direction="row" spacing={1} justifyContent="center" mb={2}>
-              <Button size="small" variant="contained" color="primary">
-                Facebook
-              </Button>
-              <Button size="small" variant="contained" color="error">
-                YouTube
-              </Button>
-              <Button size="small" variant="contained" color="secondary">
-                Email
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#25D366" }}
-              >
-                WhatsApp
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#1DA1F2" }}
-              >
-                Twitter
-              </Button>
+              <Button size="small" variant="contained" color="primary">Facebook</Button>
+              <Button size="small" variant="contained" color="error">YouTube</Button>
+              <Button size="small" variant="contained" color="secondary">Email</Button>
+              <Button size="small" variant="contained" sx={{ backgroundColor: "#25D366" }}>WhatsApp</Button>
+              <Button size="small" variant="contained" sx={{ backgroundColor: "#1DA1F2" }}>Twitter</Button>
             </Stack>
 
             <Typography
@@ -124,7 +101,7 @@ const BlogDetailPage = () => {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
-            {/* Optional Second Image (placeholder) */}
+            {/* Optional Image */}
             <Box
               component="img"
               src="https://via.placeholder.com/800x400"
@@ -138,54 +115,28 @@ const BlogDetailPage = () => {
               <Typography variant="body2">{post.author}</Typography>
             </Box>
 
-            {/* Footer Link */}
-            <Typography
-              variant="body2"
-              sx={{ mt: 2, color: "primary.main", cursor: "pointer" }}
-            >
-              Lorem Ipsum Back here
-            </Typography>
-
             <Divider sx={{ my: 2 }} />
 
             {/* Share Again */}
             <Stack direction="row" spacing={1} justifyContent="center">
-              <Button size="small" variant="contained" color="primary">
-                Facebook
-              </Button>
-              <Button size="small" variant="contained" color="error">
-                YouTube
-              </Button>
-              <Button size="small" variant="contained" color="secondary">
-                Email
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#25D366" }}
-              >
-                WhatsApp
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#1DA1F2" }}
-              >
-                Twitter
-              </Button>
+              <Button size="small" variant="contained" color="primary">Facebook</Button>
+              <Button size="small" variant="contained" color="error">YouTube</Button>
+              <Button size="small" variant="contained" color="secondary">Email</Button>
+              <Button size="small" variant="contained" sx={{ backgroundColor: "#25D366" }}>WhatsApp</Button>
+              <Button size="small" variant="contained" sx={{ backgroundColor: "#1DA1F2" }}>Twitter</Button>
             </Stack>
           </Box>
 
-          {/* Sidebar - Related Posts */}
+          {/* Related Posts Sidebar */}
           <Box
             sx={{
               flex: 1,
               backgroundColor: "#fff",
-              minHeight: "400px",       // Minimum height always maintained
-              maxHeight: "600px",       // Adjust as needed
+              minHeight: "400px",
+              maxHeight: "600px",
               p: 2,
               borderRadius: 2,
-              overflowY: "auto",        // Scroll only if overflow
+              overflowY: "auto",
               boxShadow: 1,
               alignSelf: "flex-start",
             }}
@@ -225,7 +176,6 @@ const BlogDetailPage = () => {
                 <Box sx={{ flex: 1 }}>
                   <Typography
                     variant="body2"
-                    className="title"
                     sx={{ fontWeight: 600, color: "#0d66ff", mb: 0.5 }}
                   >
                     {related.title}
