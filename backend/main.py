@@ -406,9 +406,6 @@ class ContactHeroView(BaseModelView):
 #         return False
 
 
-
-from starlette_admin import action
-
 class SubscriptionView(BaseModelView):
     identity = "subscription"
     fields = [
@@ -439,8 +436,9 @@ class SubscriptionView(BaseModelView):
     )
     async def send_bulk_email_action(self, request: Request, data: dict):
         """Handle bulk email action"""
-        subject = data.get("subject")
-        body = data.get("body")
+        form = await request.form()
+        subject = form.get("subject")
+        body = form.get("body")
         
         thread = threading.Thread(
             target=self.send_bulk_emails,
