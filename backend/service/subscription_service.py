@@ -2,6 +2,9 @@ from sqlalchemy.orm import Session
 from models.subscription import Subscription
 from schemas.subscription import SubscriptionCreate
 from fastapi import HTTPException, status
+from utils.email import send_email
+from typing import List
+from fastapi import BackgroundTasks
 
 def create_subscription(db: Session, subscription: SubscriptionCreate):
     # Check if email already exists
@@ -34,3 +37,21 @@ def delete_subscription(db: Session, subscription_id: int):
         db.commit()
         return True
     return False
+
+
+def send_bulk_emails(
+    db: Session, 
+    subject: str,
+    body: str,
+    background_tasks: BackgroundTasks
+):
+    """Send emails to all subscribers in background"""
+    subscriptions = db.query(Subscription).all()
+    for subscription in subscriptions:
+        background_tasks.add_task(
+            send_email,
+            recipient=subscription.email,
+            subject=subject,
+            body=body
+        )
+    return {"message": f"Emails being sent to {len(subscriptions)} subscribers"}

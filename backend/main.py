@@ -45,6 +45,18 @@ from models.contact_inquiry import ContactInquiry
 from routes import contact_inquiry
 from models.achievement import Achievement
 from routes import achievement
+from routes import admin
+
+# Add to imports
+from starlette_admin import action
+import threading
+from fastapi.responses import RedirectResponse
+from fastapi import BackgroundTasks
+
+
+# Add to the top after other imports
+from utils.email import send_email
+from utils.db import SessionLocal
 
 
 app = FastAPI()
@@ -78,6 +90,7 @@ app.include_router(subscription.router)
 app.include_router(contact_info.router)
 app.include_router(contact_inquiry.router)
 app.include_router(achievement.router)
+app.include_router(admin.router)
 
 # Base ModelView with access control
 class BaseModelView(ModelView):
@@ -376,6 +389,26 @@ class ContactHeroView(BaseModelView):
     ]
 
 
+# class SubscriptionView(BaseModelView):
+#     identity = "subscription"
+#     fields = [
+#         fields.IntegerField("id"),
+#         fields.StringField("email"),
+#         fields.DateTimeField("created_at"),
+#     ]
+    
+#     # Disable create/delete from admin panel (use API instead)
+#     def can_create(self, request: Request) -> bool:
+#         return False
+    
+#     # Optional: Disable editing
+#     def can_edit(self, request: Request) -> bool:
+#         return False
+
+
+
+from starlette_admin import action
+
 class SubscriptionView(BaseModelView):
     identity = "subscription"
     fields = [
@@ -384,13 +417,59 @@ class SubscriptionView(BaseModelView):
         fields.DateTimeField("created_at"),
     ]
     
-    # Disable create/delete from admin panel (use API instead)
-    def can_create(self, request: Request) -> bool:
-        return False
+    actions = ["send_bulk_email"]
     
-    # Optional: Disable editing
-    def can_edit(self, request: Request) -> bool:
-        return False
+    @action(
+        name="send_bulk_email",
+        text="Send Bulk Email",
+        confirmation="Send email to ALL subscribers?",
+        submit_btn_text="Send",
+        form="""
+            <form>
+                <div>
+                    <label for='subject'>Subject</label>
+                    <input type='text' name='subject' required />
+                </div>
+                <div>
+                    <label for='body'>Body</label>
+                    <textarea name='body' required></textarea>
+                </div>
+            </form>
+        """,
+    )
+    async def send_bulk_email_action(self, request: Request, data: dict):
+        """Handle bulk email action"""
+        subject = data.get("subject")
+        body = data.get("body")
+        
+        thread = threading.Thread(
+            target=self.send_bulk_emails,
+            args=(subject, body)
+        )
+        thread.start()
+        
+        return RedirectResponse(
+            url=request.url_for("admin:list", identity=self.identity),
+            status_code=303
+        )
+    
+    def send_bulk_emails(self, subject: str, body: str):
+        db = SessionLocal()
+        try:
+            subscriptions = db.query(Subscription).all()
+            for subscription in subscriptions:
+                try:
+                    send_email(
+                        recipient=subscription.email,
+                        subject=subject,
+                        body=body
+                    )
+                    print(f"Sent email to {subscription.email}")
+                except Exception as e:
+                    print(f"Failed to send to {subscription.email}: {str(e)}")
+        finally:
+            db.close()
+
     
 
 class ContactInfoView(BaseModelView):
@@ -495,6 +574,7 @@ admin.mount_to(app)
 # Startup logic
 @app.on_event("startup")
 def on_startup():
+    app.state.background_tasks = BackgroundTasks()
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
