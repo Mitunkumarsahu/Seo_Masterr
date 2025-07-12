@@ -130,6 +130,7 @@ const ContactUsPage = () => {
             variant="h6"
             fontWeight="bold"
             sx={{
+              color:"#1e3a8a",
               position: "relative",
               display: "inline-block",
               "&::after": {
@@ -179,12 +180,12 @@ const ContactUsPage = () => {
           </Box>
 
           <Box mt={2}>
-            <Typography variant="subtitle2" fontWeight="bold">
+            <Typography variant="subtitle2" fontWeight="bold" sx={{color:"#1e3a8a"}}>
               Call us Toll-Free
             </Typography>
             <Typography
               variant="h5"
-              sx={{ color: theme.palette.primary.main, fontWeight: "bold" }}
+              sx={{ color:"#1e3a8a", fontWeight: "bold" }}
             >
               {contactInfo?.toll_free}
             </Typography>
@@ -249,7 +250,7 @@ const ContactUsPage = () => {
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           }}
         >
-          <Typography variant="h5" fontWeight="bold" mb={3}>
+          <Typography variant="h5" fontWeight="bold" mb={3} sx={{color:"#1e3a8a"}}>
             Request Free Consultation
           </Typography>
 

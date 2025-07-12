@@ -9,6 +9,10 @@ import {
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
+import { Home } from "lucide-react";
+import HomeFooterSearch from '../components/HomeFooterSearch';
+import { COLORS } from "../styles/Styles";
+
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -70,7 +74,7 @@ const Services = () => {
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
       <Container maxWidth="xl" sx={{ py: 8 }}>
-        <Typography variant="h3" fontWeight="bold" textAlign="center" mb={5}>
+        <Typography variant="h3" fontWeight="bold" textAlign="center" sx={{color:"#1e3a8a"}} mb={5}>
           Our Services
         </Typography>
 
@@ -127,7 +131,7 @@ const Services = () => {
       </Container>
 
       {/* CTA Section */}
-      <Box sx={{ backgroundColor: "#002B5B", py: 8 }}>
+      <Box sx={{ backgroundColor: "#1e3a8a", py: 8 }}>
         <Container maxWidth="md">
           <Typography
             variant="h5"
@@ -155,6 +159,7 @@ const Services = () => {
           </Box>
         </Container>
       </Box>
+      <HomeFooterSearch />
     </Box>
   );
 };
@@ -165,9 +170,9 @@ const TabButton = ({ label, selected, onClick }) => (
     variant="outlined"
     size="small"
     sx={{
-      backgroundColor: selected ? "#0C2F58" : "#ffffff",
-      color: selected ? "#fff" : "#0C2F58",
-      border: "1px solid #0C2F58",
+      backgroundColor: selected ? COLORS.primary : "#ffffff",
+      color: selected ? "#ffff" : COLORS.primary,
+      border: `1px solid ${COLORS.primary}`,
       fontWeight: 700,
       fontSize: "0.75rem",
       borderRadius: "20px",
@@ -176,12 +181,14 @@ const TabButton = ({ label, selected, onClick }) => (
       textTransform: "capitalize",
       minWidth: "auto",
       "&:hover": {
-        backgroundColor: selected ? "#092342" : "#e0eaff",
+        backgroundColor: selected
+          ? COLORS.primary
+          : "#e0eaff",
         borderColor: "#0C2F58",
       },
     }}
   >
-    {label}
+    {label.toUpperCase()}
   </Button>
 );
 
@@ -202,7 +209,7 @@ const ServiceCard = ({ post }) => {
         },
       }}
     >
-      <Box sx={{ height: 200, backgroundColor: "#f0f0f0" }}>
+      <Box sx={{ height: 200, backgroundColor: "#1e3a8a" }}>
         <img
           src={post.image_url}
           alt={post.title}
@@ -214,7 +221,7 @@ const ServiceCard = ({ post }) => {
         />
       </Box>
       <Box sx={{ p: 3 }}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{color:COLORS.primary}}>
           {post.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -234,6 +241,7 @@ const ServiceCard = ({ post }) => {
           LEARN MORE →
         </Button>
       </Box>
+
     </Box>
   );
 };

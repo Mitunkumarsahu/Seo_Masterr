@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi"; // Ensure this path is correct
+import { COLORS } from "../styles/Styles";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -51,7 +52,9 @@ const BlogPage = () => {
   useEffect(() => {
     let url = `http://127.0.0.1:8000/blogs/?page=${currentPage}&page_size=${ITEMS_PER_PAGE}`;
     if (selectedCategory !== "all") {
-      const selectedCat = categories.find((cat) => cat.slug === selectedCategory);
+      const selectedCat = categories.find(
+        (cat) => cat.slug === selectedCategory
+      );
       if (selectedCat) {
         url += `&category_id=${selectedCat.id}`;
       }
@@ -77,7 +80,7 @@ const BlogPage = () => {
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
-         {/* <Typography variant="h3" fontWeight="bold" sx={{ color: "#000", textAlign:"center",py:4, mb: 2 }}>
+      {/* <Typography variant="h3" fontWeight="bold" sx={{ color: "#000", textAlign:"center",py:4, mb: 2 }}>
           Blogs
         </Typography> */}
       {/* Header */}
@@ -94,7 +97,13 @@ const BlogPage = () => {
       </Box> */}
 
       <Container maxWidth="xl" sx={{ py: 6 }}>
-      <Typography variant="h3" fontWeight="bold" textAlign="center" mb={5}>
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          textAlign="center"
+          sx={{ color: "#1e3a8a" }}
+          mb={5}
+        >
           Our Blogs
         </Typography>
 
@@ -146,56 +155,142 @@ const BlogPage = () => {
                 key={blog.id}
                 sx={{
                   flex: "1 1 calc(33.33% - 2rem)",
-                  backgroundColor: "#fff",
                   borderRadius: "12px",
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-                  px: 3,
-                  py: 2,
+                  overflow: "hidden",
+                  position: "relative",
                   minWidth: "250px",
                   maxWidth: "calc(33.33% - 2rem)",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
                   transition: "0.3s",
                   "&:hover": {
                     transform: "translateY(-5px)",
                   },
                 }}
               >
-                <Typography variant="subtitle2" sx={{ color: "#00C896", fontWeight: 600 }}>
-                  {blog.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: "#333", mt: 1, mb: 2 }}>
-                  {blog.meta_description}
-                </Typography>
-
+                {/* Background Image */}
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    height: "250px",
+                    width: "100%",
+                    backgroundImage: `url(${blog.featured_image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    position: "relative",
                   }}
                 >
-                  <Typography variant="caption" sx={{ color: "gray", fontWeight: 500 }}>
-                    {blog.author}
-                  </Typography>
+                  {/* Dark Overlay for readability */}
                   <Box
                     sx={{
-                      width: "30px",
-                      height: "30px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ddd",
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2))",
+                      zIndex: 1,
                     }}
                   />
+
+                  {/* Text Content */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      zIndex: 2,
+                      color: "#fff",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      p: 2,
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontSize: "20px", fontWeight: 800 }}
+                      >
+                        {blog.title}
+                      </Typography>
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        {blog.meta_description}
+                      </Typography>
+                    </Box>
+
+                    {/* Author Info - bottom right */}
+                  </Box>
                 </Box>
 
-                <Button
-                  variant="outlined"
-                  sx={{ mt: 2, alignSelf: "flex-start", borderRadius: "20px" }}
-                  onClick={() => navigate(`/blog/${blog.id}`)}
-                >
-                  Read More
-                </Button>
+                <Box sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      flexDirection: "row",
+
+                }}>
+                  {/* Read More Button */}
+                  <Box
+                    sx={{
+                      p: 2,
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        bgcolor: "transparent",
+                        color: "#ffffff",
+                        textTransform: "uppercase",
+                        borderRadius: 5,
+                        mt: 1,
+                        alignSelf: "flex-start",
+                        position: "relative",
+                        overflow: "hidden",
+                        border: "2px solid transparent",
+                        background:
+                          "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                        backgroundClip: "padding-box",
+                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                        animation: "buttonPulse 2s ease-in-out infinite",
+                        "&::before": {
+                          content: '""',
+                          position: "absolute",
+                          top: 0,
+                          left: "-100%",
+                          width: "100%",
+                          height: "100%",
+                          background:
+                            "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
+                          transition: "left 0.6s",
+                        },
+                        "&:hover": {
+                          transform: "translateY(-3px) scale(1.05)",
+                          background:
+                            "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                          "&::before": {
+                            left: "100%",
+                          },
+                        },
+                        "&:active": {
+                          transform: "translateY(-1px) scale(1.02)",
+                        },
+                      }}
+                      onClick={() => navigate(`/blog/${blog.id}`)}
+                    >
+                      Read More
+                    </Button>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      mx: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ color: COLORS.primary, fontSize:"12px", fontWeight: 900 }}
+                    >
+                     Author: {blog.author.toUpperCase()}
+                    </Typography>
+                  
+                  </Box>
+                </Box>
               </Box>
             ))}
           </Box>
@@ -224,9 +319,9 @@ const CategoryTab = ({ label, selected, onClick }) => (
     variant="outlined"
     size="small"
     sx={{
-      backgroundColor: selected ? "#0C2F58" : "#ffffff",
-      color: selected ? "#fff" : "#0C2F58",
-      border: "1px solid #0C2F58",
+      backgroundColor: selected ? COLORS.primary : "#ffffff",
+      color: selected ? "#ffff" : COLORS.primary,
+      border: `1px solid ${COLORS.primary}`,
       fontWeight: 700,
       fontSize: "0.75rem",
       borderRadius: "20px",
@@ -235,12 +330,12 @@ const CategoryTab = ({ label, selected, onClick }) => (
       textTransform: "capitalize",
       minWidth: "auto",
       "&:hover": {
-        backgroundColor: selected ? "#092342" : "#e0eaff",
+        backgroundColor: selected ? COLORS.primary : "#e0eaff",
         borderColor: "#0C2F58",
       },
     }}
   >
-    {label}
+    {label.toUpperCase()}
   </Button>
 );
 
