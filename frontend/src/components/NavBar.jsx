@@ -52,12 +52,24 @@ export default function NavBar() {
     { label: "About Us", to: "/about-us" },
     { label: "Contact Us", to: "/contact-us" },
   ];
-
-  const getLinkStyle = (to) => ({
-    color: location.pathname === to ? COLORS.green400 : "white",
-    fontWeight: location.pathname === to ? "bold" : "normal",
-    "&:hover": { color: COLORS.green400 },
-  });
+  const getLinkStyle = (to) => {
+    const path = location.pathname;
+  
+    const isActive =
+      path === to ||
+      path.startsWith(to + "/") ||
+      (to === "/blogs" && path.startsWith("/blog/")) ||    // blog details
+      (to === "/services" && path.startsWith("/service/")); // service details
+  
+    return {
+      color: isActive ? COLORS.green400 : "white",
+      fontWeight: isActive ? "bold" : "normal",
+      "&:hover": { color: COLORS.green400 },
+    };
+  };
+  
+  
+  
 
   return (
     <>

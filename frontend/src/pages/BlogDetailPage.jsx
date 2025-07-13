@@ -18,12 +18,7 @@ const BlogDetailPage = () => {
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
 
-  const {
-    apiCall: getBlogDetail,
-    data,
-    loading,
-    error,
-  } = useApi();
+  const { apiCall: getBlogDetail, data, loading, error } = useApi();
 
   useEffect(() => {
     getBlogDetail(`http://127.0.0.1:8000/blogs/${id}/with-recent`);
@@ -87,26 +82,84 @@ const BlogDetailPage = () => {
 
             {/* Social Share Buttons */}
             <Stack direction="row" spacing={1} justifyContent="center" mb={2}>
-              <Button size="small" variant="contained" color="primary">Facebook</Button>
-              <Button size="small" variant="contained" color="error">YouTube</Button>
-              <Button size="small" variant="contained" color="secondary">Email</Button>
-              <Button size="small" variant="contained" sx={{ backgroundColor: "#25D366" }}>WhatsApp</Button>
-              <Button size="small" variant="contained" sx={{ backgroundColor: "#1DA1F2" }}>Twitter</Button>
+              <Button size="small" variant="contained" color="primary">
+                Facebook
+              </Button>
+              <Button size="small" variant="contained" color="error">
+                YouTube
+              </Button>
+              <Button size="small" variant="contained" color="secondary">
+                Email
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                sx={{ backgroundColor: "#25D366" }}
+              >
+                WhatsApp
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                sx={{ backgroundColor: "#1DA1F2" }}
+              >
+                Twitter
+              </Button>
             </Stack>
 
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              mb={2}
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-
-            {/* Optional Image */}
             <Box
-              component="img"
-              src="https://via.placeholder.com/800x400"
-              alt="Second Image"
-              sx={{ width: "100%", borderRadius: 2, mb: 2 }}
+              sx={{
+                wordBreak: "break-word",
+                overflowWrap: "break-word",
+                "& img": {
+                  maxWidth: "100%",
+                  height: "auto",
+                  borderRadius: 2,
+                  my: 2,
+                  display: "block",
+                },
+                "& table": {
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  my: 2,
+                  overflowX: "auto",
+                  display: "block",
+                },
+                "& table, & th, & td": {
+                  border: "1px solid #ddd",
+                },
+                "& th, & td": {
+                  padding: "8px",
+                  textAlign: "left",
+                },
+                "& iframe, & video": {
+                  maxWidth: "100%",
+                  height: "auto",
+                  borderRadius: 2,
+                  my: 2,
+                  display: "block",
+                },
+                "& p": {
+                  marginBottom: "1rem",
+                  lineHeight: 1.7,
+                  fontSize: "1rem",
+                  color: "#333",
+                },
+                "& pre, & code": {
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  backgroundColor: "#f4f4f4",
+                  padding: "0.5rem",
+                  borderRadius: "6px",
+                  display: "block",
+                  fontSize: "0.9rem",
+                  overflowX: "auto",
+                },
+                "& *": {
+                  boxSizing: "border-box",
+                },
+              }}
+              dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
             {/* Author Info */}
@@ -119,11 +172,29 @@ const BlogDetailPage = () => {
 
             {/* Share Again */}
             <Stack direction="row" spacing={1} justifyContent="center">
-              <Button size="small" variant="contained" color="primary">Facebook</Button>
-              <Button size="small" variant="contained" color="error">YouTube</Button>
-              <Button size="small" variant="contained" color="secondary">Email</Button>
-              <Button size="small" variant="contained" sx={{ backgroundColor: "#25D366" }}>WhatsApp</Button>
-              <Button size="small" variant="contained" sx={{ backgroundColor: "#1DA1F2" }}>Twitter</Button>
+              <Button size="small" variant="contained" color="primary">
+                Facebook
+              </Button>
+              <Button size="small" variant="contained" color="error">
+                YouTube
+              </Button>
+              <Button size="small" variant="contained" color="secondary">
+                Email
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                sx={{ backgroundColor: "#25D366" }}
+              >
+                WhatsApp
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                sx={{ backgroundColor: "#1DA1F2" }}
+              >
+                Twitter
+              </Button>
             </Stack>
           </Box>
 
