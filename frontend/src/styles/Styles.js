@@ -31,8 +31,8 @@ const style = {
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
       minHeight: { xs: "auto", md: 500 },
-      fontFamily:
-        'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+      // fontFamily:
+      //   'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
     },
     leftSection: {
       backgroundColor: COLORS.primary,
@@ -337,8 +337,8 @@ const style = {
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
       minHeight: { xs: "auto", md: 500 },
-      fontFamily:
-        'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+      // fontFamily:
+      //   'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
       borderRadius: 4,
       overflow: "hidden",
       position: "relative",
