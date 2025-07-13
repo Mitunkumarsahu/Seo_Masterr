@@ -4,10 +4,11 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
+import { COLORS } from '../styles/Styles';
 
 const Footer = () => {
   return (
-    <Box sx={{ bgcolor: '#1e3a8a', color: 'white', mt: 0, pt: 6, pb: 2 }}>
+    <Box sx={{ bgcolor: COLORS.primary, color: 'white', mt: 0, pt: 6, pb: 2 }}>
       <Grid container spacing={4} justifyContent="space-around" sx={{ px: { xs: 3, md: 10 } }}>
         {/* Logo + Socials */}
         <Grid item xs={12} md={3}>
@@ -26,40 +27,57 @@ const Footer = () => {
           </Box>
         </Grid>
 
-        {/* Columns */}
+        {/* Quick Links */}
         <Grid item xs={6} md={2}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Lorem Ipsum</Typography>
-          <Typography variant="body2">Lorem Ipsum<br />Has Been The<br />Industry's Standard</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Quick Links</Typography>
+          <Typography variant="body2">
+            <Link href="/blogs" color="inherit" underline="hover">Blogs</Link><br />
+            <Link href="/services" color="inherit" underline="hover">Services</Link><br />
+            <Link href="/about-us" color="inherit" underline="hover">About Us</Link><br />
+            <Link href="/contact-us" color="inherit" underline="hover">Contact Us</Link>
+          </Typography>
         </Grid>
+
+        {/* Services */}
         <Grid item xs={6} md={2}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Lorem Ipsum</Typography>
-          <Typography variant="body2">Lorem Ipsum<br />Has Been The<br />Industry's Standard</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Our Services</Typography>
+          <Typography variant="body2">
+            SEO Optimization<br />
+            PPC Advertising<br />
+            Social Media Marketing<br />
+            Website Development
+          </Typography>
         </Grid>
+
+        {/* Company */}
         <Grid item xs={6} md={2}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Lorem Ipsum</Typography>
-          <Typography variant="body2">Lorem Ipsum<br />Has Been The<br />Industry's Standard</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Company</Typography>
+          <Typography variant="body2">
+            Empowering brands with data-driven strategies<br />
+            Trusted by startups and enterprises<br />
+            Customized growth plans<br />
+            Transparent communication
+          </Typography>
         </Grid>
 
         {/* Contact Info */}
         <Grid item xs={6} md={3}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Ipsum Has</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Get In Touch</Typography>
           <Box sx={{ display: 'flex', alignItems: 'start', gap: 1, mt: 1 }}>
             <LocationOnIcon fontSize="small" />
-            <Typography variant="body2">Lorem Ipsum has<br />been the industry</Typography>
+            <Typography variant="body2">Bhubaneswar, Odisha<br />India - 751003</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'start', gap: 1, mt: 1 }}>
             <PhoneIcon fontSize="small" />
-            <Typography variant="body2">12345678910<br />12345678910</Typography>
+            <Typography variant="body2">+91 8249*****<br />support@seomasterr.com</Typography>
           </Box>
         </Grid>
       </Grid>
 
       {/* Centered Paragraph */}
-      <Box sx={{ my: 3,  mx: { xs: 3, md: 10 },mt: 7}}>
-        <Typography variant="body2" sx={{ textAlign: 'left'}}>
-          Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
-          when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
-          It has survived not.
+      <Box sx={{ my: 3, mx: { xs: 3, md: 10 }, mt: 7 }}>
+        <Typography variant="body2" sx={{ textAlign: 'left' }}>
+          At Smile, we specialize in delivering measurable digital growth. From driving traffic through expert SEO practices to generating qualified leads via PPC and social media campaigns, we’re here to turn your online presence into real business results. Read our blogs to stay updated with digital trends, or explore our services to take your brand to the next level.
         </Typography>
       </Box>
 
@@ -79,10 +97,10 @@ const Footer = () => {
         }}
       >
         <Typography variant="body2">
-          Lorem Ipsum Has been Dummy Text And Simple Has
+          © {new Date().getFullYear()} SEO Master. All rights reserved.
         </Typography>
-        <Link href="#" underline="hover" color="inherit">
-          Lorem Ipsum Has been Dummy Text And Simple Has
+        <Link href="/privacy-policy" underline="hover" color="inherit">
+          Privacy Policy
         </Link>
       </Box>
     </Box>
