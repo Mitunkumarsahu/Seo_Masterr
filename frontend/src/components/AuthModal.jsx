@@ -10,25 +10,35 @@ import {
   Divider,
   CircularProgress,
   IconButton,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import { GoogleLogin } from "@react-oauth/google";
 import useApi from "../hooks/useApi";
-import {useAuth} from "../hooks/useAuth";
-import { Snackbar, Alert } from "@mui/material";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
-
-const AuthModal = ({ open, handleClose }) => {
+const AuthModal = ({
+  open,
+  handleClose,
+  onSuccess,
+  redirectTo = "/",
+  mode = "default", // "default" or "private"
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState({ username: "", email: "", password: "" });
-  // const { apiCall, loading } = useApi();
   const [error, setError] = useState("");
-  const { isAuthenticated, user, loading, login, logout } = useAuth();
-  
+  const { login, loading } = useAuth();
+  const { apiCall } = useApi();
+  const navigate = useNavigate();
+
+  const closeModal = () => {
+    if (mode !== "private" && handleClose) handleClose();
+  };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -47,76 +57,114 @@ const AuthModal = ({ open, handleClose }) => {
         const result = await login(loginData);
 
         if (result.success) {
-          setTimeout(() => handleClose(), 1200);
+          closeModal();
+          onSuccess?.();
+          setTimeout(() => navigate(redirectTo), 300);
         } else {
           setError(result.error || "Login failed");
         }
       } else {
-        await apiCall('http://localhost:8000/auth/signup', 'POST', {
+        await apiCall("http://localhost:8000/auth/signup", "POST", {
           username: form.username,
           email: form.email,
           password: form.password,
           permissions: [],
           is_editor: false,
-        })
-        console.log('Signup success')
-        handleClose()
+        });
+        closeModal();
+        onSuccess?.();
+        setTimeout(() => navigate(redirectTo), 300);
       }
     } catch (err) {
-      setError(err.message)
+      setError(err.message || "Something went wrong");
     }
-  }
+  };
 
   const handleGoogleSuccess = async (credentialResponse) => {
-    const payload = JSON.parse(atob(credentialResponse.credential.split('.')[1]))
-    const email = payload.email
-    const username = payload.name.replace(/\s/g, '')
+    const payload = JSON.parse(atob(credentialResponse.credential.split(".")[1]));
+    const email = payload.email;
+    const username = payload.name.replace(/\s/g, "");
 
     try {
-      await apiCall('http://localhost:8000/auth/signup', 'POST', {
+      await apiCall("http://localhost:8000/auth/signup", "POST", {
         username,
         email,
-        password: '',
+        password: "",
         permissions: [],
         is_editor: false,
-      })
-      console.log('Google signup/login success')
-      handleClose()
+      });
+      closeModal();
+      onSuccess?.();
+      setTimeout(() => navigate(redirectTo), 300);
     } catch (err) {
-      setError('Google Auth failed')
+      setError("Google Auth failed");
     }
-  }
-
+  };
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal
+      open={open}
+      onClose={closeModal}
+      disableEscapeKeyDown={mode === "private"}
+      sx={{ pointerEvents: mode === "private" ? "none" : "auto" }}
+      BackdropProps={{
+        onClick: (e) => {
+          if (mode !== "private") closeModal();
+          e.stopPropagation();
+        },
+      }}
+    >
       <Box
         sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: isMobile ? '90%' : 400,
-          bgcolor: 'background.paper',
+          pointerEvents: "auto",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: isMobile ? "90%" : 400,
+          bgcolor: "background.paper",
           boxShadow: 24,
           p: isMobile ? 3 : 4,
           borderRadius: 3,
-          borderTop: '6px solid #0a2b4c',
-        //   position: 'relative',
+          borderTop: "6px solid #0a2b4c",
         }}
       >
-        {/* Close Button */}
-        <IconButton
-          onClick={handleClose}
-          sx={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            color: '#0a2b4c',
-            zIndex: 1,
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        {/* Private Mode Warning */}
+        {mode === "private" && (
+          <Box mb={2}>
+            <Typography variant="body1" sx={{ color: "#b91c1c", fontWeight: "bold", mb: 1 }}>
+              ⚠ You must be logged in to continue
+            </Typography>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => navigate("/")}
+              sx={{
+                mb: 2,
+                color: "#0a2b4c",
+                borderColor: "#0a2b4c",
+                "&:hover": { backgroundColor: "#0a2b4c", color: "white" },
+              }}
+            >
+              Go to Home
+            </Button>
+          </Box>
+        )}
+
+        {/* Close Button (not in private mode) */}
+        {mode !== "private" && (
+          <IconButton
+            onClick={closeModal}
+            sx={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              color: "#0a2b4c",
+              zIndex: 1,
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
 
         {/* Tabs */}
         <Tabs
@@ -126,12 +174,12 @@ const AuthModal = ({ open, handleClose }) => {
           textColor="primary"
           indicatorColor="primary"
           sx={{
-            '& .MuiTabs-indicator': { backgroundColor: '#0a2b4c' },
+            "& .MuiTabs-indicator": { backgroundColor: "#0a2b4c" },
             mb: 2,
           }}
         >
-          <Tab label="Login" sx={{ color: '#0a2b4c', fontWeight: 600 }} />
-          <Tab label="Sign Up" sx={{ color: '#0a2b4c', fontWeight: 600 }} />
+          <Tab label="Login" sx={{ color: "#0a2b4c", fontWeight: 600 }} />
+          <Tab label="Sign Up" sx={{ color: "#0a2b4c", fontWeight: 600 }} />
         </Tabs>
 
         {/* Form */}
@@ -178,15 +226,21 @@ const AuthModal = ({ open, handleClose }) => {
             fullWidth
             sx={{
               mt: 2,
-              backgroundColor: '#0a2b4c',
-              '&:hover': {
-                backgroundColor: '#093456',
+              backgroundColor: "#0a2b4c",
+              "&:hover": {
+                backgroundColor: "#093456",
               },
             }}
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={22} color="inherit" /> : tab === 0 ? 'Login' : 'Sign Up'}
+            {loading ? (
+              <CircularProgress size={22} color="inherit" />
+            ) : tab === 0 ? (
+              "Login"
+            ) : (
+              "Sign Up"
+            )}
           </Button>
 
           <Divider sx={{ my: 3 }}>OR</Divider>
@@ -194,13 +248,13 @@ const AuthModal = ({ open, handleClose }) => {
           <Box display="flex" justifyContent="center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google Auth failed')}
+              onError={() => setError("Google Auth failed")}
             />
           </Box>
         </Box>
       </Box>
     </Modal>
-  )
-}
+  );
+};
 
-export default AuthModal
+export default AuthModal;
