@@ -142,158 +142,235 @@ const BlogPage = () => {
             No blogs found for this category.
           </Typography>
         ) : (
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              gap: 3,
-            }}
-          >
+          // <Box
+          //   sx={{
+          //     display: "flex",
+          //     flexWrap: "wrap",
+          //     justifyContent: "space-between",
+          //     gap: 3,
+          //   }}
+          // >
+          //   {blogs.map((blog) => (
+          //     <Box
+          //       key={blog.id}
+          //       sx={{
+          //         flex: "1 1 calc(33.33% - 2rem)",
+          //         borderRadius: "12px",
+          //         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
+          //         overflow: "hidden",
+          //         position: "relative",
+          //         minWidth: "250px",
+          //         maxWidth: "calc(33.33% - 2rem)",
+          //         transition: "0.3s",
+          //         "&:hover": {
+          //           transform: "translateY(-5px)",
+          //         },
+          //       }}
+          //     >
+          //       {/* Background Image */}
+          //       <Box
+          //         sx={{
+          //           height: "250px",
+          //           width: "100%",
+          //           backgroundImage: `url(${blog.featured_image})`,
+          //           backgroundSize: "cover",
+          //           backgroundPosition: "center",
+          //           position: "relative",
+          //         }}
+          //       >
+          //         {/* Dark Overlay for readability */}
+          //         <Box
+          //           sx={{
+          //             position: "absolute",
+          //             inset: 0,
+          //             background:
+          //               "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2))",
+          //             zIndex: 1,
+          //           }}
+          //         />
+
+          //         {/* Text Content */}
+          //         <Box
+          //           sx={{
+          //             position: "absolute",
+          //             inset: 0,
+          //             zIndex: 2,
+          //             color: "#fff",
+          //             display: "flex",
+          //             flexDirection: "column",
+          //             justifyContent: "space-between",
+          //             p: 2,
+          //           }}
+          //         >
+          //           <Box>
+          //             <Typography
+          //               variant="subtitle2"
+          //               sx={{ fontSize: "20px", fontWeight: 800 }}
+          //             >
+          //               {blog.title}
+          //             </Typography>
+          //             <Typography variant="body2" sx={{ mt: 1 }}>
+          //               {blog.meta_description}
+          //             </Typography>
+          //           </Box>
+
+          //           {/* Author Info - bottom right */}
+          //         </Box>
+          //       </Box>
+
+          //       <Box sx={{
+          //             display: "flex",
+          //             justifyContent: "space-between",
+          //             flexDirection: "row",
+
+          //       }}>
+          //         {/* Read More Button */}
+          //         <Box
+          //           sx={{
+          //             p: 2,
+          //           }}
+          //         >
+          //           <Button
+          //             variant="outlined"
+          //             sx={{
+          //               bgcolor: "transparent",
+          //               color: "#ffffff",
+          //               textTransform: "uppercase",
+          //               borderRadius: 5,
+          //               mt: 1,
+          //               alignSelf: "flex-start",
+          //               position: "relative",
+          //               overflow: "hidden",
+          //               border: "2px solid transparent",
+          //               background:
+          //                 "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+          //               backgroundClip: "padding-box",
+          //               transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          //               animation: "buttonPulse 2s ease-in-out infinite",
+          //               "&::before": {
+          //                 content: '""',
+          //                 position: "absolute",
+          //                 top: 0,
+          //                 left: "-100%",
+          //                 width: "100%",
+          //                 height: "100%",
+          //                 background:
+          //                   "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
+          //                 transition: "left 0.6s",
+          //               },
+          //               "&:hover": {
+          //                 transform: "translateY(-3px) scale(1.05)",
+          //                 background:
+          //                   "linear-gradient(135deg, #059669 0%, #047857 100%)",
+          //                 "&::before": {
+          //                   left: "100%",
+          //                 },
+          //               },
+          //               "&:active": {
+          //                 transform: "translateY(-1px) scale(1.02)",
+          //               },
+          //             }}
+          //             onClick={() => navigate(`/blog/${blog.id}`)}
+          //           >
+          //             Read More
+          //           </Button>
+          //         </Box>
+          //         <Box
+          //           sx={{
+          //             display: "flex",
+          //             alignItems: "center",
+          //             mx: 2,
+          //           }}
+          //         >
+          //           <Typography
+          //             variant="caption"
+          //             sx={{ color: COLORS.primary, fontSize:"12px", fontWeight: 900 }}
+          //           >
+          //            Author: {blog.author.toUpperCase()}
+          //           </Typography>
+                  
+          //         </Box>
+          //       </Box>
+          //     </Box>
+          //   ))}
+          // </Box>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 4, px: { xs: 2, sm: 4, md: 30 }, py: 4 }}>
             {blogs.map((blog) => (
               <Box
                 key={blog.id}
                 sx={{
-                  flex: "1 1 calc(33.33% - 2rem)",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-                  overflow: "hidden",
-                  position: "relative",
-                  minWidth: "250px",
-                  maxWidth: "calc(33.33% - 2rem)",
-                  transition: "0.3s",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                  },
+                  display: "flex",
+                  // flexDirection: { xs: "column", sm: "row" },
+                  gap: 3,
+                  borderBottom: "1px solid #ddd",
+                  pb: 3,
                 }}
               >
-                {/* Background Image */}
+                {/* Thumbnail */}
                 <Box
                   sx={{
-                    height: "250px",
-                    width: "100%",
-                    backgroundImage: `url(${blog.featured_image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    position: "relative",
+                    width: { xs: 40, sm: 60 },
+                    height: { xs: 40, sm: 60 },
+                    borderRadius: '50%',
+                    overflow: "hidden",
+                    flexShrink: 0,
                   }}
                 >
-                  {/* Dark Overlay for readability */}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      background:
-                        "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2))",
-                      zIndex: 1,
+                  <img
+                    src={blog.featured_image}
+                    alt={blog.title}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
                     }}
                   />
-
-                  {/* Text Content */}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      zIndex: 2,
-                      color: "#fff",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      p: 2,
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontSize: "20px", fontWeight: 800 }}
-                      >
-                        {blog.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        {blog.meta_description}
-                      </Typography>
-                    </Box>
-
-                    {/* Author Info - bottom right */}
-                  </Box>
                 </Box>
 
-                <Box sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      flexDirection: "row",
+                {/* Content */}
+                <Box sx={{ flex: 1 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "#1e3a8a",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      "&:hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
+                    onClick={() => navigate(`/blog/${blog.id}`)}
+                  >
+                    {blog.title}
+                  </Typography>
 
-                }}>
-                  {/* Read More Button */}
-                  <Box
+                  <Typography
+                    variant="body2"
                     sx={{
-                      p: 2,
+                      fontStyle: "italic",
+                      color: "text.secondary",
+                      mb: 1,
                     }}
                   >
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        bgcolor: "transparent",
-                        color: "#ffffff",
-                        textTransform: "uppercase",
-                        borderRadius: 5,
-                        mt: 1,
-                        alignSelf: "flex-start",
-                        position: "relative",
-                        overflow: "hidden",
-                        border: "2px solid transparent",
-                        background:
-                          "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                        backgroundClip: "padding-box",
-                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                        animation: "buttonPulse 2s ease-in-out infinite",
-                        "&::before": {
-                          content: '""',
-                          position: "absolute",
-                          top: 0,
-                          left: "-100%",
-                          width: "100%",
-                          height: "100%",
-                          background:
-                            "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
-                          transition: "left 0.6s",
-                        },
-                        "&:hover": {
-                          transform: "translateY(-3px) scale(1.05)",
-                          background:
-                            "linear-gradient(135deg, #059669 0%, #047857 100%)",
-                          "&::before": {
-                            left: "100%",
-                          },
-                        },
-                        "&:active": {
-                          transform: "translateY(-1px) scale(1.02)",
-                        },
-                      }}
-                      onClick={() => navigate(`/blog/${blog.id}`)}
-                    >
-                      Read More
-                    </Button>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      mx: 2,
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{ color: COLORS.primary, fontSize:"12px", fontWeight: 900 }}
-                    >
-                     Author: {blog.author.toUpperCase()}
-                    </Typography>
-                  
-                  </Box>
+                    By {blog.author} • {new Date(blog.published_at).toLocaleDateString("en-IN", {
+                      weekday: "short",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </Typography>
+
+                  <Typography variant="body2" sx={{ color: "text.primary" }}>
+                    {blog.meta_description.length > 150
+                      ? blog.meta_description.slice(0, 150) + "..."
+                      : blog.meta_description}
+                  </Typography>
                 </Box>
               </Box>
             ))}
           </Box>
+
         )}
 
         {/* Pagination */}
