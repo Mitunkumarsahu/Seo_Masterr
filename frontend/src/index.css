@@ -3,4 +3,8 @@
     padding: 0;
     box-sizing: border-box;
   }
+  .body-blur > *:not(.MuiModal-root) {
+    filter: blur(86px);
+    pointer-events: none;
+  }
   

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -42,6 +42,13 @@ const AuthModal = ({
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  useEffect(() => {
+    if (open && mode === "private") {
+      document.body.classList.add("body-blur");
+    } else {
+      document.body.classList.remove("body-blur");
+    }
+  }, [open, mode]);
 
   const handleSubmit = async () => {
     setError("");
@@ -58,6 +65,8 @@ const AuthModal = ({
 
         if (result.success) {
           closeModal();
+          document.body.classList.remove("body-blur");
+
           onSuccess?.();
           setTimeout(() => navigate(redirectTo), 300);
         } else {
@@ -137,7 +146,10 @@ const AuthModal = ({
             <Button
               variant="outlined"
               fullWidth
-              onClick={() => navigate("/")}
+              onClick={function () {
+                document.body.classList.remove("body-blur");
+                navigate("/");
+              }}
               sx={{
                 mb: 2,
                 color: "#0a2b4c",
