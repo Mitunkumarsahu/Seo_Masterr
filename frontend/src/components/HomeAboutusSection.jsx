@@ -23,7 +23,7 @@ export default function HomeAboutusSection({ data }) {
           {data.description}
         </Typography>
 
-        <Button variant="contained" sx={styles.button}>
+        <Button variant="contained" sx={style.heroSection.button}>
           Learn More
         </Button>
       </Box>

@@ -73,7 +73,7 @@ const style = {
       bgcolor: "transparent",
       color: "#ffffff",
       fontSize: "14px",
-      fontWeight: 600,
+      fontWeight: 400,
       px: 3,
       py: 1.5,
       textTransform: "uppercase",
@@ -148,7 +148,7 @@ const style = {
     heading: {
       color: COLORS.primary,
       fontWeight: "bold",
-      fontSize: { xs: "20px", sm: "24px", md: "28px" },
+      fontSize:  { xs: "32px", md: "48px" },
       background: 'linear-gradient(45deg, #0C2F58, #1a5490)',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
@@ -234,7 +234,7 @@ const style = {
       boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
     },
     cardTitle: {
-      fontSize: "16px",
+      fontSize: { xs: "32px", md: "48px" },
       fontWeight: "bold",
       background: 'linear-gradient(45deg, #0C2F58, #1a5490)',
       WebkitBackgroundClip: 'text',
@@ -250,7 +250,7 @@ const style = {
       display: "inline-flex",
       alignItems: "center",
       fontSize: "14px",
-      fontWeight: 600,
+      fontWeight: 400,
       color: COLORS.accentBlue,
       textTransform: "lowercase",
       position: "relative",
@@ -288,7 +288,7 @@ const style = {
       height: "200px",
     },
     arrowIcon: {
-      fontSize: "18px",
+      fontSize: "14px",
       ml: 0.5,
       transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     },
@@ -307,7 +307,7 @@ const style = {
       fontWeight: "bold",
       textAlign: "center",
       mb: 5,
-      fontSize: { xs: "20px", md: "32px" },
+      fontSize: { xs: "32px", md: "48px" },
     },
     gridItemWrapper: {
       display: "flex",
@@ -323,7 +323,7 @@ const style = {
     },
     itemText: {
       textAlign: "center",
-      fontSize: "16px",
+      fontSize: "14px",
       lineHeight: 1.4,
     },
   },
@@ -356,8 +356,8 @@ const style = {
       backdropFilter: "blur(20px)",
     },
     title: {
-      fontSize: { xs: "36px", md: "56px" },
-      fontWeight: 800,
+      fontSize: { xs: "32px", md: "48px" },
+      fontWeight: "bold",
       lineHeight: 1.1,
       mb: 3,
       background: "linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 50%, #1e3a8a 100%)",
@@ -387,7 +387,7 @@ const style = {
       },
     },
     description: {
-      fontSize: "18px",
+      fontSize: "14px",
       lineHeight: 1.8,
       mb: 5,
       color: "#4a5568",
@@ -400,7 +400,7 @@ const style = {
         position: "absolute",
         left: -30,
         top: 0,
-        fontSize: "20px",
+        fontSize: "17px",
         animation: "sparkle 2s ease-in-out infinite",
       },
       "@keyframes fadeInUp": {
@@ -415,8 +415,8 @@ const style = {
     button: {
       bgcolor: "transparent",
       color: "#ffffff",
-      fontSize: "16px",
-      fontWeight: 700,
+      fontSize: "14px",
+      fontWeight: 400,
       px: 5,
       py: 2.5,
       textTransform: "uppercase",
@@ -510,7 +510,7 @@ const style = {
       textAlign: "center",
       mb: 8,
       fontSize: { xs: "32px", md: "48px" },
-      fontWeight: 800,
+      fontWeight: "bold",
       position: "relative",
       zIndex: 2,
       background: "linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 50%, #1e3a8a 100%)",
@@ -590,7 +590,7 @@ const style = {
       },
     },
     quoteIcon: {
-      fontSize: { xs: 24, md: 28 },
+      fontSize: { xs: 16, md: 18 },
       color: "#10b981",
       mb: 2,
       position: "relative",
@@ -653,19 +653,19 @@ const style = {
     },
     name: {
       fontSize: { xs: "14px", md: "16px" },
-      fontWeight: 700,
+      fontWeight: 400,
       color: "#1e3a8a",
       mb: 0.5,
       position: "relative",
       zIndex: 2,
     },
     title: {
-      fontSize: { xs: "12px", md: "13px" },
+      fontSize:  { xs: "14px", md: "16px" },
       color: "#64748b",
       mb: 1.5,
       position: "relative",
       zIndex: 2,
-      fontWeight: 500,
+      fontWeight: "bold",
     },
     stars: {
       justifyContent: "center",
@@ -673,7 +673,7 @@ const style = {
       position: "relative",
       zIndex: 2,
       "& .MuiSvgIcon-root": {
-        fontSize: "16px",
+        fontSize: "14px",
         color: "#fbbf24",
         filter: "drop-shadow(0 2px 4px rgba(251, 191, 36, 0.3))",
         animation: "testimonialStarTwinkle 2s ease-in-out infinite",
@@ -693,12 +693,12 @@ const style = {
       mt: 6,
       color: "#64748b",
       fontSize: "14px",
-      fontWeight: 500,
+      fontWeight: 400,
       position: "relative",
       zIndex: 2,
       "& span": {
         color: "#10b981",
-        fontWeight: 700,
+        fontWeight: 600,
         fontSize: "16px",
       },
     },
@@ -720,9 +720,9 @@ const style = {
       mx: "auto",
     },
     heading: {
-      fontWeight: 700,
+      fontWeight: "bold",
       color: "#1e3a8a",
-      fontSize: { xs: "clamp(16px, 4.5vw, 18px)", sm: "20px" },
+      fontSize:  { xs: "20px", md: "22px" },
       lineHeight: 1.35,
       maxWidth: { md: "55%" },
     },
@@ -748,7 +748,7 @@ const style = {
       bgcolor: "transparent",
       color: "#ffffff",
       fontSize: "14px",
-      fontWeight: 600,
+      fontWeight: 400,
       px: 4,
       textTransform: "none",
       borderRadius: 5,
@@ -834,7 +834,7 @@ const style = {
       borderRadius: 1,
     },
     featureTitle: {
-      fontWeight: 700,
+      fontWeight: "bold",
       color: "#0d2142",
       mb: 1,
     },
@@ -870,7 +870,7 @@ const style = {
       bgcolor: COLORS.secondary,
       "&:hover": { bgcolor: "#0e9f6e" },
       px: 4,
-      fontWeight: 700,
+      fontWeight: 400,
       "&:hover": { bgcolor: "#07a764" },
     },
     
@@ -881,7 +881,7 @@ const style = {
       textAlign: "center",
     },
     heading: {
-      fontWeight: 700,
+      fontWeight: "bold",
       color: COLORS.primary,
       mb: 4
     },
@@ -898,7 +898,7 @@ const style = {
       mb: 2
     },
     featureTitle: {
-      fontWeight: 700,
+      fontWeight: "bold",
       color: "#0d2142",
       mb: 1
     },
@@ -914,7 +914,7 @@ const style = {
     ctaButton: {
       bgcolor: "#08c177",
       px: 4,
-      fontWeight: 700,
+      fontWeight: 400,
       "&:hover": { bgcolor: "#07a764" }
     }
   },
@@ -926,7 +926,7 @@ const style = {
 
     heading: {
       textAlign: "center",
-      fontWeight: 700,
+      fontWeight: "bold",
       color: "#0d2142",
       mt: 2,
       mb: 4
@@ -943,7 +943,7 @@ const style = {
       mb: 6
     },
     catChip: {
-      fontWeight: 600,
+      fontWeight: 400,
       color: "#0d2142",
       cursor: "pointer",
       "&.active": {
@@ -954,9 +954,9 @@ const style = {
     /* cards */
     cardRoot: { maxWidth: 360, mx: "auto" },
     cardMedia: { height: 140, bgcolor: "#cfcfcf" },
-    cardTitle: { fontWeight: 700, color: "#0d2142", mt: 1, mb: 1 },
+    cardTitle: { fontWeight: "bold", color: "#0d2142", mt: 1, mb: 1 },
     cardExcerpt: { color: "text.secondary", fontSize: 14 },
-    learnMore: { mt: 2, fontWeight: 700, color: "#0d66ff", cursor: "pointer" },
+    learnMore: { mt: 2, fontWeight: 400, color: "#0d66ff", cursor: "pointer" },
 
     cardFooter: {
       display: "flex",
@@ -980,7 +980,7 @@ const style = {
     ctaBtn: {
       bgcolor: "#08c177",
       px: 4,
-      fontWeight: 700,
+      fontWeight: 400,
       "&:hover": { bgcolor: "#07a764" }
     }
   }
