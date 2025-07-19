@@ -19,9 +19,10 @@ import {
 } from "@mui/material";
 import { Menu as MenuIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import AuthModal from "./AuthModal";
-import {useAuth} from "../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
+import SubscribeModal from "./SubscribeModal";
+import useApi from "../hooks/useApi";
 
 const COLORS = {
   blue800: "#1e3a8a",
@@ -37,13 +38,51 @@ export default function NavBar() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
+  const [email, setEmail] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
+  const { apiCall: postSubscription, loading } = useApi();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
 
   const toggleDrawer = () => setMobileDrawerOpen((prev) => !prev);
   const handleMenuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
   const handleMenuClose = () => setUserMenuAnchorEl(null);
+
+  const handleSubmit = async () => {
+    if (!email || !email.includes("@")) {
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid email.",
+        severity: "error",
+      });
+      return;
+    }
+
+    try {
+      await postSubscription("http://127.0.0.1:8000/subscriptions/", "POST", {
+        email,
+      });
+      setSnackbar({
+        open: true,
+        message: "Subscribed successfully!",
+        severity: "success",
+      });
+      setEmail("");
+      setModalOpen(false);
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Subscription failed.",
+        severity: "error",
+      });
+    }
+  };
 
   const navLinks = [
     { label: "Home", to: "/" },
@@ -52,33 +91,27 @@ export default function NavBar() {
     { label: "About Us", to: "/about-us" },
     { label: "Contact Us", to: "/contact-us" },
   ];
+
   const getLinkStyle = (to) => {
     const path = location.pathname;
-
     const isActive =
       path === to ||
       path.startsWith(to + "/") ||
-      (to === "/blogs" && path.startsWith("/blog/")) || // blog details
-      (to === "/services" && path.startsWith("/service/")); // service details
-
+      (to === "/blogs" && path.startsWith("/blog/")) ||
+      (to === "/services" && path.startsWith("/service/"));
     return {
       color: isActive ? COLORS.green400 : "white",
       fontWeight: isActive ? "bold" : "normal",
       "&:hover": { color: COLORS.green400 },
     };
   };
-  
-  
-  
 
   return (
     <>
       <AppBar position="sticky" elevation={0} sx={{ bgcolor: COLORS.blue800 }}>
         <Toolbar sx={{ minHeight: 64 }}>
           {/* Logo */}
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
             <Box
               sx={{
                 width: 40,
@@ -127,6 +160,19 @@ export default function NavBar() {
               gap: 2,
             }}
           >
+            {/* New Subscribe Button */}
+            <Button
+              variant="outlined"
+              onClick={() => setModalOpen(true)}
+              sx={{
+                color: "white",
+                borderColor: "white",
+                "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+              }}
+            >
+              Subscribe
+            </Button>
+
             {isAuthenticated ? (
               <>
                 <Tooltip title="Account">
@@ -148,21 +194,9 @@ export default function NavBar() {
                   anchorEl={userMenuAnchorEl}
                   open={Boolean(userMenuAnchorEl)}
                   onClose={handleMenuClose}
-                  PaperProps={{
-                    sx: {
-                      mt: 1.5,
-                      minWidth: 180,
-                      boxShadow: 3,
-                    },
-                  }}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
+                  PaperProps={{ sx: { mt: 1.5, minWidth: 180, boxShadow: 3 } }}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  transformOrigin={{ vertical: "top", horizontal: "right" }}
                 >
                   <MenuItem disabled>
                     <Typography variant="subtitle2" color="text.secondary">
@@ -251,6 +285,23 @@ export default function NavBar() {
           </List>
           <Divider sx={{ borderColor: COLORS.slate700, my: 2 }} />
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {/* Subscribe button for mobile */}
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => {
+                setModalOpen(true);
+                toggleDrawer();
+              }}
+              sx={{
+                color: "white",
+                borderColor: "white",
+                "&:hover": { bgcolor: "white", color: COLORS.blue800 },
+              }}
+            >
+              Subscribe
+            </Button>
+
             {isAuthenticated ? (
               <>
                 <Typography sx={{ fontWeight: 600, mb: 1 }}>
@@ -309,13 +360,21 @@ export default function NavBar() {
         </Box>
       </Drawer>
 
+      {/* Auth & Subscribe Modals */}
       <AuthModal
         open={authModalOpen}
         handleClose={() => setAuthModalOpen(false)}
-        onSuccess={() => {
-          setAuthModalOpen(false);
-        }}
-        redirectTo={'/'}
+        onSuccess={() => setAuthModalOpen(false)}
+        redirectTo={"/"}
+      />
+
+      <SubscribeModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        email={email}
+        setEmail={setEmail}
+        loading={loading}
+        handleSubmit={handleSubmit}
       />
     </>
   );

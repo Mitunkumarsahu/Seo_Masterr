@@ -130,35 +130,8 @@ const Services = () => {
         </Box>
       </Container>
 
-      {/* CTA Section */}
-      <Box sx={{ backgroundColor: "#1e3a8a", py: 8 }}>
-        <Container maxWidth="md">
-          <Typography
-            variant="h5"
-            sx={{ color: "#fff", textAlign: "center", mb: 4 }}
-          >
-            Ready to grow your business with us?
-          </Typography>
-          <Box display="flex" justifyContent="center">
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#00C896",
-                color: "#fff",
-                fontWeight: "bold",
-                px: 5,
-                py: 1.5,
-                borderRadius: "30px",
-                "&:hover": {
-                  backgroundColor: "#00b488",
-                },
-              }}
-            >
-              GET STARTED
-            </Button>
-          </Box>
-        </Container>
-      </Box>
+
+
       <HomeFooterSearch />
     </Box>
   );
@@ -228,7 +201,7 @@ const ServiceCard = ({ post }) => {
           {post.meta_description}
         </Typography>
         <Button
-          onClick={() => navigate(`/service/${post.slug}`)}
+          onClick={() => navigate(`/service/${post.id}`)}
           sx={{
             mt: 2,
             fontWeight: 600,

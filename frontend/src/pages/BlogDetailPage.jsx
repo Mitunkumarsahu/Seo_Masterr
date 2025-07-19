@@ -8,7 +8,9 @@ import {
   Button,
   Stack,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../hooks/useApi"; // make sure this path is correct
 
@@ -52,9 +54,19 @@ const BlogDetailPage = () => {
   return (
     <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh", py: 4 }}>
       <Container>
-        <Typography variant="h4" align="center" fontWeight="bold" mb={4}>
+        <Typography variant="h4" align="center" fontWeight="bold" mb={1}>
           {post.title}
         </Typography>
+
+        {/* Author and Date */}
+        <Box display="flex" justifyContent="center" gap={1} mb={3}>
+          <Typography variant="body2" color="text.secondary">
+            By {post.author}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            • {new Date(post.published_at).toLocaleDateString()}
+          </Typography>
+        </Box>
 
         <Box
           sx={{
@@ -73,40 +85,43 @@ const BlogDetailPage = () => {
               boxShadow: 1,
             }}
           >
-            <Box
-              component="img"
-              src={post.featured_image}
-              alt="Post Cover"
-              sx={{ width: "100%", borderRadius: 2, mb: 2 }}
-            />
+            {/* Featured Image with Share Icon */}
+            <Box sx={{ position: "relative", mb: 2 }}>
+              <Box
+                component="img"
+                src={post.featured_image}
+                alt="Post Cover"
+                sx={{ width: "100%", borderRadius: 2 }}
+              />
+              <Tooltip title="Copy link" arrow>
+                <Button
+                  size="small"
+                  variant="contained"
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    right: 12,
+                    minWidth: "unset",
+                    padding: "6px",
+                    borderRadius: "50%",
+                    background: "#10b981",
+                    color: "white",
+                    boxShadow: 3,
+                    "&:hover": {
+                      backgroundColor: "#059669",
+                    },
+                  }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert("Link copied to clipboard!");
+                  }}
+                >
+                  <ContentCopyIcon fontSize="small" />
+                </Button>
+              </Tooltip>
+            </Box>
 
-            {/* Social Share Buttons */}
-            <Stack direction="row" spacing={1} justifyContent="center" mb={2}>
-              <Button size="small" variant="contained" color="primary">
-                Facebook
-              </Button>
-              <Button size="small" variant="contained" color="error">
-                YouTube
-              </Button>
-              <Button size="small" variant="contained" color="secondary">
-                Email
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#25D366" }}
-              >
-                WhatsApp
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#1DA1F2" }}
-              >
-                Twitter
-              </Button>
-            </Stack>
-
+            {/* Blog HTML Content */}
             <Box
               sx={{
                 wordBreak: "break-word",
@@ -162,40 +177,8 @@ const BlogDetailPage = () => {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
-            {/* Author Info */}
-            <Box display="flex" alignItems="center" gap={1} mt={2}>
-              <Avatar sx={{ bgcolor: "#ccc", width: 40, height: 40 }} />
-              <Typography variant="body2">{post.author}</Typography>
-            </Box>
-
+            {/* Bottom Divider */}
             <Divider sx={{ my: 2 }} />
-
-            {/* Share Again */}
-            <Stack direction="row" spacing={1} justifyContent="center">
-              <Button size="small" variant="contained" color="primary">
-                Facebook
-              </Button>
-              <Button size="small" variant="contained" color="error">
-                YouTube
-              </Button>
-              <Button size="small" variant="contained" color="secondary">
-                Email
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#25D366" }}
-              >
-                WhatsApp
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                sx={{ backgroundColor: "#1DA1F2" }}
-              >
-                Twitter
-              </Button>
-            </Stack>
           </Box>
 
           {/* Related Posts Sidebar */}

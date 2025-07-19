@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Stack,
-  TextField,
   Typography,
   useMediaQuery,
   useTheme,
@@ -11,7 +10,8 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import style from "../styles/Styles";
-import useApi from "../hooks/useApi"; // ✅ Import useApi
+import useApi from "../hooks/useApi";
+import SubscribeModal from "./SubscribeModal"; // ✅ Import modal component
 
 export default function HomeFooterSearch() {
   const styles = style.homeFooterSearch;
@@ -20,12 +20,9 @@ export default function HomeFooterSearch() {
 
   const [email, setEmail] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const {
-    apiCall: postSubscription,
-    loading,
-    error,
-  } = useApi();
+  const { apiCall: postSubscription, loading } = useApi();
 
   const handleSubmit = async () => {
     if (!email || !email.includes("@")) {
@@ -34,44 +31,81 @@ export default function HomeFooterSearch() {
     }
 
     try {
-      console.log(email);
-      await postSubscription("http://127.0.0.1:8000/subscriptions/","POST",{"email":email});
+      await postSubscription("http://127.0.0.1:8000/subscriptions/", "POST", { email });
       setSnackbar({ open: true, message: "Subscribed successfully!", severity: "success" });
       setEmail("");
+      setModalOpen(false);
     } catch (err) {
       setSnackbar({ open: true, message: "Subscription failed.", severity: "error" });
     }
   };
 
   return (
-    <Box sx={styles.wrapper}>
-      <Stack sx={styles.container}>
-        <Typography component="h2" sx={styles.heading}>
-          Lorem Ipsum has been the industry's standard dummy text ever since
-          the 1500s, when an
+    <Box
+      sx={{
+        py: 10,
+        position: "relative",
+        background: "transparent",
+        overflow: "hidden",
+        textAlign: "center",
+      }}
+    >
+      {/* Floating icons */}
+      <Box
+        component="img"
+        src="https://images.unsplash.com/photo-1741975520592-3a7fdaad929f?q=80&w=1449&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        sx={{
+          position: "absolute",
+          top: "15%",
+          left: "5%",
+          width: 80,
+          opacity: 0.03,
+          animation: "float 6s ease-in-out infinite",
+        }}
+      />
+      <Box
+        component="img"
+        src="https://images.unsplash.com/photo-1741975520592-3a7fdaad929f?q=80&w=1449&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        sx={{
+          position: "absolute",
+          top: "30%",
+          right: "5%",
+          width: 90,
+          opacity: 0.03,
+          animation: "float 8s ease-in-out infinite",
+        }}
+      />
+      <Box
+        component="img"
+        src="https://images.unsplash.com/photo-1741975520592-3a7fdaad929f?q=80&w=1449&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        sx={{
+          position: "absolute",
+          bottom: "10%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 100,
+          opacity: 0.03,
+          animation: "float 10s ease-in-out infinite",
+        }}
+      />
+
+      <Stack spacing={2} alignItems="center" position="relative" zIndex={2}>
+     
+        <Typography
+          variant="body2"
+          sx={styles.heading}
+        >
+          Stay updated with our latest news, offers, and tips directly in your inbox.
         </Typography>
 
-        <Stack sx={styles.inputStack} direction={isMobile ? "column" : "row"} spacing={1}>
-          <TextField
-            fullWidth
-            placeholder="Enter your email"
-            variant="outlined"
-            size="small"
-            sx={styles.input}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <Button
-            variant="contained"
-            size="small"
-            sx={styles.button}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "Subscribing..." : "Subscribe"}
-          </Button>
-        </Stack>
+        <Button
+          variant="contained"
+          size="small"
+          sx={style?.heroSection?.button}
+          onClick={() => setModalOpen(true)}
+        >
+          Subscribe
+        </Button>
       </Stack>
 
       <Snackbar
@@ -84,6 +118,26 @@ export default function HomeFooterSearch() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* ✅ Use the modular modal */}
+      <SubscribeModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        email={email}
+        setEmail={setEmail}
+        loading={loading}
+        handleSubmit={handleSubmit}
+      />
+
+      <style>
+        {`
+          @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0); }
+          }
+        `}
+      </style>
     </Box>
   );
 }
