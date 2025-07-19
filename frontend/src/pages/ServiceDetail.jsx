@@ -38,7 +38,7 @@ const ServiceDetail = () => {
   if (!service) return null;
 
   return (
-    <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh", pt: 4 }}>
+    <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh", pt: 0 }}>
       {/* Hero Image */}
       <Box
         sx={{
