@@ -14,6 +14,10 @@ DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
 
 def ensure_database_exists():
+    print("Ensuring database exists...")
+    print(f"Connecting to MySQL at {DB_HOST}:{DB_PORT} as {DB_USER}")
+    print(f"Using database name: {DB_NAME}")
+    print(DB_PASSWORD)
     connection = pymysql.connect(
         host=DB_HOST,
         user=DB_USER,
