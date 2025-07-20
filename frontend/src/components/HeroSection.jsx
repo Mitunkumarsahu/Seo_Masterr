@@ -7,8 +7,11 @@ import {
 } from "@mui/material";
 import React from "react";
 import style from "../styles/Styles";
+import { useLocation } from "react-router-dom";
 
 export default function HeroSection({ data }) {
+  const location = useLocation();
+  const path = location.pathname;
   const theme = useTheme();
   const styles = style.heroSection;
 
@@ -19,16 +22,18 @@ export default function HeroSection({ data }) {
       {/* Left Section */}
       <Box sx={styles.leftSection}>
         <Typography component="h1" sx={styles.title}>
-          {data.heading}
+          {data.heading || data?.title}
         </Typography>
 
         <Typography sx={styles.description}>
           {data.description}
         </Typography>
-
+        {path == '/'?
         <Button variant="contained" sx={styles.button}>
           Learn More
         </Button>
+        :""
+        }
       </Box>
 
       {/* Right Section */}

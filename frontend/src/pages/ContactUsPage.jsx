@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import useApi from "../hooks/useApi";
 import style, { COLORS } from '../styles/Styles';
+import HeroSection from "../components/HeroSection";
 
 
 const ContactUsPage = () => {
@@ -25,6 +26,23 @@ const ContactUsPage = () => {
   const { apiCall: fetchHero, data: heroData } = useApi();
   const { apiCall: fetchInfo, data: infoData } = useApi();
   const { apiCall: submitForm, loading: submitting } = useApi();
+  const { apiCall: getHomeFeatures, data } = useApi();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+  useEffect(() => {
+    const fetchFeatures = async () => {
+      try {
+        await getHomeFeatures(backendUrl+"/home-features/");
+      } catch (error) {
+        console.error("Failed to fetch home features:", error);
+      }
+    };
+
+    fetchFeatures();
+  }, []);
+
+  const position1Data = data?.find((item) => item.position === 1);
+  const position2Data = data?.find((item) => item.position === 2);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -61,7 +79,7 @@ const ContactUsPage = () => {
   return (
     <Box sx={{ backgroundColor: "#f9f9ff", pb: 8 }}>
       {/* Hero Section */}
-      <Box
+      {/* <Box
         sx={{
           position: "relative",
           minHeight: "60vh",
@@ -96,7 +114,11 @@ const ContactUsPage = () => {
             </Typography>
           </motion.div>
         </Box>
-      </Box>
+      </Box> */}
+
+
+        <HeroSection data={contactHero} />
+
 
       {/* Main Content Section */}
       <Box

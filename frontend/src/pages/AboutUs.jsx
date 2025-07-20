@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import useApi from '../hooks/useApi';
 import style from '../styles/Styles';
+import HeroSection from "../components/HeroSection";
 
 const MotionBox = motion(Box)
 const MotionTypography = motion(Typography);
@@ -61,7 +62,7 @@ const AboutUs = () => {
   const styles = style.aboutUsSection;
   const featuresStyles = style.circleFeatureSection;
 
-  const HeroSection = () => {
+  const HeroSection1 = () => {
     const { apiCall, loading } = useApi();
     const [heroData, setHeroData] = useState(null);
 
@@ -88,48 +89,7 @@ const AboutUs = () => {
     }
 
     return (
-      <MotionBox
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
-        sx={{
-          position: 'relative',
-          height: { xs: 'auto', md: '60vh' },
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: 2,
-          py: { xs: 6, md: 0 },
-          textAlign: 'center',
-          backgroundImage: `linear-gradient(to right, rgba(20, 30, 48, 0.85), rgba(36, 59, 85, 0.85)), url(${heroData.image_url})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          color: 'white',
-        }}
-      >
-        <MotionBox
-          maxWidth="900px"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 1 }}
-        >
-          <Typography variant="h3" fontWeight="bold" sx={style.heroSection.title} gutterBottom>
-            {heroData.title || 'Services'}
-          </Typography>
-
-          <Typography
-            variant="body1"
-            sx={{
-              fontSize: '1.2rem',
-              lineHeight: 1.8,
-              mt: 2,
-              color: 'rgba(255, 255, 255, 0.9)',
-            }}
-          >
-            {heroData.description}
-          </Typography>
-        </MotionBox>
-      </MotionBox>
+      <HeroSection data={heroData} />
     );
   };
 
@@ -431,7 +391,7 @@ const AboutUs = () => {
   return (
     <>
 
-    <HeroSection />
+    <HeroSection1 />
 
     <ProcessSteps />
 

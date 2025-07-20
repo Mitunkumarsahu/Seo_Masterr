@@ -62,7 +62,7 @@ const style = {
       fontSize: "16px",
       lineHeight: 1.5,
       mb: 4,
-      maxWidth: 500,
+      maxWidth: 700,
       opacity: 0.9,
     },
     // button: {
