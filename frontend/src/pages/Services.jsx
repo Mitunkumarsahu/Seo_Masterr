@@ -12,6 +12,7 @@ import useApi from "../hooks/useApi";
 import { Home } from "lucide-react";
 import HomeFooterSearch from '../components/HomeFooterSearch';
 import { COLORS } from "../styles/Styles";
+import style from "../styles/Styles"; // Ensure this path is correct  
 
 
 const Services = () => {
@@ -74,7 +75,7 @@ const Services = () => {
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
       <Container maxWidth="xl" sx={{ py: 8 }}>
-        <Typography variant="h3" fontWeight="bold" textAlign="center" sx={{color:"#1e3a8a"}} mb={5}>
+        <Typography variant="h3" fontWeight="bold" textAlign="center" sx={style?.testimonialSection?.headline} mb={5}>
           Our Services
         </Typography>
 
@@ -205,7 +206,7 @@ const ServiceCard = ({ post }) => {
           sx={{
             mt: 2,
             fontWeight: 600,
-            color: "#0d66ff",
+            color: COLORS.secondary,
             "&:hover": {
               textDecoration: "underline",
             },

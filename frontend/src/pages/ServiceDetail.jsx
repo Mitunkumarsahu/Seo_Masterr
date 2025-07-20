@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import { COLORS } from "../styles/Styles";
+import style from "../styles/Styles"; // Ensure this path is correct
 
 const ServiceDetail = () => {
   const { id } = useParams();
@@ -165,28 +166,36 @@ const ServiceDetail = () => {
             p={4}
             borderRadius={4}
             sx={{
-              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+              background: COLORS.primary,
               color: "#fff",
               textAlign: "center",
             }}
           >
-            <Typography variant="h5" fontWeight="bold" mb={2}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              mb={2}
+              sx={{
+                fontSize: { xs: "32px", md: "48px" },
+                fontWeight: "bold",
+                lineHeight: 1.1,
+                mb: 3,
+                background: `linear-gradient(135deg, #fff 50%, #FF6D00 20%)`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                position: "relative",
+                animation: "textGlow 2s ease-in-out infinite alternate",
+                textAlign: "center",
+                letterSpacing: "-0.02em",
+              }}
+            >
               Ready to get started with {service.title}?
             </Typography>
             <Button
               variant="contained"
               onClick={() => navigate("/contact-us")}
-              sx={{
-                backgroundColor: "#fff",
-                color: "#059669",
-                fontWeight: "bold",
-                px: 4,
-                py: 1.5,
-                borderRadius: "30px",
-                "&:hover": {
-                  backgroundColor: "#f0fdfa",
-                },
-              }}
+              sx={style.heroSection.button}
             >
               Contact Us
             </Button>

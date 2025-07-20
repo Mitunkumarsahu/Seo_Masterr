@@ -115,7 +115,7 @@ const AboutUs = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 1 }}
         >
-          <Typography variant="h3" fontWeight="bold" gutterBottom>
+          <Typography variant="h3" fontWeight="bold" sx={style.heroSection.title} gutterBottom>
             {heroData.title || 'Services'}
           </Typography>
 
@@ -178,7 +178,7 @@ const AboutUs = () => {
         }}
       >
         <Container maxWidth="lg">
-          <Typography variant="h4" fontWeight="bold" textAlign="center" mb={6} color="#1e3a8a">
+          <Typography variant="h4" fontWeight="bold" textAlign="center" mb={6} sx={style?.testimonialSection?.headline}>
             Process We Follow
           </Typography>
 
@@ -386,7 +386,7 @@ const AboutUs = () => {
       <Box sx={styles.container}>
         <Fade in={true} timeout={800}>
           <Box>
-            <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center" color="#1e3a8a">
+            <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center" sx={style?.testimonialSection?.headline}>
               Frequently Asked Questions
             </Typography>
 

@@ -107,7 +107,7 @@ export default function FeatureSection() {
                 variant="h4"
                 sx={{
                   fontWeight: "bold",
-                  color: "#fff",
+                  color: "#FF6D00",
                   mb: 1,
                   fontSize: { xs: "1.5rem", sm: "2rem" },
                 }}

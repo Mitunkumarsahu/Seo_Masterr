@@ -14,7 +14,7 @@ const fadeInUp = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 1.2,       // ⬅️ Increase duration from 0.6 to 1.2 seconds
+      duration: 0.8,       // ⬅️ Increase duration from 0.6 to 1.2 seconds
       ease: "easeOut",
     },
   },

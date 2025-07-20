@@ -100,15 +100,15 @@ export default function NavBar() {
       (to === "/blogs" && path.startsWith("/blog/")) ||
       (to === "/services" && path.startsWith("/service/"));
     return {
-      color: isActive ? COLORS.green400 : "white",
+      color: isActive ? "#FF6D00" : "white",
       fontWeight: isActive ? "bold" : "normal",
-      "&:hover": { color: COLORS.green400 },
+      "&:hover": { color: "#FF6D00" },
     };
   };
 
   return (
     <>
-      <AppBar position="sticky" elevation={0} sx={{ bgcolor: COLORS.blue800 }}>
+      <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#2E2E2E" }}>
         <Toolbar sx={{ minHeight: 64 }}>
           {/* Logo */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>

@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi"; // Ensure this path is correct
 import { COLORS } from "../styles/Styles";
+import style from "../styles/Styles"; // Ensure this path is correct
 
 const ITEMS_PER_PAGE = 6;
 
@@ -101,7 +102,7 @@ const BlogPage = () => {
           variant="h3"
           fontWeight="bold"
           textAlign="center"
-          sx={{ color: "#1e3a8a" }}
+          sx={[style.testimonialSection.headline]}
           mb={5}
         >
           Our Blogs
@@ -288,14 +289,22 @@ const BlogPage = () => {
           //           >
           //            Author: {blog.author.toUpperCase()}
           //           </Typography>
-                  
+
           //         </Box>
           //       </Box>
           //     </Box>
           //   ))}
           // </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 4, px: { xs: 2, sm: 4, md: 30 }, py: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+              px: { xs: 2, sm: 4, md: 30 },
+              py: 4,
+            }}
+          >
             {blogs.map((blog) => (
               <Box
                 key={blog.id}
@@ -312,7 +321,7 @@ const BlogPage = () => {
                   sx={{
                     width: { xs: 40, sm: 60 },
                     height: { xs: 40, sm: 60 },
-                    borderRadius: '50%',
+                    borderRadius: "50%",
                     overflow: "hidden",
                     flexShrink: 0,
                   }}
@@ -333,7 +342,7 @@ const BlogPage = () => {
                   <Typography
                     variant="h6"
                     sx={{
-                      color: "#1e3a8a",
+                      color: COLORS.primary,
                       fontWeight: "bold",
                       cursor: "pointer",
                       "&:hover": {
@@ -353,7 +362,8 @@ const BlogPage = () => {
                       mb: 1,
                     }}
                   >
-                    By {blog.author} • {new Date(blog.published_at).toLocaleDateString("en-IN", {
+                    By {blog.author} •{" "}
+                    {new Date(blog.published_at).toLocaleDateString("en-IN", {
                       weekday: "short",
                       year: "numeric",
                       month: "short",
@@ -370,7 +380,6 @@ const BlogPage = () => {
               </Box>
             ))}
           </Box>
-
         )}
 
         {/* Pagination */}
@@ -382,6 +391,18 @@ const BlogPage = () => {
               onChange={handlePageChange}
               shape="rounded"
               color="primary"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "#000", // optional text color
+                },
+                "& .Mui-selected": {
+                  backgroundColor: COLORS.secondary,
+                  color: "#fff", // white text on secondary background
+                  "&:hover": {
+                    backgroundColor: COLORS.secondary, // maintain bg on hover
+                  },
+                },
+              }}
             />
           </Box>
         )}

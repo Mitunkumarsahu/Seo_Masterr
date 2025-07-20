@@ -65,14 +65,24 @@ export default function TestimonialSection() {
       </Typography>
 
       {loading ? (
-        <CircularProgress />
+        <Box mt={4}>
+          <CircularProgress />
+        </Box>
       ) : error ? (
-        <Typography color="error">Failed to load testimonials.</Typography>
+        <Typography color="error" mt={4}>
+          Failed to load testimonials.
+        </Typography>
       ) : testimonials.length === 0 ? (
-        <Typography>No testimonials available.</Typography>
+        <Typography mt={4}>No testimonials available.</Typography>
       ) : (
         <Box mt={4}>
-          <Grid container spacing={4} justifyContent="center">
+          <Grid
+            container
+            spacing={4}
+            justifyContent="center"
+            alignItems="center"
+            sx={{ transition: "transform 0.5s ease-in-out" }}
+          >
             {currentTestimonials.map((testimonial, index) => (
               <Grid
                 item
@@ -86,13 +96,16 @@ export default function TestimonialSection() {
               >
                 <Box>
                   <Paper
-                    elevation={3}
+                    elevation={4}
                     sx={{
                       ...style.testimonialSection.paper,
                       minWidth: 300,
                       maxWidth: 500,
+                      minHeight: 300,
                       width: "100%",
+                      height: "100%",
                       textAlign: "center",
+                      transition: "all 0.3s ease",
                     }}
                   >
                     <FormatQuoteIcon sx={style.testimonialSection.quoteIcon} />
@@ -125,7 +138,7 @@ export default function TestimonialSection() {
                     </Typography>
                   </Paper>
 
-                  {/* 👇 Index below each card */}
+                  {/* Index */}
                   <Typography
                     mt={1}
                     textAlign="center"
@@ -139,7 +152,7 @@ export default function TestimonialSection() {
             ))}
           </Grid>
 
-          {/* Navigation Buttons */}
+          {/* Controls */}
           <Stack direction="row" justifyContent="center" spacing={2} mt={4}>
             <IconButton onClick={handlePrev} aria-label="Previous">
               <ChevronLeftIcon />

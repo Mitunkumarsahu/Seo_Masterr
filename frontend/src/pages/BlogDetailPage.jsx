@@ -13,6 +13,8 @@ import {
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../hooks/useApi"; // make sure this path is correct
+import style from "../styles/Styles"; // make sure this path is correct
+import COLORS from "../styles/Styles"; // make sure this path is correct
 
 const BlogDetailPage = () => {
   const { id } = useParams();
@@ -54,7 +56,13 @@ const BlogDetailPage = () => {
   return (
     <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh", py: 4 }}>
       <Container>
-        <Typography variant="h4" align="center" fontWeight="bold" mb={1}>
+        <Typography
+          variant="h4"
+          align="center"
+          fontWeight="bold"
+          mb={1}
+          sx={[style.testimonialSection.headline]}
+        >
           {post.title}
         </Typography>
 
@@ -104,11 +112,11 @@ const BlogDetailPage = () => {
                     minWidth: "unset",
                     padding: "6px",
                     borderRadius: "50%",
-                    background: "#10b981",
+                    background: "#FF6D00",
                     color: "white",
                     boxShadow: 3,
                     "&:hover": {
-                      backgroundColor: "#059669",
+                      backgroundColor: "#FF6D00",
                     },
                   }}
                   onClick={() => {
@@ -195,18 +203,24 @@ const BlogDetailPage = () => {
               alignSelf: "flex-start",
             }}
           >
-            <Typography variant="h6" fontWeight="bold" mb={2}>
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              mb={2}
+            >
               Related Posts
             </Typography>
 
             {relatedPosts.map((related) => (
               <Box
                 key={related.id}
+                onClick={() => navigate(`/blog/${related.id}`)}
                 sx={{
                   display: "flex",
                   alignItems: "flex-start",
                   gap: 1.5,
                   mb: 3,
+                  cursor:"pointer",
                   p: 1,
                   borderRadius: 1,
                   transition: "0.2s",
@@ -227,23 +241,17 @@ const BlogDetailPage = () => {
                     flexShrink: 0,
                   }}
                 />
-                <Box sx={{ flex: 1 }}>
+                <Box sx={{ flex: 1,flexDirection:"column" }}>
                   <Typography
                     variant="body2"
-                    sx={{ fontWeight: 600, color: "#0d66ff", mb: 0.5 }}
+                    sx={{ fontWeight: 600, color: COLORS.primary, mb: 0.5 }}
                   >
                     {related.title}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {related.meta_description}
                   </Typography>
-                  <Button
-                    size="small"
-                    sx={{ mt: 1, textTransform: "none" }}
-                    onClick={() => navigate(`/blog/${related.id}`)}
-                  >
-                    View Blog
-                  </Button>
+                  
                 </Box>
               </Box>
             ))}

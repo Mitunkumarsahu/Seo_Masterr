@@ -17,6 +17,8 @@ import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import { motion, AnimatePresence } from "framer-motion";
 import useApi from "../hooks/useApi";
 import { COLORS } from "../styles/Styles";
+import style from '../styles/Styles';
+
 
 const ContactUsPage = () => {
   const theme = useTheme();
@@ -86,7 +88,7 @@ const ContactUsPage = () => {
             animate={{ y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Typography variant="h3" fontWeight="bold" gutterBottom>
+            <Typography variant="h3" fontWeight="bold" gutterBottom sx={style?.heroSection?.title}>
               {contactHero?.title || "Contact Us"}
             </Typography>
             <Typography variant="body1" sx={{ fontSize: "1.2rem", mt: 2 }}>
@@ -103,6 +105,8 @@ const ContactUsPage = () => {
         flexDirection={{ xs: "column", md: "row" }}
         justifyContent="center"
         alignItems="stretch"
+        margin={"0 auto"}
+        width={"80%"}
         gap={4}
         mt={6}
         px={2}
@@ -130,40 +134,24 @@ const ContactUsPage = () => {
           <Typography
             variant="h6"
             fontWeight="bold"
-            sx={{
-              color:"#1e3a8a",
-              position: "relative",
-              display: "inline-block",
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                bottom: -9, // space between text and underline
-                left: "5%",
-                transform: "translateX(-50%)",
-                width: "10%", // or any width you prefer
-                height: "4px",
-                background:
-                  "linear-gradient(90deg, #1e3a8a 0%, #1e3a8a 50%, #1e3a8a 100%)",
-                borderRadius: "2px",
-              },
-            }}
+            sx={style?.testimonialSection?.headline}
           >
             {contactInfo?.section_title || "Get In Touch"}
           </Typography>
 
           <Box display="flex" alignItems="start" gap={2}>
-            <LocationOnIcon sx={{ color: "#1e3a8a" }} />
+            <LocationOnIcon sx={{ color: COLORS.primary }} />
             <Typography>{contactInfo?.address}</Typography>
           </Box>
 
           <Box display="flex" alignItems="center" gap={2}>
-            <EmailIcon sx={{ color: "#1e3a8a" }} />
+            <EmailIcon sx={{ color: COLORS.primary }} />
             <Typography>{contactInfo?.email}</Typography>
           </Box>
 
           {contactInfo?.phone_numbers?.map((phone, idx) => (
             <Box key={idx} display="flex" alignItems="center" gap={2}>
-              <PhoneIcon sx={{ color: "#1e3a8a" }} />
+              <PhoneIcon sx={{ color: COLORS.primary }} />
               <Typography>{phone}</Typography>
             </Box>
           ))}
@@ -171,22 +159,22 @@ const ContactUsPage = () => {
           <Divider sx={{ my: 2 }} />
 
           <Box display="flex" alignItems="center" gap={2}>
-            <AccessTimeIcon sx={{ color: "#1e3a8a" }} />
+            <AccessTimeIcon sx={{ color: COLORS.primary }} />
             <Typography>Mon - Sat: 9:00 AM - 6:00 PM</Typography>
           </Box>
 
           <Box display="flex" alignItems="center" gap={2}>
-            <BusinessCenterIcon sx={{ color: "#1e3a8a" }} />
+            <BusinessCenterIcon sx={{ color: COLORS.primary }} />
             <Typography>We usually reply within 24 hours</Typography>
           </Box>
 
           <Box mt={2}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{color:"#1e3a8a"}}>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{color:COLORS.primary}}>
               Call us Toll-Free
             </Typography>
             <Typography
               variant="h5"
-              sx={{ color:"#1e3a8a", fontWeight: "bold" }}
+              sx={{ color:COLORS.primary, fontWeight: "bold" }}
             >
               {contactInfo?.toll_free}
             </Typography>
@@ -196,7 +184,7 @@ const ContactUsPage = () => {
             mt={4}
             p={3}
             borderRadius={3}
-            bgcolor="#1e3a8a"
+            bgcolor={COLORS.primary}
             textAlign="center"
             component={motion.div}
             initial={{ opacity: 0, y: 20 }}
@@ -251,7 +239,7 @@ const ContactUsPage = () => {
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           }}
         >
-          <Typography variant="h5" fontWeight="bold" mb={3} sx={{color:"#1e3a8a"}}>
+          <Typography variant="h5" fontWeight="bold" mb={3}             sx={style?.testimonialSection?.headline}>
             Request Free Consultation
           </Typography>
 
@@ -304,7 +292,7 @@ const ContactUsPage = () => {
               variant="contained"
               onClick={handleSubmit}
               disabled={submitting}
-              sx={{ borderRadius: 2, bgcolor: "#1e3a8a", color: "#fff" }}
+              sx={{ borderRadius: 2, bgcolor: COLORS.primary, color: "#fff" }}
               component={motion.button}
               whileTap={{ scale: 0.97 }}
               whileHover={{ scale: 1.03 }}
