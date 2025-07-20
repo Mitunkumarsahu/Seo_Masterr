@@ -13,4 +13,3 @@ starlette-admin
 itsdangerous
 starlette-admin[tinymce]
 python-multipart 
-fontawesomefree==6.5.2
