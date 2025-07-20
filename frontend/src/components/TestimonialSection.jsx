@@ -5,74 +5,62 @@ import {
   Paper,
   Avatar,
   Stack,
-  IconButton,
   CircularProgress,
+  Grid,
+  IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import StarIcon from "@mui/icons-material/Star";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import PauseIcon from "@mui/icons-material/Pause";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { motion, AnimatePresence } from "framer-motion";
 import useApi from "../hooks/useApi";
-import style, { COLORS } from "../styles/Styles";
-
-const slideVariants = {
-  enter: (direction) => ({
-    x: direction > 0 ? 300 : -300,
-    opacity: 0,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-  },
-  exit: (direction) => ({
-    x: direction < 0 ? 300 : -300,
-    opacity: 0,
-  }),
-};
+import style from "../styles/Styles";
 
 export default function TestimonialSection() {
-  const [[index, direction], setIndex] = useState([0, 0]);
-  const [isPaused, setIsPaused] = useState(false);
-  const timeoutRef = useRef(null);
-
   const { apiCall: getTestimonials, data, loading, error } = useApi();
-
   const testimonials = Array.isArray(data) ? data : [];
 
+  const [pageIndex, setPageIndex] = useState(0);
+  const intervalRef = useRef(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const testimonialsPerPage = isMobile ? 1 : 2;
+  const totalPages = Math.ceil(testimonials.length / testimonialsPerPage);
+
+  // Fetch testimonials
   useEffect(() => {
     getTestimonials("http://127.0.0.1:8000/testimonials/");
   }, []);
 
+  // Autoplay
   useEffect(() => {
-    if (!isPaused && testimonials.length > 0) {
-      timeoutRef.current = setTimeout(() => {
-        setIndex(([prevIdx]) => [(prevIdx + 1) % testimonials.length, 1]);
+    if (testimonials.length > 0) {
+      intervalRef.current = setInterval(() => {
+        setPageIndex((prev) => (prev + 1) % totalPages);
       }, 4000);
     }
-    return () => clearTimeout(timeoutRef.current);
-  }, [index, isPaused, testimonials]);
+    return () => clearInterval(intervalRef.current);
+  }, [testimonials, totalPages, testimonialsPerPage]);
 
   const handleNext = () => {
-    setIndex(([prevIdx]) => [(prevIdx + 1) % testimonials.length, 1]);
+    setPageIndex((prev) => (prev + 1) % totalPages);
   };
 
   const handlePrev = () => {
-    setIndex(([prevIdx]) => [
-      (prevIdx - 1 + testimonials.length) % testimonials.length,
-      -1,
-    ]);
+    setPageIndex((prev) => (prev - 1 + totalPages) % totalPages);
   };
 
-  const togglePause = () => setIsPaused((prev) => !prev);
-
-  const current = testimonials.length > 0 ? testimonials[index] : null;
+  const currentTestimonials = testimonials.slice(
+    pageIndex * testimonialsPerPage,
+    pageIndex * testimonialsPerPage + testimonialsPerPage
+  );
 
   return (
-    <Box sx={{ py: 6, backgroundColor: "#f9fafb", textAlign: "center" }}>
-      <Typography variant="h5" sx={style?.testimonialSection?.headline}>
+    <Box sx={style.testimonialSection.wrapper}>
+      <Typography variant="h5" sx={style.testimonialSection.headline}>
         What Our Clients Say
       </Typography>
 
@@ -83,41 +71,42 @@ export default function TestimonialSection() {
       ) : testimonials.length === 0 ? (
         <Typography>No testimonials available.</Typography>
       ) : (
-        <>
-          <Box
-            sx={{
-              position: "relative",
-              width: "100%",
-              maxWidth: 600,
-              mx: "auto",
-              height: 300,
-            }}
-          >
-            {current && (
-              <AnimatePresence custom={direction}>
-                <motion.div
-                  key={current.id}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.6 }}
-                  style={{ position: "absolute", width: "100%" }}
-                >
-                  <Paper elevation={3} sx={style.testimonialSection.paper}>
+        <Box mt={4}>
+          <Grid container spacing={4} justifyContent="center">
+            {currentTestimonials.map((testimonial, index) => (
+              <Grid
+                item
+                key={testimonial.id}
+                xs={12}
+                sm={6}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Box>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      ...style.testimonialSection.paper,
+                      minWidth: 300,
+                      maxWidth: 500,
+                      width: "100%",
+                      textAlign: "center",
+                    }}
+                  >
                     <FormatQuoteIcon sx={style.testimonialSection.quoteIcon} />
 
                     <Typography
                       variant="body2"
                       sx={style.testimonialSection.quoteText}
                     >
-                      “{current.content}”
+                      “{testimonial.content}”
                     </Typography>
 
                     <Avatar
-                      src={current.image_url}
-                      alt={current.client_name}
+                      src={testimonial.image_url}
+                      alt={testimonial.client_name}
                       sx={style.testimonialSection.avatar}
                     />
 
@@ -125,43 +114,41 @@ export default function TestimonialSection() {
                       variant="subtitle2"
                       sx={style.testimonialSection.name}
                     >
-                      {current.client_name}
+                      {testimonial.client_name}
                     </Typography>
 
                     <Typography
                       variant="caption"
                       sx={style.testimonialSection.title}
                     >
-                      {current.client_title} • {current.company}
+                      {testimonial.client_title} • {testimonial.company}
                     </Typography>
-
-                    <Stack
-                      direction="row"
-                      spacing={0.3}
-                      sx={style.testimonialSection.stars}
-                    >
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon key={i} />
-                      ))}
-                    </Stack>
                   </Paper>
-                </motion.div>
-              </AnimatePresence>
-            )}
-          </Box>
 
-          <Stack direction="row" spacing={2} justifyContent="center" mt={4}>
-            <IconButton onClick={handlePrev} color="primary">
+                  {/* 👇 Index below each card */}
+                  <Typography
+                    mt={1}
+                    textAlign="center"
+                    variant="caption"
+                    color="text.secondary"
+                  >
+                    {index + 1} / {currentTestimonials.length}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Navigation Buttons */}
+          <Stack direction="row" justifyContent="center" spacing={2} mt={4}>
+            <IconButton onClick={handlePrev} aria-label="Previous">
               <ChevronLeftIcon />
             </IconButton>
-            <IconButton onClick={togglePause} color="primary">
-              {isPaused ? <PlayArrowIcon /> : <PauseIcon />}
-            </IconButton>
-            <IconButton onClick={handleNext} color="primary">
+            <IconButton onClick={handleNext} aria-label="Next">
               <ChevronRightIcon />
             </IconButton>
           </Stack>
-        </>
+        </Box>
       )}
     </Box>
   );

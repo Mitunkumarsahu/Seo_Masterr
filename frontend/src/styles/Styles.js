@@ -197,7 +197,7 @@ const style = {
         bottom: "-100%",
         left: 0,
         width: "100%",
-        height: "100%",
+        height: "65%",
         background: "linear-gradient(to top, #0C2F58, #1a5490)",
         borderTopLeftRadius: "80% 20%",
         borderTopRightRadius: "80% 20%",

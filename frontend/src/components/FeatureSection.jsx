@@ -96,7 +96,7 @@ export default function FeatureSection() {
       {/* Grid */}
       <Grid container justifyContent="center" spacing={4}>
         {items.map((item, index) => (
-          <Grid item xs={6} sm={4} md={2.4} key={item.id}>
+          <Grid item xs={6} sm={4} md={2.4} mx={4} key={item.id}>
             <Box sx={styles.gridItemWrapper}>
               <Avatar
                 src={item.image_url}

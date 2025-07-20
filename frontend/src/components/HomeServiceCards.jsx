@@ -88,7 +88,7 @@ const HomeServiceCards = () => {
                   className="card-description"
                   sx={{ ...styles.cardDescription, fontSize: "0.9rem" }}
                 >
-                  {card.description}
+                  {card.description.length > 100 ? card.description.slice(0, 100) + "..." : card.description}
                 </Typography>
               </CardContent>
             </Box>
