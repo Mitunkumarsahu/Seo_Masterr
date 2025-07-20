@@ -1,23 +1,26 @@
-import React, { useEffect, useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
-  Modal,
   Box,
-  Tabs,
-  Tab,
-  TextField,
   Button,
-  Typography,
-  Divider,
   CircularProgress,
+  Divider,
   IconButton,
+  Modal,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
   useMediaQuery,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import { GoogleLogin } from "@react-oauth/google";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { COLORS } from "../styles/Styles";
+import.meta.env.VITE_BACKEND_URL
+
 
 const AuthModal = ({
   open,
@@ -73,7 +76,7 @@ const AuthModal = ({
           setError(result.error || "Login failed");
         }
       } else {
-        await apiCall("http://localhost:8000/auth/signup", "POST", {
+        await apiCall(import.meta.env.VITE_BACKEND_URL+"/auth/signup", "POST", {
           username: form.username,
           email: form.email,
           password: form.password,
@@ -95,7 +98,7 @@ const AuthModal = ({
     const username = payload.name.replace(/\s/g, "");
 
     try {
-      await apiCall("http://localhost:8000/auth/signup", "POST", {
+      await apiCall(import.meta.env.VITE_BACKEND_URL+"/auth/signup", "POST", {
         username,
         email,
         password: "",
@@ -152,9 +155,9 @@ const AuthModal = ({
               }}
               sx={{
                 mb: 2,
-                color: "#0a2b4c",
+                color: COLORS.primary,
                 borderColor: "#0a2b4c",
-                "&:hover": { backgroundColor: "#0a2b4c", color: "white" },
+                "&:hover": { backgroundColor: COLORS.primary, color: COLORS.secondary },
               }}
             >
               Go to Home
@@ -190,8 +193,8 @@ const AuthModal = ({
             mb: 2,
           }}
         >
-          <Tab label="Login" sx={{ color: "#0a2b4c", fontWeight: 600 }} />
-          <Tab label="Sign Up" sx={{ color: "#0a2b4c", fontWeight: 600 }} />
+          <Tab label="Login" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
+          <Tab label="Sign Up" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
         </Tabs>
 
         {/* Form */}
@@ -238,9 +241,9 @@ const AuthModal = ({
             fullWidth
             sx={{
               mt: 2,
-              backgroundColor: "#0a2b4c",
+              backgroundColor: COLORS.primary,
               "&:hover": {
-                backgroundColor: "#093456",
+                backgroundColor: COLORS.secondary,
               },
             }}
             onClick={handleSubmit}

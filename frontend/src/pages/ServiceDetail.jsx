@@ -1,9 +1,8 @@
-import { Box, Container, Typography, Button, Divider } from "@mui/material";
+import { Box, Button, Container, Divider, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../hooks/useApi";
-import { COLORS } from "../styles/Styles";
-import style from "../styles/Styles"; // Ensure this path is correct
+import style, { COLORS } from "../styles/Styles"; // Ensure this path is correct
 
 const ServiceDetail = () => {
   const { id } = useParams();
@@ -14,7 +13,7 @@ const ServiceDetail = () => {
 
   useEffect(() => {
     if (id) {
-      fetchService(`http://127.0.0.1:8000/services/${id}`);
+      fetchService(import.meta.env.VITE_BACKEND_URL+`/services/${id}`);
     }
   }, [id]);
 

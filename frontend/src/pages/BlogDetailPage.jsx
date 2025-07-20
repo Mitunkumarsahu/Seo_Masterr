@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from "react";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import {
   Box,
-  Container,
-  Typography,
-  Avatar,
-  Divider,
   Button,
-  Stack,
   CircularProgress,
+  Container,
+  Divider,
   Tooltip,
+  Typography
 } from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../hooks/useApi"; // make sure this path is correct
-import style from "../styles/Styles"; // make sure this path is correct
-import COLORS from "../styles/Styles"; // make sure this path is correct
+import { default as COLORS, default as style } from "../styles/Styles"; // make sure this path is correct
 
 const BlogDetailPage = () => {
   const { id } = useParams();
@@ -25,7 +22,7 @@ const BlogDetailPage = () => {
   const { apiCall: getBlogDetail, data, loading, error } = useApi();
 
   useEffect(() => {
-    getBlogDetail(`http://127.0.0.1:8000/blogs/${id}/with-recent`);
+    getBlogDetail(import.meta.env.VITE_BACKEND_URL+`/blogs/${id}/with-recent`);
   }, [id]);
 
   useEffect(() => {

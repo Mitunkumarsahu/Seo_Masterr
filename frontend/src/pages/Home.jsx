@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import HeroSection from "../components/HeroSection";
-import HomeServiceCards from "../components/HomeServiceCards";
-import FeatureSection from "../components/FeatureSection";
-import HomeAboutusSection from "../components/HomeAboutusSection";
-import TestimonialSection from "../components/TestimonialSection";
-import HomeFooterSearch from "../components/HomeFooterSearch";
-import useApi from "../hooks/useApi";
 import { motion } from "framer-motion";
+import React, { useEffect } from "react";
+import FeatureSection from "../components/FeatureSection";
+import HeroSection from "../components/HeroSection";
+import HomeAboutusSection from "../components/HomeAboutusSection";
+import HomeFooterSearch from "../components/HomeFooterSearch";
+import HomeServiceCards from "../components/HomeServiceCards";
+import TestimonialSection from "../components/TestimonialSection";
+import useApi from "../hooks/useApi";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -22,11 +22,12 @@ const fadeInUp = {
 
 export default function Home() {
   const { apiCall: getHomeFeatures, loading, error, data } = useApi();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        await getHomeFeatures("http://127.0.0.1:8000/home-features/");
+        await getHomeFeatures(backendUrl+"/home-features/");
       } catch (error) {
         console.error("Failed to fetch home features:", error);
       }

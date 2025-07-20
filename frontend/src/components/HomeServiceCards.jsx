@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import {
   Avatar,
   Box,
@@ -7,9 +7,9 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import style from "../styles/Styles";
+import React, { useEffect } from "react";
 import useApi from "../hooks/useApi";
+import style from "../styles/Styles";
 
 const HomeServiceCards = () => {
   const styles = style.homeServiceCards;
@@ -17,7 +17,7 @@ const HomeServiceCards = () => {
   const { apiCall: getBestWorks, loading, error, data } = useApi();
 
   useEffect(() => {
-    getBestWorks("http://127.0.0.1:8000/best-works/?active_only=false");
+    getBestWorks(import.meta.env.VITE_BACKEND_URL+"/best-works/?active_only=false");
   }, []);
 
   const activeCards = data?.filter((item) => item.is_active) || [];

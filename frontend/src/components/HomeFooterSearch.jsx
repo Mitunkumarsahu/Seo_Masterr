@@ -1,16 +1,16 @@
 import {
+  Alert,
   Box,
   Button,
+  Snackbar,
   Stack,
   Typography,
   useMediaQuery,
   useTheme,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import React, { useState } from "react";
-import style from "../styles/Styles";
 import useApi from "../hooks/useApi";
+import style from "../styles/Styles";
 import SubscribeModal from "./SubscribeModal"; // ✅ Import modal component
 
 export default function HomeFooterSearch() {
@@ -31,7 +31,7 @@ export default function HomeFooterSearch() {
     }
 
     try {
-      await postSubscription("http://127.0.0.1:8000/subscriptions/", "POST", { email });
+      await postSubscription(import.meta.env.VITE_BACKEND_URL+"/subscriptions/", "POST", { email });
       setSnackbar({ open: true, message: "Subscribed successfully!", severity: "success" });
       setEmail("");
       setModalOpen(false);

@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
 import {
   Box,
-  Container,
-  Typography,
   Button,
-  Pagination,
   CircularProgress,
+  Container,
+  Pagination,
+  Typography,
 } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi"; // Ensure this path is correct
-import { COLORS } from "../styles/Styles";
-import style from "../styles/Styles"; // Ensure this path is correct
+import style, { COLORS } from "../styles/Styles"; // Ensure this path is correct
 
 const ITEMS_PER_PAGE = 6;
 
@@ -41,7 +40,7 @@ const BlogPage = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    getCategories("http://127.0.0.1:8000/blogs/categories");
+    getCategories(import.meta.env.VITE_BACKEND_URL+"/blogs/categories");
   }, []);
 
   useEffect(() => {
@@ -51,7 +50,7 @@ const BlogPage = () => {
   }, [categoriesData]);
 
   useEffect(() => {
-    let url = `http://127.0.0.1:8000/blogs/?page=${currentPage}&page_size=${ITEMS_PER_PAGE}`;
+    let url = import.meta.env.VITE_BACKEND_URL+`/blogs/?page=${currentPage}&page_size=${ITEMS_PER_PAGE}`;
     if (selectedCategory !== "all") {
       const selectedCat = categories.find(
         (cat) => cat.slug === selectedCategory

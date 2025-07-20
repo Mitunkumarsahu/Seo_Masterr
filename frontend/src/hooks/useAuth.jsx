@@ -1,6 +1,6 @@
 // src/context/AuthContext.js
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import useApi from "./useApi";
 
 const AuthContext = createContext();
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (credentials) => {
     setLoading(true);
     try {
-      const response = await apiCall("http://localhost:8000/auth/login", "POST", credentials);
+      const response = await apiCall(import.meta.env.VITE_BACKEND_URL+"/auth/login", "POST", credentials);
       const { access_token } = response;
       if (!access_token) throw new Error("No token received");
 

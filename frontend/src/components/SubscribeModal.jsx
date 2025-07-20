@@ -50,7 +50,7 @@ import {
   
             <Button
               fullWidth
-              sx={[style?.homeFooterSearch.button, { mt: 2 }]}
+              sx={[style?.heroSection?.button, { mt: 2 }]}
               variant="contained"
               onClick={handleSubmit}
               disabled={loading}

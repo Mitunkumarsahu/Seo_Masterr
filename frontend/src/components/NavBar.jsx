@@ -1,29 +1,29 @@
-import React, { useState } from "react";
 import {
   AppBar,
-  Toolbar,
+  Avatar,
   Box,
   Button,
-  IconButton,
-  Typography,
-  Menu,
-  MenuItem,
+  Divider,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  Divider,
-  Avatar,
+  Menu,
+  MenuItem,
+  Toolbar,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { Menu as MenuIcon } from "lucide-react";
+import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import AuthModal from "./AuthModal";
-import { useAuth } from "../hooks/useAuth";
-import SubscribeModal from "./SubscribeModal";
 import useApi from "../hooks/useApi";
-
+import { useAuth } from "../hooks/useAuth";
+import AuthModal from "./AuthModal";
+import SubscribeModal from "./SubscribeModal";
+import {COLORS as COLOR} from "../styles/Styles"
 const COLORS = {
   blue800: "#1e3a8a",
   green400: "#34d399",
@@ -65,7 +65,7 @@ export default function NavBar() {
     }
 
     try {
-      await postSubscription("http://127.0.0.1:8000/subscriptions/", "POST", {
+      await postSubscription(import.meta.env.VITE_BACKEND_URL+"/subscriptions/", "POST", {
         email,
       });
       setSnackbar({
@@ -231,8 +231,8 @@ export default function NavBar() {
                   variant="contained"
                   onClick={() => setAuthModalOpen(true)}
                   sx={{
-                    bgcolor: COLORS.green500,
-                    "&:hover": { bgcolor: COLORS.green600 },
+                    bgcolor: COLOR.secondary,
+                    "&:hover": { bgcolor: COLOR.primary },
                   }}
                 >
                   Sign&nbsp;Up
@@ -258,7 +258,7 @@ export default function NavBar() {
         open={mobileDrawerOpen}
         onClose={toggleDrawer}
         PaperProps={{
-          sx: { width: 260, bgcolor: COLORS.blue800, color: "white" },
+          sx: { width: 260, bgcolor: COLOR.primary, color: "white" },
         }}
       >
         <Box sx={{ p: 2 }}>
@@ -348,8 +348,8 @@ export default function NavBar() {
                     toggleDrawer();
                   }}
                   sx={{
-                    bgcolor: COLORS.green500,
-                    "&:hover": { bgcolor: COLORS.green600 },
+                    bgcolor: COLOR.secondary,
+                    "&:hover": { bgcolor: COLORS.primary },
                   }}
                 >
                   Sign&nbsp;Up

@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>
     <ThemeProvider theme={theme}>
 
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+    <GoogleOAuthProvider clientId="284681747746-28vo0j4vmf79lbu3ia7oqqljmu7cc4on.apps.googleusercontent.com">
 
       <App />
       </GoogleOAuthProvider>

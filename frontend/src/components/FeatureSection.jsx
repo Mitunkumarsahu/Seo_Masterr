@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Box, Grid, Typography, Avatar } from "@mui/material";
-import style from "../styles/Styles";
+import { Avatar, Box, Grid, Typography } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import useApi from "../hooks/useApi";
+import style from "../styles/Styles";
 
 export default function FeatureSection() {
   const styles = style.featureSection;
@@ -18,7 +18,7 @@ export default function FeatureSection() {
 
   // Fetch data on mount
   useEffect(() => {
-    fetchAchievements("http://127.0.0.1:8000/achievements/");
+    fetchAchievements(import.meta.env.VITE_BACKEND_URL+"/achievements/");
   }, []);
 
   // Set initial counters

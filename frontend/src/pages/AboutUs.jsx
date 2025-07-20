@@ -1,24 +1,22 @@
-import { useEffect, useState } from 'react';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-  Box,
-  Grid,
-  Typography,
-  Button,
-  Container,
-  useTheme,
-  CircularProgress,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
+  AccordionSummary,
+  Box,
+  CircularProgress,
+  Container,
   Fade,
   Stack,
+  Typography,
   useMediaQuery,
+  useTheme
 } from "@mui/material";
-import style from '../styles/Styles';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import useApi from '../hooks/useApi';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { motion } from 'framer-motion'
+import style from '../styles/Styles';
 
 const MotionBox = motion(Box)
 const MotionTypography = motion(Typography);
@@ -70,7 +68,7 @@ const AboutUs = () => {
     useEffect(() => {
       const fetchHero = async () => {
         try {
-          const res = await apiCall('http://localhost:8000/about-hero/?active_only=true');
+          const res = await apiCall(import.meta.env.VITE_BACKEND_URL+'/about-hero/?active_only=true');
           if (res && res.length > 0) {
             setHeroData(res[0]);
           }
@@ -146,7 +144,7 @@ const AboutUs = () => {
 
     const fetchSteps = async () => {
       try {
-        const res = await fetch('http://localhost:8000/process-steps/?active_only=true');
+        const res = await fetch(import.meta.env.VITE_BACKEND_URL+'/process-steps/?active_only=true');
         const json = await res.json();
         const sorted = json.sort((a, b) => a.order - b.order);
         setSteps(sorted);
@@ -245,7 +243,7 @@ const AboutUs = () => {
 
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:8000/why-choose-us/');
+        const res = await fetch(import.meta.env.VITE_BACKEND_URL+'/why-choose-us/');
         const json = await res.json();
         if (json.length) {
           setData(json[0]);
@@ -370,7 +368,7 @@ const AboutUs = () => {
     useEffect(() => {
       const fetchFaqs = async () => {
         try {
-          const res = await apiCall('http://localhost:8000/faqs/?active_only=true');
+          const res = await apiCall(import.meta.env.VITE_BACKEND_URL+'/faqs/?active_only=true');
           if (res && Array.isArray(res)) {
             const sortedFaqs = res.sort((a, b) => a.order - b.order);
             setFaqs(sortedFaqs);

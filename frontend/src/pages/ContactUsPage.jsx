@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from "react";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import EmailIcon from "@mui/icons-material/Email";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PhoneIcon from "@mui/icons-material/Phone";
 import {
   Box,
   Button,
-  Typography,
-  TextField,
-  Paper,
-  useTheme,
-  Divider,
   CircularProgress,
+  Divider,
+  Paper,
+  TextField,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import EmailIcon from "@mui/icons-material/Email";
-import PhoneIcon from "@mui/icons-material/Phone";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
 import useApi from "../hooks/useApi";
-import { COLORS } from "../styles/Styles";
-import style from '../styles/Styles';
+import style, { COLORS } from '../styles/Styles';
 
 
 const ContactUsPage = () => {
@@ -36,8 +35,8 @@ const ContactUsPage = () => {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    fetchHero("http://127.0.0.1:8000/contact-hero/?active_only=false");
-    fetchInfo("http://127.0.0.1:8000/contact-info/");
+    fetchHero(import.meta.env.VITE_BACKEND_URL+"/contact-hero/?active_only=false");
+    fetchInfo(import.meta.env.VITE_BACKEND_URL+"/contact-info/");
   }, []);
 
   const contactHero = heroData?.find((item) => item.is_active);
@@ -50,7 +49,7 @@ const ContactUsPage = () => {
 
   const handleSubmit = async () => {
     await submitForm(
-      "http://127.0.0.1:8000/contact-inquiries/",
+      import.meta.env.VITE_BACKEND_URL+"/contact-inquiries/",
       "POST",
       formData
     );

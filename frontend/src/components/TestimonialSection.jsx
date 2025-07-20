@@ -1,20 +1,19 @@
-import React, { useEffect, useState, useRef } from "react";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import {
-  Box,
-  Typography,
-  Paper,
   Avatar,
-  Stack,
+  Box,
   CircularProgress,
   Grid,
   IconButton,
+  Paper,
+  Stack,
+  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
-import StarIcon from "@mui/icons-material/Star";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import React, { useEffect, useRef, useState } from "react";
 import useApi from "../hooks/useApi";
 import style from "../styles/Styles";
 
@@ -32,7 +31,7 @@ export default function TestimonialSection() {
 
   // Fetch testimonials
   useEffect(() => {
-    getTestimonials("http://127.0.0.1:8000/testimonials/");
+    getTestimonials(import.meta.env.VITE_BACKEND_URL+"/testimonials/");
   }, []);
 
   // Autoplay
@@ -99,7 +98,7 @@ export default function TestimonialSection() {
                     elevation={4}
                     sx={{
                       ...style.testimonialSection.paper,
-                      minWidth: 300,
+                      minWidth: 360,
                       maxWidth: 500,
                       minHeight: 300,
                       width: "100%",

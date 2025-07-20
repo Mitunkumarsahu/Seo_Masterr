@@ -3,16 +3,14 @@ import {
   Button,
   Container,
   Typography,
-  useTheme,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useApi from "../hooks/useApi";
-import { Home } from "lucide-react";
 import HomeFooterSearch from '../components/HomeFooterSearch';
-import { COLORS } from "../styles/Styles";
-import style from "../styles/Styles"; // Ensure this path is correct  
+import useApi from "../hooks/useApi";
+import style, { COLORS } from "../styles/Styles"; // Ensure this path is correct  
 
 
 const Services = () => {
@@ -39,8 +37,8 @@ const Services = () => {
   } = useApi();
 
   useEffect(() => {
-    getServices("http://127.0.0.1:8000/services/");
-    getServiceTypes("http://127.0.0.1:8000/services/types");
+    getServices(import.meta.env.VITE_BACKEND_URL+"/services/");
+    getServiceTypes(import.meta.env.VITE_BACKEND_URL+"/services/types");
   }, []);
 
   // Set services when data is received
