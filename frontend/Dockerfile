@@ -5,6 +5,8 @@ WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install --legacy-peer-deps
 
+RUN npm install -g vite
+
 COPY frontend/ ./
 
 EXPOSE 5173
