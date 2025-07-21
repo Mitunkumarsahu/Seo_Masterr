@@ -59,7 +59,16 @@ from utils.email import send_email
 from utils.db import SessionLocal
 
 
-app = FastAPI()
+# app = FastAPI()
+
+
+API_PREFIX = os.getenv("API_PREFIX", "")
+
+app = FastAPI(
+    docs_url=f"{API_PREFIX}/docs",
+    openapi_url=f"{API_PREFIX}/openapi.json"
+)
+
 
 # Middleware
 app.add_middleware(SessionMiddleware, secret_key="super-secret-session-key")
