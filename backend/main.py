@@ -555,7 +555,7 @@ admin = Admin(
     engine,
     title="SEO Masterr Admin",
     auth_provider=DatabaseAuthProvider(),
-    prefix=f"{API_PREFIX}/admin"
+    # prefix=f"{API_PREFIX}/admin"
 )
 
 admin.add_view(UserView(User, icon="fa fa-user"))
@@ -580,8 +580,8 @@ admin.add_view(SubscriptionView(Subscription, icon="fa fa-envelope", name="Subsc
 admin.add_view(ContactInfoView(ContactInfo, icon="fa fa-address-book", name="Contact Info"))
 admin.add_view(ContactInquiryView(ContactInquiry, icon="fa fa-envelope", name="Contact Inquiries"))
 
-admin.mount_to(app)
-# admin.mount_to(app, f"{API_PREFIX}/admin")
+# admin.mount_to(app)
+admin.mount_to(app, f"{API_PREFIX}/admin")
 # admin.mount_to(app, f"{API_PREFIX}/admin", static_url=f"{API_PREFIX}/admin/static")
 
 
