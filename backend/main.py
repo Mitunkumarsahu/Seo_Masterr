@@ -65,10 +65,11 @@ load_dotenv()
 
 
 API_PREFIX = os.getenv("API_PREFIX", "")
+print(API_PREFIX)
 
 app = FastAPI(
-    docs_url=f"{API_PREFIX}/docs",
-    openapi_url=f"{API_PREFIX}/openapi.json"
+    # docs_url=f"{API_PREFIX}/docs",
+    # openapi_url=f"{API_PREFIX}/openapi.json"
 )
 
 
