@@ -584,9 +584,10 @@ admin.add_view(ContactInquiryView(ContactInquiry, icon="fa fa-envelope", name="C
 admin.mount_to(app, f"{API_PREFIX}/admin-panel")
 # admin.mount_to(app, f"{API_PREFIX}/admin", static_url=f"{API_PREFIX}/admin/static")
 
-@app.get("/debug/routes")
-def debug_routes():
+@app.get(f"{API_PREFIX}/debug/routes")
+def show_routes():
     return [route.path for route in app.routes]
+
 
 
 # Startup logic
