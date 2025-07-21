@@ -581,7 +581,7 @@ admin.add_view(ContactInfoView(ContactInfo, icon="fa fa-address-book", name="Con
 admin.add_view(ContactInquiryView(ContactInquiry, icon="fa fa-envelope", name="Contact Inquiries"))
 
 # admin.mount_to(app)
-admin.mount_to(app, f"{API_PREFIX}/admin")
+admin.mount_to(app, f"{API_PREFIX}/admin-panel")
 # admin.mount_to(app, f"{API_PREFIX}/admin", static_url=f"{API_PREFIX}/admin/static")
 
 
