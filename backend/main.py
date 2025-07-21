@@ -57,8 +57,8 @@ from fastapi import BackgroundTasks
 # Add to the top after other imports
 from utils.email import send_email
 from utils.db import SessionLocal
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # app = FastAPI()
