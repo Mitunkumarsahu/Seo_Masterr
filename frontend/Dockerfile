@@ -13,6 +13,8 @@ COPY frontend/ ./
 
 # Optional: install Vite globally (you don't need this unless you want to run vite directly)
 RUN npm install -g vite
+RUN npm install --save-dev @vitejs/plugin-react
+
 
 # Step 4: Expose Vite's default port
 EXPOSE 5173
