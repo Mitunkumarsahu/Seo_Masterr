@@ -45,7 +45,7 @@ from models.contact_inquiry import ContactInquiry
 from routes import contact_inquiry
 from models.achievement import Achievement
 from routes import achievement
-from routes import admin
+from routes import admin_router
 
 # Add to imports
 from starlette_admin import action
@@ -120,7 +120,7 @@ app.include_router(subscription.router, prefix=API_PREFIX)
 app.include_router(contact_info.router, prefix=API_PREFIX)
 app.include_router(contact_inquiry.router, prefix=API_PREFIX)
 app.include_router(achievement.router, prefix=API_PREFIX)
-app.include_router(admin.router, prefix=API_PREFIX)
+app.include_router(admin_router.router, prefix=API_PREFIX)
 
 
 # Base ModelView with access control
@@ -600,7 +600,7 @@ admin.add_view(ContactInfoView(ContactInfo, icon="fa fa-address-book", name="Con
 admin.add_view(ContactInquiryView(ContactInquiry, icon="fa fa-envelope", name="Contact Inquiries"))
 
 # admin.mount_to(app)
-admin.mount_to(app, f"{API_PREFIX}/admin-panel")
+admin.mount_to(app, f"{API_PREFIX}/admin")
 # admin.mount_to(app, f"{API_PREFIX}/admin", static_url=f"{API_PREFIX}/admin/static")
 
 @app.get(f"{API_PREFIX}/debug/routes")

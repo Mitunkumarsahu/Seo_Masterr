@@ -6,7 +6,7 @@ from models.user import User
 from routes.auth import require_permission
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(prefix="/admin-mail", tags=["Admin"])
 
 class BulkEmailRequest(BaseModel):
     subject: str
