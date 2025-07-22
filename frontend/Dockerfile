@@ -8,12 +8,13 @@ COPY frontend/package*.json ./
 # Step 2: Install dependencies (dev included)
 RUN npm install --legacy-peer-deps
 
-# Step 3: Copy the rest of your frontend app
-COPY frontend/ ./
-
 # Optional: install Vite globally (you don't need this unless you want to run vite directly)
 RUN npm install -g vite
 RUN npm install --save-dev @vitejs/plugin-react
+
+# Step 3: Copy the rest of your frontend app
+COPY frontend/ ./
+
 
 
 # Step 4: Expose Vite's default port
@@ -21,4 +22,4 @@ EXPOSE 5173
 
 
 
-CMD ["sh", "-c", "npm run dev", "-- --host 0.0.0.0", "--port 5173"]
+CMD ["npm", "run", "dev"]
