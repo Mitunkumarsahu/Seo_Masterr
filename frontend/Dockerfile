@@ -8,10 +8,6 @@ COPY frontend/package*.json ./
 # Step 2: Install dependencies (dev included)
 RUN npm install --legacy-peer-deps
 
-# Optional: install Vite globally (you don't need this unless you want to run vite directly)
-RUN npm install -g vite
-RUN npm install --save-dev @vitejs/plugin-react
-
 # Step 3: Copy the rest of your frontend app
 COPY frontend/ ./
 
