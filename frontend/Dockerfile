@@ -4,7 +4,11 @@ FROM node:22
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY frontend/package*.json ./
+# COPY frontend/package*.json ./
+COPY frontend/package.json ./
+
+COPY frontend/package-lock.json ./
+
 RUN npm install --legacy-peer-deps
 
 # Copy the rest of the frontend code
