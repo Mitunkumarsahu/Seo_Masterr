@@ -3,6 +3,8 @@ FROM node:22
 # Set working directory
 WORKDIR /app
 
+ENV NODE_ENV=development
+
 # Copy package files and install dependencies
 # COPY frontend/package*.json ./
 COPY frontend/package.json ./
