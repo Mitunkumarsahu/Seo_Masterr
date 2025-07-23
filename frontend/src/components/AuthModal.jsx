@@ -11,6 +11,8 @@ import {
   TextField,
   Typography,
   useMediaQuery,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { GoogleLogin } from "@react-oauth/google";
@@ -19,8 +21,6 @@ import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import { useAuth } from "../hooks/useAuth";
 import { COLORS } from "../styles/Styles";
-import.meta.env.VITE_BACKEND_URL
-
 
 const AuthModal = ({
   open,
@@ -37,6 +37,16 @@ const AuthModal = ({
   const { login, loading } = useAuth();
   const { apiCall } = useApi();
   const navigate = useNavigate();
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success", // success | error | info | warning
+  });
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   const closeModal = () => {
     if (mode !== "private" && handleClose) handleClose();
@@ -67,13 +77,13 @@ const AuthModal = ({
         const result = await login(loginData);
 
         if (result.success) {
+          showSnackbar("Login successful", "success");
           closeModal();
           document.body.classList.remove("body-blur");
-
           onSuccess?.();
           setTimeout(() => navigate(redirectTo), 300);
         } else {
-          setError(result.error || "Login failed");
+          showSnackbar(result.error || "Login failed", "error");
         }
       } else {
         await apiCall(import.meta.env.VITE_BACKEND_URL+"/auth/signup", "POST", {
@@ -83,12 +93,13 @@ const AuthModal = ({
           permissions: [],
           is_editor: false,
         });
+        showSnackbar("Signup successful", "success");
         closeModal();
         onSuccess?.();
         setTimeout(() => navigate(redirectTo), 300);
       }
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      showSnackbar(err.message || "Something went wrong", "error");
     }
   };
 
@@ -105,170 +116,193 @@ const AuthModal = ({
         permissions: [],
         is_editor: false,
       });
+      showSnackbar("Google login successful", "success");
       closeModal();
       onSuccess?.();
       setTimeout(() => navigate(redirectTo), 300);
     } catch (err) {
       setError("Google Auth failed");
+      showSnackbar("Google Auth failed", "error");
     }
   };
   return (
-    <Modal
-      open={open}
-      onClose={closeModal}
-      disableEscapeKeyDown={mode === "private"}
-      sx={{ pointerEvents: mode === "private" ? "none" : "auto" }}
-      BackdropProps={{
-        onClick: (e) => {
-          if (mode !== "private") closeModal();
-          e.stopPropagation();
-        },
-      }}
-    >
-      <Box
-        sx={{
-          pointerEvents: "auto",
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: isMobile ? "90%" : 400,
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: isMobile ? 3 : 4,
-          borderRadius: 3,
-          borderTop: "6px solid #0a2b4c",
+    <>
+      <Modal
+        open={open}
+        onClose={closeModal}
+        disableEscapeKeyDown={mode === "private"}
+        sx={{ pointerEvents: mode === "private" ? "none" : "auto" }}
+        BackdropProps={{
+          onClick: (e) => {
+            if (mode !== "private") closeModal();
+            e.stopPropagation();
+          },
         }}
       >
-        {/* Private Mode Warning */}
-        {mode === "private" && (
-          <Box mb={2}>
-            <Typography variant="body1" sx={{ color: "#b91c1c", fontWeight: "bold", mb: 1 }}>
-              ⚠ You must be logged in to continue
-            </Typography>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={function () {
-                document.body.classList.remove("body-blur");
-                navigate("/");
-              }}
-              sx={{
-                mb: 2,
-                color: COLORS.primary,
-                borderColor: "#0a2b4c",
-                "&:hover": { backgroundColor: COLORS.primary, color: COLORS.secondary },
-              }}
-            >
-              Go to Home
-            </Button>
-          </Box>
-        )}
-
-        {/* Close Button (not in private mode) */}
-        {mode !== "private" && (
-          <IconButton
-            onClick={closeModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              color: "#0a2b4c",
-              zIndex: 1,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        )}
-
-        {/* Tabs */}
-        <Tabs
-          value={tab}
-          onChange={(_, val) => setTab(val)}
-          centered
-          textColor="primary"
-          indicatorColor="primary"
+        <Box
           sx={{
-            "& .MuiTabs-indicator": { backgroundColor: "#0a2b4c" },
-            mb: 2,
+            pointerEvents: "auto",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: isMobile ? "90%" : 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: isMobile ? 3 : 4,
+            borderRadius: 3,
+            borderTop: "6px solid #0a2b4c",
           }}
         >
-          <Tab label="Login" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
-          <Tab label="Sign Up" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
-        </Tabs>
+          {/* Private Mode Warning */}
+          {mode === "private" && (
+            <Box mb={2}>
+              <Typography variant="body1" sx={{ color: "#b91c1c", fontWeight: "bold", mb: 1 }}>
+                ⚠ You must be logged in to continue
+              </Typography>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => {
+                  document.body.classList.remove("body-blur");
+                  navigate("/");
+                }}
+                sx={{
+                  mb: 2,
+                  color: COLORS.primary,
+                  borderColor: "#0a2b4c",
+                  "&:hover": { backgroundColor: COLORS.primary, color: COLORS.secondary },
+                }}
+              >
+                Go to Home
+              </Button>
+            </Box>
+          )}
 
-        {/* Form */}
-        <Box>
-          {tab === 1 && (
+          {/* Close Button */}
+          {mode !== "private" && (
+            <IconButton
+              onClick={closeModal}
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                color: "#0a2b4c",
+                zIndex: 1,
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          )}
+
+          {/* Tabs */}
+          <Tabs
+            value={tab}
+            onChange={(_, val) => setTab(val)}
+            centered
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{
+              "& .MuiTabs-indicator": { backgroundColor: "#0a2b4c" },
+              mb: 2,
+            }}
+          >
+            <Tab label="Login" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
+            <Tab label="Sign Up" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
+          </Tabs>
+
+          {/* Form */}
+          <Box>
+            {tab === 1 && (
+              <TextField
+                fullWidth
+                name="username"
+                label="Username"
+                margin="dense"
+                onChange={handleChange}
+                value={form.username}
+              />
+            )}
+
             <TextField
               fullWidth
-              name="username"
-              label="Username"
+              name="email"
+              label="Email"
+              type="email"
               margin="dense"
               onChange={handleChange}
-              value={form.username}
+              value={form.email}
             />
-          )}
 
-          <TextField
-            fullWidth
-            name="email"
-            label="Email"
-            type="email"
-            margin="dense"
-            onChange={handleChange}
-            value={form.email}
-          />
+            <TextField
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              margin="dense"
+              onChange={handleChange}
+              value={form.password}
+            />
 
-          <TextField
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            margin="dense"
-            onChange={handleChange}
-            value={form.password}
-          />
-
-          {error && (
-            <Typography color="error" variant="body2" mt={1}>
-              {error}
-            </Typography>
-          )}
-
-          <Button
-            variant="contained"
-            fullWidth
-            sx={{
-              mt: 2,
-              backgroundColor: COLORS.primary,
-              "&:hover": {
-                backgroundColor: COLORS.secondary,
-              },
-            }}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <CircularProgress size={22} color="inherit" />
-            ) : tab === 0 ? (
-              "Login"
-            ) : (
-              "Sign Up"
+            {error && (
+              <Typography color="error" variant="body2" mt={1}>
+                {error}
+              </Typography>
             )}
-          </Button>
 
-          <Divider sx={{ my: 3 }}>OR</Divider>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{
+                mt: 2,
+                backgroundColor: COLORS.primary,
+                "&:hover": {
+                  backgroundColor: COLORS.secondary,
+                },
+              }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <CircularProgress size={22} color="inherit" />
+              ) : tab === 0 ? (
+                "Login"
+              ) : (
+                "Sign Up"
+              )}
+            </Button>
 
-          <Box display="flex" justifyContent="center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError("Google Auth failed")}
-            />
+            <Divider sx={{ my: 3 }}>OR</Divider>
+
+            <Box display="flex" justifyContent="center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => {
+                  setError("Google Auth failed");
+                  showSnackbar("Google Auth failed", "error");
+                }}
+              />
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </Modal>
+      </Modal>
+
+      {/* Snackbar Notification */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
