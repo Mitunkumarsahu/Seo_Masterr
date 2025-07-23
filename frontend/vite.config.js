@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    allowedHosts: 'all'
+    allowedHosts: ['seomasterr.com']
   },
   optimizeDeps: {
     include: ['@mui/material', '@mui/icons-material'],
