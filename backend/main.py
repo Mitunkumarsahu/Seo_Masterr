@@ -53,6 +53,8 @@ import threading
 from fastapi.responses import RedirectResponse
 from fastapi import BackgroundTasks
 
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
+
 
 # Add to the top after other imports
 from utils.email import send_email
@@ -72,8 +74,13 @@ app = FastAPI(
     openapi_url=f"{API_PREFIX}/openapi.json"
 )
 
+# app.add_middleware(HTTPSRedirectMiddleware, trusted_hosts="*")
 
 # Middleware
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
+if ENVIRONMENT == "production":
+    app.add_middleware(HTTPSRedirectMiddleware)
+    
 app.add_middleware(SessionMiddleware, secret_key="super-secret-session-key")
 app.add_middleware(
     CORSMiddleware,
