@@ -112,7 +112,7 @@ export default function NavBar() {
         <Toolbar sx={{ minHeight: 64 }}>
           {/* Logo */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
-            <Box
+            {/* <Box
               sx={{
                 width: 40,
                 height: 40,
@@ -122,8 +122,8 @@ export default function NavBar() {
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
-              <Typography
+            > */}
+              {/* <Typography
                 variant="h6"
                 component="span"
                 sx={{ color: COLORS.blue800, fontWeight: "bold" }}
@@ -133,7 +133,10 @@ export default function NavBar() {
             </Box>
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
               Site
-            </Typography>
+            </Typography> */}
+            <Box variant="image">
+              <img src="/main-logo.png" alt="Logo" style={{ width: 106, height: 40 }} />
+            </Box>
           </Box>
 
           {/* Desktop Nav */}
