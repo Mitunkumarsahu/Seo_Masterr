@@ -95,7 +95,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(CustomProxyHeadersMiddleware, trusted_hosts="*")
+app.add_middleware(CustomProxyHeadersMiddleware)
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
