@@ -54,6 +54,7 @@ from fastapi.responses import RedirectResponse
 from fastapi import BackgroundTasks
 
 
+
 # Add to the top after other imports
 from utils.email import send_email
 from utils.db import SessionLocal
@@ -62,6 +63,17 @@ load_dotenv()
 
 
 # app = FastAPI()
+
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+
+class CustomProxyHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        forwarded_proto = request.headers.get("x-forwarded-proto")
+        if forwarded_proto:
+            # Override the scheme (http/https) used by Starlette
+            request.scope["scheme"] = forwarded_proto
+        return await call_next(request)
 
 
 API_PREFIX = os.getenv("API_PREFIX", "")
@@ -82,6 +94,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(CustomProxyHeadersMiddleware, trusted_hosts="*")
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
