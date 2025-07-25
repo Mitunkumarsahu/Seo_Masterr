@@ -26,7 +26,13 @@ export default function HomeAboutusSection({ data }) {
 
         <Typography sx={styles.description}>{data.description}</Typography>
 
-        <Button variant="contained" sx={style.heroSection.button}>
+        <Button
+          variant="contained"
+          sx={style.heroSection.button}
+          onClick={() => {
+            navigate("/about-us");
+          }}
+        >
           Learn More
         </Button>
       </Box>

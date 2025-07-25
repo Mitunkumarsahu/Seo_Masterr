@@ -93,7 +93,7 @@ const HomeServiceCards = () => {
               </CardContent>
             </Box>
 
-            <Box sx={{ mt: 3, textAlign: "center", zIndex: 2, position: "relative" }}>
+            <Box sx={{textAlign: "center", zIndex: 2, position: "relative" }}>
               <Link href="#" underline="none" className="card-link" sx={styles.link}>
                 Learn More{" "}
                 <ArrowForwardIcon className="arrow" sx={styles.arrowIcon} />

@@ -7,13 +7,15 @@ import {
 } from "@mui/material";
 import React from "react";
 import style from "../styles/Styles";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function HeroSection({ data }) {
   const location = useLocation();
   const path = location.pathname;
   const theme = useTheme();
   const styles = style.heroSection;
+
+  const navigate = useNavigate();
 
   if (!data) return null; // or loading UI
 
@@ -29,7 +31,9 @@ export default function HeroSection({ data }) {
           {data.description}
         </Typography>
         {path == '/'?
-        <Button variant="contained" sx={styles.button}>
+        <Button variant="contained" sx={styles.button} onClick={()=>{
+          navigate('/about-us')
+        }}>
           Learn More
         </Button>
         :""

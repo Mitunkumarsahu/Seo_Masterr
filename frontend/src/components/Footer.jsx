@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -7,13 +7,45 @@ import {
   Link,
   IconButton,
 } from "@mui/material";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import TwitterIcon from "@mui/icons-material/Twitter";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { COLORS } from "../styles/Styles";
+import useApi from "../hooks/useApi";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import PinterestIcon from "@mui/icons-material/Pinterest";
+import TikTokIcon from "@mui/icons-material/MusicNote"; // TikTok alternative icon
+import SnapchatIcon from "@mui/icons-material/Chat";     // Snapchat alternative icon
+
 
 const Footer = () => {
+  const { apiCall: getSocialIcons, loading, error, data } = useApi();
+  const { apiCall: fetchInfo, data: infoData } = useApi();
+
+  useEffect(() => {
+    const fetchSocialIcons = async () => {
+      try {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+        await getSocialIcons(backendUrl + "/social-media/");
+      } catch (error) {
+        console.error("Failed to fetch home features:", error);
+      }
+    };
+
+    fetchSocialIcons();
+  }, []);
+
+  useEffect(() => {
+    fetchInfo(import.meta.env.VITE_BACKEND_URL+"/contact-info/");
+  }, []);
+  const contactInfo = infoData?.find((item) => item.is_active);
+
+
+
   return (
     <Box sx={{ bgcolor: COLORS.primary, color: "white", mt: 0, pt: 6, pb: 2 }}>
       <Grid
@@ -37,24 +69,44 @@ const Footer = () => {
             />
           </Box>
           <Box sx={{ display: "flex", gap: 2 }}>
-            <IconButton
-              sx={{
-                bgcolor: "white",
-                color: "#0a2b4c",
-                "&:hover": { bgcolor: "#f0f0f0" },
-              }}
-            >
-              <LinkedInIcon />
-            </IconButton>
-            <IconButton
-              sx={{
-                bgcolor: "white",
-                color: "#0a2b4c",
-                "&:hover": { bgcolor: "#f0f0f0" },
-              }}
-            >
-              <TwitterIcon />
-            </IconButton>
+            {data?.map((item) => {
+              if (!item.is_active) return null;
+
+              const iconMap = {
+                facebook: <FacebookIcon />,
+                twitter: <TwitterIcon />,
+                instagram: <InstagramIcon />,
+                linkedin: <LinkedInIcon />,
+                youtube: <YouTubeIcon />,
+                tiktok: <TikTokIcon />,
+                pinterest: <PinterestIcon />,
+                whatsapp: <WhatsAppIcon />,
+                snapchat: <SnapchatIcon />,
+              };
+
+              const IconComponent = iconMap[item.platform?.toLowerCase()];
+              if (!IconComponent) return null;
+
+              return (
+                <Link
+                  key={item.id}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener"
+                  underline="none"
+                >
+                  <IconButton
+                    sx={{
+                      bgcolor: "#f0f0f0",
+                      color: "#000",
+                      "&:hover": { bgcolor: COLORS.secondary},
+                    }}
+                  >
+                    {IconComponent}
+                  </IconButton>
+                </Link>
+              );
+            })}
           </Box>
         </Grid>
 
@@ -122,7 +174,7 @@ const Footer = () => {
           <Box sx={{ display: "flex", alignItems: "start", gap: 1, mt: 1 }}>
             <LocationOnIcon fontSize="small" />
             <Typography variant="body2">
-              Bhubaneswar, Odisha
+              {contactInfo?.address || "123 Main St, City, Country"}
               <br />
               India - 751003
             </Typography>
@@ -130,9 +182,9 @@ const Footer = () => {
           <Box sx={{ display: "flex", alignItems: "start", gap: 1, mt: 1 }}>
             <PhoneIcon fontSize="small" />
             <Typography variant="body2">
-              +91 8249*****
+              {contactInfo?.phone_numbers || "+91 12345 67890"}
               <br />
-              support@seomasterr.com
+              {contactInfo?.email || "seomasterr@gmail.com"}
             </Typography>
           </Box>
         </Grid>

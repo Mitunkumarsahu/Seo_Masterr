@@ -29,9 +29,10 @@ export default function TestimonialSection() {
   const testimonialsPerPage = isMobile ? 1 : 2;
   const totalPages = Math.ceil(testimonials.length / testimonialsPerPage);
 
+
   // Fetch testimonials
   useEffect(() => {
-    getTestimonials(import.meta.env.VITE_BACKEND_URL+"/testimonials/");
+    getTestimonials(import.meta.env.VITE_BACKEND_URL + "/testimonials/");
   }, []);
 
   // Autoplay
@@ -98,13 +99,27 @@ export default function TestimonialSection() {
                     elevation={4}
                     sx={{
                       ...style.testimonialSection.paper,
-                      minWidth: 360,
-                      maxWidth: 500,
+                      width: {
+                        xs: "100%", // full width on mobile
+                        sm: 400, // fixed width on small and above
+                      },
+                      height: {
+                        xs: 300, // same height on mobile
+                        sm: 300, // same height on desktop
+                      },
+                      minWidth: {
+                        xs: "100%",
+                        sm: 400,
+                      },
+                      maxWidth: {
+                        xs: "100%",
+                        sm: 400,
+                      },
                       minHeight: 300,
-                      width: "100%",
-                      height: "100%",
+                      maxHeight: 300,
                       textAlign: "center",
                       transition: "all 0.3s ease",
+                      mx: "auto",
                     }}
                   >
                     <FormatQuoteIcon sx={style.testimonialSection.quoteIcon} />
@@ -144,7 +159,8 @@ export default function TestimonialSection() {
                     variant="caption"
                     color="text.secondary"
                   >
-                    {index + 1} / {currentTestimonials.length}
+                    {pageIndex * testimonialsPerPage + index + 1} /{" "}
+                    {testimonials.length}
                   </Typography>
                 </Box>
               </Grid>
