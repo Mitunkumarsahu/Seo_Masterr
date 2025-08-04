@@ -6,31 +6,82 @@ import {
   Container,
   Divider,
   Tooltip,
-  Typography
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useApi from "../hooks/useApi"; // make sure this path is correct
-import { default as COLORS, default as style } from "../styles/Styles"; // make sure this path is correct
+import useApi from "../hooks/useApi";
+import { default as COLORS, default as style } from "../styles/Styles";
 
 const BlogDetailPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
 
-  const { apiCall: getBlogDetail, data, loading, error } = useApi();
+  const {
+    apiCall: getBlogDetail,
+    data,
+    loading,
+    error,
+  } = useApi();
 
+  // Fetch blog post by slug
   useEffect(() => {
-    getBlogDetail(import.meta.env.VITE_BACKEND_URL+`/blogs/${id}/with-recent`);
-  }, [id]);
+    getBlogDetail(`http://localhost:8000/wp-json/wp/v2/posts?slug=${slug}&_embed`);
+  }, [slug]);
 
+  // Transform blog data and fetch related posts
   useEffect(() => {
-    if (data) {
-      setPost(data.blog);
-      setRelatedPosts(data.recent_blogs);
+    if (data && Array.isArray(data) && data.length > 0) {
+      const wpPost = data[0];
+      const transformedPost = {
+        id: wpPost.id,
+        title: wpPost.title.rendered,
+        content: wpPost.content.rendered,
+        author: wpPost._embedded?.author?.[0]?.name || "Unknown",
+        published_at: wpPost.date,
+        featured_image:
+          wpPost._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+          "https://via.placeholder.com/300",
+        categories: wpPost.categories,
+        excerpt: wpPost.excerpt.rendered.replace(/<[^>]+>/g, ""),
+        slug: wpPost.slug,
+      };
+      setPost(transformedPost);
+
+      if (wpPost.categories?.length) {
+        const categoryParams = wpPost.categories.join(",");
+        fetchRelatedPosts(wpPost.id, categoryParams);
+      }
+    } else {
+      setPost(null);
     }
   }, [data]);
+
+  // Fetch related posts from same categories
+  const fetchRelatedPosts = async (currentPostId, categoryParams) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/wp-json/wp/v2/posts?_embed&per_page=5&categories=${categoryParams}&exclude=${currentPostId}`
+      );
+      const posts = await response.json();
+
+      const transformed = posts.map((post) => ({
+        id: post.id,
+        title: post.title.rendered,
+        meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, "").slice(0, 80) + "...",
+        slug: post.slug,
+        featured_image:
+          post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+          "https://via.placeholder.com/100",
+      }));
+
+      setRelatedPosts(transformed);
+    } catch (error) {
+      console.error("Failed to fetch related posts", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -43,7 +94,7 @@ const BlogDetailPage = () => {
   if (error || !post) {
     return (
       <Container>
-        <Typography variant="h5" color="error">
+        <Typography variant="h5" color="error" mt={4}>
           {error ? "Something went wrong." : "Post not found."}
         </Typography>
       </Container>
@@ -90,7 +141,7 @@ const BlogDetailPage = () => {
               boxShadow: 1,
             }}
           >
-            {/* Featured Image with Share Icon */}
+            {/* Featured Image + Share */}
             <Box sx={{ position: "relative", mb: 2 }}>
               <Box
                 component="img"
@@ -126,7 +177,7 @@ const BlogDetailPage = () => {
               </Tooltip>
             </Box>
 
-            {/* Blog HTML Content */}
+            {/* Post Content */}
             <Box
               sx={{
                 wordBreak: "break-word",
@@ -182,11 +233,10 @@ const BlogDetailPage = () => {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
-            {/* Bottom Divider */}
             <Divider sx={{ my: 2 }} />
           </Box>
 
-          {/* Related Posts Sidebar */}
+          {/* Related Posts */}
           <Box
             sx={{
               flex: 1,
@@ -200,58 +250,59 @@ const BlogDetailPage = () => {
               alignSelf: "flex-start",
             }}
           >
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              mb={2}
-            >
+            <Typography variant="h6" fontWeight="bold" mb={2}>
               Related Posts
             </Typography>
 
-            {relatedPosts.map((related) => (
-              <Box
-                key={related.id}
-                onClick={() => navigate(`/blog/${related.id}`)}
-                sx={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 1.5,
-                  mb: 3,
-                  cursor:"pointer",
-                  p: 1,
-                  borderRadius: 1,
-                  transition: "0.2s",
-                  "&:hover": {
-                    backgroundColor: "#f5f5f5",
-                  },
-                }}
-              >
+            {relatedPosts.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No related posts found.
+              </Typography>
+            ) : (
+              relatedPosts.map((related) => (
                 <Box
-                  component="img"
-                  src={related.featured_image}
-                  alt={related.title}
+                  key={related.id}
+                  onClick={() => navigate(`/blog/${related.slug}`)}
                   sx={{
-                    width: 50,
-                    height: 50,
-                    objectFit: "cover",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 1.5,
+                    mb: 3,
+                    cursor: "pointer",
+                    p: 1,
                     borderRadius: 1,
-                    flexShrink: 0,
+                    transition: "0.2s",
+                    "&:hover": {
+                      backgroundColor: "#f5f5f5",
+                    },
                   }}
-                />
-                <Box sx={{ flex: 1,flexDirection:"column" }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 600, color: COLORS.primary, mb: 0.5 }}
-                  >
-                    {related.title}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {related.meta_description}
-                  </Typography>
-                  
+                >
+                  <Box
+                    component="img"
+                    src={related.featured_image}
+                    alt={related.title}
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      objectFit: "cover",
+                      borderRadius: 1,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Box sx={{ flex: 1, flexDirection: "column" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 600, color: COLORS.primary, mb: 0.5 }}
+                    >
+                      {related.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {related.meta_description}
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              ))
+            )}
           </Box>
         </Box>
       </Container>

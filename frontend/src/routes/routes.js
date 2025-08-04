@@ -37,7 +37,7 @@ const routes = {
 
     },
     {
-      "path": "/blog/:id",
+      "path": "/blog/:slug",
       "component": BlogDetailPage,
       "type": "private"
     },

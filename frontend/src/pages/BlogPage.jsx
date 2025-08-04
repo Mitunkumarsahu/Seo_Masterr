@@ -16,285 +16,192 @@ const ITEMS_PER_PAGE = 6;
 const BlogPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [blogs, setBlogs] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
 
   const navigate = useNavigate();
 
-  // Blogs API
+  // Blog Fetch
   const {
     apiCall: getBlogs,
     data: blogsData,
+    headers: blogsHeaders,
     loading: blogsLoading,
-    error: blogsError,
   } = useApi();
 
-  // Categories API
+  // Categories Fetch
   const {
     apiCall: getCategories,
-    data: categoriesData,
+    data: categoryData,
     loading: categoriesLoading,
-    error: categoriesError,
   } = useApi();
 
-  const [blogs, setBlogs] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
+  // Tags Fetch
+  const {
+    apiCall: getTags,
+    data: tagData,
+  } = useApi();
 
+  // Fetch categories and tags on mount
   useEffect(() => {
-    getCategories(import.meta.env.VITE_BACKEND_URL+"/blogs/categories");
+    getCategories("http://localhost:8000/wp-json/wp/v2/categories");
+    getTags("http://localhost:8000/wp-json/wp/v2/tags?per_page=100");
   }, []);
 
+  // Store categories
   useEffect(() => {
-    if (categoriesData) {
-      setCategories(categoriesData);
+    if (Array.isArray(categoryData)) {
+      setCategories(categoryData);
     }
-  }, [categoriesData]);
+  }, [categoryData]);
 
+  // Store tags
   useEffect(() => {
-    let url = import.meta.env.VITE_BACKEND_URL+`/blogs/?page=${currentPage}&page_size=${ITEMS_PER_PAGE}`;
+    if (Array.isArray(tagData)) {
+      setTags(tagData);
+    }
+  }, [tagData]);
+
+  // Fetch blogs
+  useEffect(() => {
+    let url = `http://localhost:8000/wp-json/wp/v2/posts?_embed&per_page=${ITEMS_PER_PAGE}&page=${currentPage}`;
     if (selectedCategory !== "all") {
-      const selectedCat = categories.find(
-        (cat) => cat.slug === selectedCategory
-      );
-      if (selectedCat) {
-        url += `&category_id=${selectedCat.id}`;
-      }
+      url += `&categories=${selectedCategory}`;
     }
     getBlogs(url);
-  }, [currentPage, selectedCategory, categories]);
+  }, [selectedCategory, currentPage]);
 
+  // Transform blog data
   useEffect(() => {
-    if (blogsData) {
-      setBlogs(blogsData.items || []);
-      setTotalPages(Math.ceil((blogsData.total || 0) / ITEMS_PER_PAGE));
-    }
-  }, [blogsData]);
+    if (Array.isArray(blogsData)) {
+      const transformed = blogsData.map((post) => {
+        const tagNames = post.tags
+          .map((tagId) => tags.find((tag) => tag.id === tagId)?.name)
+          .filter(Boolean);
 
-  const handlePageChange = (event, value) => {
+        return {
+          id: post.id,
+          title: post.title.rendered,
+          author: post._embedded?.author?.[0]?.name || "Unknown",
+          published_at: post.date,
+          meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
+          slug: post.slug,
+          featured_image:
+            post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+            "https://via.placeholder.com/150",
+          tags: tagNames,
+        };
+      });
+
+      setBlogs(transformed);
+      const total = Number(blogsHeaders?.["x-wp-totalpages"] || 1);
+      setTotalPages(total);
+    }
+  }, [blogsData, blogsHeaders, tags]);
+
+  const handlePageChange = (_, value) => {
     setCurrentPage(value);
   };
 
-  const handleCategoryChange = (slug) => {
-    setSelectedCategory(slug);
+  const handleCategoryChange = (catId) => {
+    setSelectedCategory(catId);
     setCurrentPage(1);
   };
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
-      {/* <Typography variant="h3" fontWeight="bold" sx={{ color: "#000", textAlign:"center",py:4, mb: 2 }}>
-          Blogs
-        </Typography> */}
-      {/* Header */}
-      {/* <Box
-        sx={{
-          background: "linear-gradient(to top, rgba(12, 47, 88, 1), rgba(12, 47, 88, 0))",
-          py: 6,
-          textAlign: "center",
-        }}
-      >
-        <Typography variant="h3" fontWeight="bold" sx={{ color: "#fff", mb: 2 }}>
-          Blogs
-        </Typography>
-      </Box> */}
-
       <Container maxWidth="xl" sx={{ py: 6 }}>
         <Typography
           variant="h3"
           fontWeight="bold"
           textAlign="center"
           sx={[style.testimonialSection.headline]}
-          mb={5}
+          mb={4}
         >
           Our Blogs
         </Typography>
 
         {/* Category Tabs */}
         <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            justifyContent: "center",
-            mb: 6,
-          }}
+          display="flex"
+          justifyContent="center"
+          flexWrap="wrap"
+          gap={2}
+          mb={4}
         >
-          <CategoryTab
-            label="All"
-            selected={selectedCategory === "all"}
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{
+              backgroundColor:
+                selectedCategory === "all" ? COLORS.primary : "#ffffff",
+              color: selectedCategory === "all" ? "#fff" : COLORS.primary,
+              border: `1px solid ${COLORS.primary}`,
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              borderRadius: "20px",
+              px: 2.5,
+              py: 0.75,
+              textTransform: "capitalize",
+              minWidth: "auto",
+              "&:hover": {
+                backgroundColor:
+                  selectedCategory === "all" ? COLORS.primary : "#e0eaff",
+                borderColor: "#0C2F58",
+              },
+            }}
             onClick={() => handleCategoryChange("all")}
-          />
-          {categories.map((cat) => (
-            <CategoryTab
-              key={cat.id}
-              label={cat.name}
-              selected={selectedCategory === cat.slug}
-              onClick={() => handleCategoryChange(cat.slug)}
-            />
-          ))}
+          >
+            All
+          </Button>
+
+          {categoriesLoading ? (
+            <CircularProgress size={24} />
+          ) : (
+            categories.map((cat) => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <Button
+                  key={cat.id}
+                  size="small"
+                  sx={{
+                    backgroundColor: isSelected ? COLORS.primary : "#ffffff",
+                    color: isSelected ? "#fff" : COLORS.primary,
+                    border: `1px solid ${COLORS.primary}`,
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    borderRadius: "20px",
+                    px: 2.5,
+                    py: 0.75,
+                    textTransform: "capitalize",
+                    minWidth: "auto",
+                    "&:hover": {
+                      backgroundColor: isSelected ? COLORS.primary : "#e0eaff",
+                      borderColor: "#0C2F58",
+                    },
+                  }}
+                  variant="outlined"
+                  onClick={() => handleCategoryChange(cat.id)}
+                >
+                  {cat.name}
+                </Button>
+              );
+            })
+          )}
         </Box>
 
         {/* Blog List */}
-        {blogsLoading || categoriesLoading ? (
+        {blogsLoading ? (
           <Box display="flex" justifyContent="center" mt={6}>
             <CircularProgress />
           </Box>
         ) : blogs.length === 0 ? (
           <Typography textAlign="center" mt={4}>
-            No blogs found for this category.
+            No blogs found.
           </Typography>
         ) : (
-          // <Box
-          //   sx={{
-          //     display: "flex",
-          //     flexWrap: "wrap",
-          //     justifyContent: "space-between",
-          //     gap: 3,
-          //   }}
-          // >
-          //   {blogs.map((blog) => (
-          //     <Box
-          //       key={blog.id}
-          //       sx={{
-          //         flex: "1 1 calc(33.33% - 2rem)",
-          //         borderRadius: "12px",
-          //         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-          //         overflow: "hidden",
-          //         position: "relative",
-          //         minWidth: "250px",
-          //         maxWidth: "calc(33.33% - 2rem)",
-          //         transition: "0.3s",
-          //         "&:hover": {
-          //           transform: "translateY(-5px)",
-          //         },
-          //       }}
-          //     >
-          //       {/* Background Image */}
-          //       <Box
-          //         sx={{
-          //           height: "250px",
-          //           width: "100%",
-          //           backgroundImage: `url(${blog.featured_image})`,
-          //           backgroundSize: "cover",
-          //           backgroundPosition: "center",
-          //           position: "relative",
-          //         }}
-          //       >
-          //         {/* Dark Overlay for readability */}
-          //         <Box
-          //           sx={{
-          //             position: "absolute",
-          //             inset: 0,
-          //             background:
-          //               "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2))",
-          //             zIndex: 1,
-          //           }}
-          //         />
-
-          //         {/* Text Content */}
-          //         <Box
-          //           sx={{
-          //             position: "absolute",
-          //             inset: 0,
-          //             zIndex: 2,
-          //             color: "#fff",
-          //             display: "flex",
-          //             flexDirection: "column",
-          //             justifyContent: "space-between",
-          //             p: 2,
-          //           }}
-          //         >
-          //           <Box>
-          //             <Typography
-          //               variant="subtitle2"
-          //               sx={{ fontSize: "20px", fontWeight: 800 }}
-          //             >
-          //               {blog.title}
-          //             </Typography>
-          //             <Typography variant="body2" sx={{ mt: 1 }}>
-          //               {blog.meta_description}
-          //             </Typography>
-          //           </Box>
-
-          //           {/* Author Info - bottom right */}
-          //         </Box>
-          //       </Box>
-
-          //       <Box sx={{
-          //             display: "flex",
-          //             justifyContent: "space-between",
-          //             flexDirection: "row",
-
-          //       }}>
-          //         {/* Read More Button */}
-          //         <Box
-          //           sx={{
-          //             p: 2,
-          //           }}
-          //         >
-          //           <Button
-          //             variant="outlined"
-          //             sx={{
-          //               bgcolor: "transparent",
-          //               color: "#ffffff",
-          //               textTransform: "uppercase",
-          //               borderRadius: 5,
-          //               mt: 1,
-          //               alignSelf: "flex-start",
-          //               position: "relative",
-          //               overflow: "hidden",
-          //               border: "2px solid transparent",
-          //               background:
-          //                 "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-          //               backgroundClip: "padding-box",
-          //               transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-          //               animation: "buttonPulse 2s ease-in-out infinite",
-          //               "&::before": {
-          //                 content: '""',
-          //                 position: "absolute",
-          //                 top: 0,
-          //                 left: "-100%",
-          //                 width: "100%",
-          //                 height: "100%",
-          //                 background:
-          //                   "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
-          //                 transition: "left 0.6s",
-          //               },
-          //               "&:hover": {
-          //                 transform: "translateY(-3px) scale(1.05)",
-          //                 background:
-          //                   "linear-gradient(135deg, #059669 0%, #047857 100%)",
-          //                 "&::before": {
-          //                   left: "100%",
-          //                 },
-          //               },
-          //               "&:active": {
-          //                 transform: "translateY(-1px) scale(1.02)",
-          //               },
-          //             }}
-          //             onClick={() => navigate(`/blog/${blog.id}`)}
-          //           >
-          //             Read More
-          //           </Button>
-          //         </Box>
-          //         <Box
-          //           sx={{
-          //             display: "flex",
-          //             alignItems: "center",
-          //             mx: 2,
-          //           }}
-          //         >
-          //           <Typography
-          //             variant="caption"
-          //             sx={{ color: COLORS.primary, fontSize:"12px", fontWeight: 900 }}
-          //           >
-          //            Author: {blog.author.toUpperCase()}
-          //           </Typography>
-
-          //         </Box>
-          //       </Box>
-          //     </Box>
-          //   ))}
-          // </Box>
-
           <Box
             sx={{
               display: "flex",
@@ -309,7 +216,6 @@ const BlogPage = () => {
                 key={blog.id}
                 sx={{
                   display: "flex",
-                  // flexDirection: { xs: "column", sm: "row" },
                   gap: 3,
                   borderBottom: "1px solid #ddd",
                   pb: 3,
@@ -348,7 +254,7 @@ const BlogPage = () => {
                         textDecoration: "underline",
                       },
                     }}
-                    onClick={() => navigate(`/blog/${blog.id}`)}
+                    onClick={() => navigate(`/blog/${blog.slug}`)}
                   >
                     {blog.title}
                   </Typography>
@@ -375,6 +281,28 @@ const BlogPage = () => {
                       ? blog.meta_description.slice(0, 150) + "..."
                       : blog.meta_description}
                   </Typography>
+
+                  {/* Tags */}
+                  {blog.tags?.length > 0 && (
+                    <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
+                      {blog.tags.map((tag, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{
+                            backgroundColor: "#f0f0f0",
+                            color: "#333",
+                            px: 1,
+                            py: 0.25,
+                            fontSize: "0.7rem",
+                            borderRadius: "4px",
+                            fontWeight: 500,
+                          }}
+                        >
+                          #{tag}
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
               </Box>
             ))}
@@ -392,13 +320,13 @@ const BlogPage = () => {
               color="primary"
               sx={{
                 "& .MuiPaginationItem-root": {
-                  color: "#000", // optional text color
+                  color: "#000",
                 },
                 "& .Mui-selected": {
                   backgroundColor: COLORS.secondary,
-                  color: "#fff", // white text on secondary background
+                  color: "#fff",
                   "&:hover": {
-                    backgroundColor: COLORS.secondary, // maintain bg on hover
+                    backgroundColor: COLORS.secondary,
                   },
                 },
               }}
@@ -409,31 +337,5 @@ const BlogPage = () => {
     </Box>
   );
 };
-
-const CategoryTab = ({ label, selected, onClick }) => (
-  <Button
-    onClick={onClick}
-    variant="outlined"
-    size="small"
-    sx={{
-      backgroundColor: selected ? COLORS.primary : "#ffffff",
-      color: selected ? "#ffff" : COLORS.primary,
-      border: `1px solid ${COLORS.primary}`,
-      fontWeight: 700,
-      fontSize: "0.75rem",
-      borderRadius: "20px",
-      px: 2.5,
-      py: 0.75,
-      textTransform: "capitalize",
-      minWidth: "auto",
-      "&:hover": {
-        backgroundColor: selected ? COLORS.primary : "#e0eaff",
-        borderColor: "#0C2F58",
-      },
-    }}
-  >
-    {label.toUpperCase()}
-  </Button>
-);
 
 export default BlogPage;
