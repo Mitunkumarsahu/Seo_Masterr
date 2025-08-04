@@ -28,7 +28,7 @@ const BlogDetailPage = () => {
 
   // Fetch blog post by slug
   useEffect(() => {
-    getBlogDetail(`http://localhost:8000/wp-json/wp/v2/posts?slug=${slug}&_embed`);
+    getBlogDetail(`https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/posts?slug=${slug}&_embed`);
   }, [slug]);
 
   // Transform blog data and fetch related posts
@@ -43,7 +43,7 @@ const BlogDetailPage = () => {
         published_at: wpPost.date,
         featured_image:
           wpPost._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-          "https://via.placeholder.com/300",
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcPgqm575oc2CiJLcYCo75HYrrQatuUSZ3KA&s",
         categories: wpPost.categories,
         excerpt: wpPost.excerpt.rendered.replace(/<[^>]+>/g, ""),
         slug: wpPost.slug,
@@ -63,7 +63,7 @@ const BlogDetailPage = () => {
   const fetchRelatedPosts = async (currentPostId, categoryParams) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/wp-json/wp/v2/posts?_embed&per_page=5&categories=${categoryParams}&exclude=${currentPostId}`
+        `https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/posts?_embed&per_page=5&categories=${categoryParams}&exclude=${currentPostId}`
       );
       const posts = await response.json();
 
@@ -74,7 +74,7 @@ const BlogDetailPage = () => {
         slug: post.slug,
         featured_image:
           post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-          "https://via.placeholder.com/100",
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcPgqm575oc2CiJLcYCo75HYrrQatuUSZ3KA&s",
       }));
 
       setRelatedPosts(transformed);
