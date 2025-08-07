@@ -25,6 +25,10 @@ const BlogDetailPage = () => {
     loading,
     error,
   } = useApi();
+  const decodeHTML = (html) => {
+    const parser = new DOMParser();
+    return parser.parseFromString(html, "text/html").body.textContent || "";
+  };
 
   // Fetch blog post by slug
   useEffect(() => {
@@ -37,7 +41,7 @@ const BlogDetailPage = () => {
       const wpPost = data[0];
       const transformedPost = {
         id: wpPost.id,
-        title: wpPost.title.rendered,
+        title: decodeHTML(wpPost.title.rendered),
         content: wpPost.content.rendered,
         author: wpPost._embedded?.author?.[0]?.name || "Unknown",
         published_at: wpPost.date,
@@ -69,7 +73,7 @@ const BlogDetailPage = () => {
 
       const transformed = posts.map((post) => ({
         id: post.id,
-        title: post.title.rendered,
+        title: decodeHTML(post.title.rendered),
         meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, "").slice(0, 80) + "...",
         slug: post.slug,
         featured_image:

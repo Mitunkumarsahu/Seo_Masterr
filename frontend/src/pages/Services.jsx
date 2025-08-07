@@ -5,13 +5,13 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import HomeFooterSearch from '../components/HomeFooterSearch';
+import HomeFooterSearch from "../components/HomeFooterSearch";
 import useApi from "../hooks/useApi";
-import style, { COLORS } from "../styles/Styles"; // Ensure this path is correct  
-
+import style, { COLORS } from "../styles/Styles";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -24,60 +24,82 @@ const Services = () => {
 
   const {
     apiCall: getServices,
+    data: servicesData,
     loading: servicesLoading,
     error: servicesError,
-    data: servicesData,
   } = useApi();
 
   const {
     apiCall: getServiceTypes,
-    loading: serviceTypesLoading,
-    error: serviceTypesError,
-    data: serviceTypesData,
+    data: typesData,
+    loading: typesLoading,
+    error: typesError,
   } = useApi();
 
+  // Fetch services and types on mount
   useEffect(() => {
-    getServices(import.meta.env.VITE_BACKEND_URL+"/services/");
-    getServiceTypes(import.meta.env.VITE_BACKEND_URL+"/services/types");
+    getServices("https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/service?_embed&per_page=100");
+    getServiceTypes("https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/service_type?per_page=100");
   }, []);
 
-  // Set services when data is received
+  // Transform and set services data
   useEffect(() => {
-    if (servicesData) {
-      setServices(servicesData);
-      setFilteredServices(servicesData);
+    if (Array.isArray(servicesData)) {
+      const transformed = servicesData.map((post) => {
+        const typeId = post.service_type?.[0]; // Assuming one service_type
+
+        return {
+          id: post.id,
+          title: post.title.rendered,
+          meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
+          slug: post.slug,
+          image_url:
+            post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+            "https://via.placeholder.com/300x200",
+          service_type: typeId,
+        };
+      });
+
+      setServices(transformed);
+      setFilteredServices(transformed);
     }
   }, [servicesData]);
 
-  // Set service types when data is received
+  // Set available service types
   useEffect(() => {
-    if (serviceTypesData) {
-      setServiceTypes(serviceTypesData);
+    if (Array.isArray(typesData)) {
+      setServiceTypes(typesData);
     }
-  }, [serviceTypesData]);
+  }, [typesData]);
 
+  // Filter services by selected type
   useEffect(() => {
     if (selectedType === "all") {
       setFilteredServices(services);
     } else {
-      const filtered = services.filter(
-        (s) => s.service_type?.slug === selectedType
+      setFilteredServices(
+        services.filter((s) => s.service_type === selectedType)
       );
-      setFilteredServices(filtered);
     }
   }, [selectedType, services]);
 
-  const loading = servicesLoading || serviceTypesLoading;
-  const error = servicesError || serviceTypesError;
+  const loading = servicesLoading || typesLoading;
+  const error = servicesError || typesError;
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
       <Container maxWidth="xl" sx={{ py: 8 }}>
-        <Typography variant="h3" fontWeight="bold" textAlign="center" sx={style?.testimonialSection?.headline} mb={5}>
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          textAlign="center"
+          sx={style?.testimonialSection?.headline}
+          mb={5}
+        >
           Our Services
         </Typography>
 
-        {/* Tab Buttons */}
+        {/* Filter Tabs */}
         <Box
           sx={{
             display: "flex",
@@ -96,8 +118,8 @@ const Services = () => {
             <TabButton
               key={type.id}
               label={type.name}
-              selected={selectedType === type.slug}
-              onClick={() => setSelectedType(type.slug)}
+              selected={selectedType === type.id}
+              onClick={() => setSelectedType(type.id)}
             />
           ))}
         </Box>
@@ -116,9 +138,13 @@ const Services = () => {
           }}
         >
           {loading ? (
-            <Typography textAlign="center">Loading services...</Typography>
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <CircularProgress />
+            </Box>
           ) : error ? (
-            <Typography color="error" textAlign="center">{error}</Typography>
+            <Typography color="error" textAlign="center">
+              {error}
+            </Typography>
           ) : filteredServices.length === 0 ? (
             <Typography textAlign="center">No services found.</Typography>
           ) : (
@@ -128,8 +154,6 @@ const Services = () => {
           )}
         </Box>
       </Container>
-
-
 
       <HomeFooterSearch />
     </Box>
@@ -143,7 +167,7 @@ const TabButton = ({ label, selected, onClick }) => (
     size="small"
     sx={{
       backgroundColor: selected ? COLORS.primary : "#ffffff",
-      color: selected ? "#ffff" : COLORS.primary,
+      color: selected ? "#ffffff" : COLORS.primary,
       border: `1px solid ${COLORS.primary}`,
       fontWeight: 700,
       fontSize: "0.75rem",
@@ -153,9 +177,7 @@ const TabButton = ({ label, selected, onClick }) => (
       textTransform: "capitalize",
       minWidth: "auto",
       "&:hover": {
-        backgroundColor: selected
-          ? COLORS.primary
-          : "#e0eaff",
+        backgroundColor: selected ? COLORS.primary : "#e0eaff",
         borderColor: "#0C2F58",
       },
     }}
@@ -193,14 +215,21 @@ const ServiceCard = ({ post }) => {
         />
       </Box>
       <Box sx={{ p: 3 }}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{color:COLORS.primary}}>
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          gutterBottom
+          sx={{ color: COLORS.primary }}
+        >
           {post.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          {post.meta_description}
+          {post.meta_description.length > 150
+            ? post.meta_description.slice(0, 60) + "..."
+            : post.meta_description.slice(0, 60) + "..."}
         </Typography>
         <Button
-          onClick={() => navigate(`/service/${post.id}`)}
+          onClick={() => navigate(`/service/${post.slug}`)}
           sx={{
             mt: 2,
             fontWeight: 600,
@@ -213,7 +242,6 @@ const ServiceCard = ({ post }) => {
           LEARN MORE →
         </Button>
       </Box>
-
     </Box>
   );
 };

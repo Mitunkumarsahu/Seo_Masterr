@@ -1,25 +1,49 @@
-import { Box, Button, Container, Divider, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../hooks/useApi";
-import style, { COLORS } from "../styles/Styles"; // Ensure this path is correct
+import style, { COLORS } from "../styles/Styles";
 
 const ServiceDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams(); // now using slug instead of id
   const navigate = useNavigate();
   const [service, setService] = useState(null);
 
-  const { apiCall: fetchService, data: serviceData, loading, error } = useApi();
+  const {
+    apiCall: fetchService,
+    data: serviceData,
+    loading,
+    error,
+  } = useApi();
 
   useEffect(() => {
-    if (id) {
-      fetchService(import.meta.env.VITE_BACKEND_URL+`/services/${id}`);
+    if (slug) {
+      fetchService(`https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/service?slug=${slug}&_embed`);
     }
-  }, [id]);
+  }, [slug]);
 
   useEffect(() => {
-    if (serviceData) {
-      setService(serviceData);
+    if (Array.isArray(serviceData) && serviceData.length > 0) {
+      const post = serviceData[0];
+
+      const serviceDetail = {
+        id: post.id,
+        title: post.title.rendered,
+        content: post.content.rendered,
+        meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
+        image_url:
+          post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+          "https://via.placeholder.com/1200x600",
+        service_type: post._embedded?.["wp:term"]?.[0]?.[0]?.name || "",
+      };
+
+      setService(serviceDetail);
     }
   }, [serviceData]);
 
@@ -76,12 +100,14 @@ const ServiceDetail = () => {
       {/* Content Section */}
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 12 }, py: 6 }}>
         <Box sx={{ maxWidth: "1400px", mx: "auto" }}>
-          <Typography
-            variant="subtitle2"
-            sx={{ color: COLORS.primary, fontWeight: "bold", mb: 1 }}
-          >
-            {service.service_type?.name?.toUpperCase()}
-          </Typography>
+          {service.service_type && (
+            <Typography
+              variant="subtitle2"
+              sx={{ color: COLORS.primary, fontWeight: "bold", mb: 1 }}
+            >
+              {service.service_type.toUpperCase()}
+            </Typography>
+          )}
 
           <Typography variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
             {service.title}
@@ -183,7 +209,6 @@ const ServiceDetail = () => {
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                position: "relative",
                 animation: "textGlow 2s ease-in-out infinite alternate",
                 textAlign: "center",
                 letterSpacing: "-0.02em",

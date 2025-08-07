@@ -42,7 +42,7 @@ const routes = {
       "type": "private"
     },
     {
-      "path": "/service/:id",
+      "path": "/service/:slug",
       "component": ServiceDetail,
       "type": "private"
     },

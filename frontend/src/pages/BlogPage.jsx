@@ -39,15 +39,16 @@ const BlogPage = () => {
   } = useApi();
 
   // Tags Fetch
-  const {
-    apiCall: getTags,
-    data: tagData,
-  } = useApi();
+  const { apiCall: getTags, data: tagData } = useApi();
 
   // Fetch categories and tags on mount
   useEffect(() => {
-    getCategories("https://lemonchiffon-curlew-159892.hostingersite.com//wp-json/wp/v2/categories");
-    getTags("https://lemonchiffon-curlew-159892.hostingersite.com//wp-json/wp/v2/tags?per_page=100");
+    getCategories(
+      "https://lemonchiffon-curlew-159892.hostingersite.com//wp-json/wp/v2/categories"
+    );
+    getTags(
+      "https://lemonchiffon-curlew-159892.hostingersite.com//wp-json/wp/v2/tags?per_page=100"
+    );
   }, []);
 
   // Store categories
@@ -77,16 +78,23 @@ const BlogPage = () => {
   useEffect(() => {
     if (Array.isArray(blogsData)) {
       const transformed = blogsData.map((post) => {
+        const parser = new DOMParser();
+
+        const decode = (html) =>
+          parser.parseFromString(html, "text/html").body.textContent || "";
+
         const tagNames = post.tags
           .map((tagId) => tags.find((tag) => tag.id === tagId)?.name)
           .filter(Boolean);
 
         return {
           id: post.id,
-          title: post.title.rendered,
+          title: decode(post.title.rendered), // 👈 fix here
           author: post._embedded?.author?.[0]?.name || "Unknown",
           published_at: post.date,
-          meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
+          meta_description: decode(
+            post.excerpt.rendered.replace(/<[^>]+>/g, "")
+          ), // 👈 also decode excerpt
           slug: post.slug,
           featured_image:
             post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
