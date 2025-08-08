@@ -4,10 +4,10 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: seomasterr@1999AS
+      MYSQL_ROOT_PASSWORD: "seomasterr@1999AS"
       MYSQL_DATABASE: seo_db
       MYSQL_USER: seo_user
-      MYSQL_PASSWORD: seomasterr@1999AS
+      MYSQL_PASSWORD: "seomasterr@1999AS"
     ports:
       - "3306:3306"
     volumes:
