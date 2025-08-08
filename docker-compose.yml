@@ -1,6 +1,20 @@
-
-
 services:
+  mysql:
+    container_name: seo_mysql
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: seomasterr@1999AS
+      MYSQL_DATABASE: seo_db
+      MYSQL_USER: seo_user
+      MYSQL_PASSWORD: seomasterr@1999AS
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - seonet
+
   backend:
     container_name: seo_backend
     build:
@@ -13,6 +27,8 @@ services:
     ports:
       - "8000:8000"
     restart: always
+    depends_on:
+      - mysql
     networks:
       - seonet
 
@@ -28,6 +44,9 @@ services:
     restart: always
     networks:
       - seonet
+
+volumes:
+  mysql_data:
 
 networks:
   seonet:
