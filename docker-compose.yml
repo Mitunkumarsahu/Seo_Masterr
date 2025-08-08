@@ -14,6 +14,11 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - seonet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pseomasterr1999AS"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     container_name: seo_backend
@@ -28,7 +33,8 @@ services:
       - "8000:8000"
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - seonet
 
