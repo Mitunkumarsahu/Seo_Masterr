@@ -1,13 +1,15 @@
-FROM node:22
-
+FROM node:22 AS build
 WORKDIR /app
 
-COPY frontend/package*.json ./
+# Copy package files first for caching
+COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
-COPY frontend/ ./
+# Copy rest of the frontend source code
+COPY . .
 
-EXPOSE 5173
+# Build production files
+RUN npm run build
 
-# CMD ["sh", "-c", "npm run dev -- --host 0.0.0.0"]
-CMD ["npx", "vite", "--host", "0.0.0.0"]
+# Copy build output to shared volume for Nginx
+CMD ["sh", "-c", "cp -r dist/* /frontend_build && echo 'Frontend build copied' && tail -f /dev/null"]
