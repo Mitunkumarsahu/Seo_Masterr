@@ -38,15 +38,15 @@ services:
     networks:
       - seonet
 
-frontend:
-  container_name: seo_frontend
-  build:
-    context: ./frontend
-    dockerfile: Dockerfile
-  volumes:
-    - ./frontend_build:/frontend_build
-  networks:
-    - seonet
+  frontend:
+    container_name: seo_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend_build:/frontend_build
+    networks:
+      - seonet
 
 
 volumes:
