@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Fab, Zoom } from "@mui/material";
 import { KeyboardArrowUp } from "@mui/icons-material";
+import { COLORS } from "../styles/Styles";
 
 export default function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
@@ -33,7 +34,7 @@ export default function ScrollToTopButton() {
           bottom: 24,
           right: 24,
           zIndex: 1200,
-          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+          background: COLORS.secondary,
           color: "white",
           "&:hover": {
             bgcolor: "#1e40af",
