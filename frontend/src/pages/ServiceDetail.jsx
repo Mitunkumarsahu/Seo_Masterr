@@ -15,6 +15,12 @@ const ServiceDetail = () => {
   const navigate = useNavigate();
   const [service, setService] = useState(null);
 
+  const decodeHTML = (html) => {
+    const parser = new DOMParser();
+    return parser.parseFromString(html, "text/html").body.textContent || "";
+  };
+
+
   const {
     apiCall: fetchService,
     data: serviceData,
@@ -34,8 +40,8 @@ const ServiceDetail = () => {
 
       const serviceDetail = {
         id: post.id,
-        title: post.title.rendered,
-        content: post.content.rendered,
+        title:decodeHTML(post.title.rendered),
+        content:decodeHTML(post.content.rendered),
         meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
         image_url:
           post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||

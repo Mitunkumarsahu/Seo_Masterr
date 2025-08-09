@@ -22,6 +22,11 @@ const Services = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const decodeHTML = (html) => {
+    const parser = new DOMParser();
+    return parser.parseFromString(html, "text/html").body.textContent || "";
+  };
+
   const {
     apiCall: getServices,
     data: servicesData,
@@ -50,7 +55,7 @@ const Services = () => {
 
         return {
           id: post.id,
-          title: post.title.rendered,
+          title:decodeHTML(post.title.rendered),
           meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
           slug: post.slug,
           image_url:
