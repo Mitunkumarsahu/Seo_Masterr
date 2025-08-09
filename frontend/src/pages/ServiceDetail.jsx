@@ -42,7 +42,7 @@ const ServiceDetail = () => {
         id: post.id,
         title:decodeHTML(post.title.rendered),
         content:decodeHTML(post.content.rendered),
-        meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
+        meta_description: decodeHTML(post.excerpt.rendered.replace(/<[^>]+>/g, "")),
         image_url:
           post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
           "https://via.placeholder.com/1200x600",
