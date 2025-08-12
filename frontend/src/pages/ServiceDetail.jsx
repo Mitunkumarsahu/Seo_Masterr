@@ -30,7 +30,7 @@ const ServiceDetail = () => {
 
   useEffect(() => {
     if (slug) {
-      fetchService(`https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/service?slug=${slug}&_embed`);
+      fetchService(import.meta.env.VITE_BACKEND_URL+`/wp-json/wp/v2/service?slug=${slug}&_embed`);
     }
   }, [slug]);
 

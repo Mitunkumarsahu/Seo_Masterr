@@ -44,10 +44,10 @@ const BlogPage = () => {
   // Fetch categories and tags on mount
   useEffect(() => {
     getCategories(
-      "https://lemonchiffon-curlew-159892.hostingersite.com//wp-json/wp/v2/categories"
+      import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/categories"
     );
     getTags(
-      "https://lemonchiffon-curlew-159892.hostingersite.com//wp-json/wp/v2/tags?per_page=100"
+      import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/tags?per_page=100"
     );
   }, []);
 
@@ -67,7 +67,7 @@ const BlogPage = () => {
 
   // Fetch blogs
   useEffect(() => {
-    let url = `https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/posts?_embed&per_page=${ITEMS_PER_PAGE}&page=${currentPage}`;
+    let url = import.meta.env.VITE_BACKEND_URL+`/wp-json/wp/v2/posts?_embed&per_page=${ITEMS_PER_PAGE}&page=${currentPage}`;
     if (selectedCategory !== "all") {
       url += `&categories=${selectedCategory}`;
     }

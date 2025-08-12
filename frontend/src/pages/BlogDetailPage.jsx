@@ -67,7 +67,7 @@ const BlogDetailPage = () => {
   const fetchRelatedPosts = async (currentPostId, categoryParams) => {
     try {
       const response = await fetch(
-        `https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/posts?_embed&per_page=5&categories=${categoryParams}&exclude=${currentPostId}`
+        import.meta.env.VITE_BACKEND_URL+`/wp-json/wp/v2/posts?_embed&per_page=5&categories=${categoryParams}&exclude=${currentPostId}`
       );
       const posts = await response.json();
 

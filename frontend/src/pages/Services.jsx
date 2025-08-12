@@ -43,8 +43,8 @@ const Services = () => {
 
   // Fetch services and types on mount
   useEffect(() => {
-    getServices("https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/service?_embed&per_page=100");
-    getServiceTypes("https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/service_type?per_page=100");
+    getServices(import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/service?_embed&per_page=100");
+    getServiceTypes(import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/service_type?per_page=100");
   }, []);
 
   // Transform and set services data
