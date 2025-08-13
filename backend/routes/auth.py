@@ -119,13 +119,14 @@ def google_login(data: GoogleLoginRequest, db: Session = Depends(get_db)):
     from schemas.user import UserCreate
 
     if not user:
-         user_data = UserCreate(
+        user_data = UserCreate(
             username=email.split("@")[0],
             email=email,
             full_name=name,
             password="password@123"
         )
-    user = create_user(db, user_data)
+        user = create_user(db, user_data)
+
 
 
     token = create_access_token({"sub": user.email})
