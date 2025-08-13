@@ -45,18 +45,18 @@ def require_super_admin(user: User = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Only Super Admins allowed")
     return user
 
-# def require_permission(permission: str):
-#     def dependency(
-#         db: Session = Depends(get_db),
-#         current_user: User = Depends(get_current_user)
-#     ):
-#         if not has_permission(db, current_user.id, permission):
-#             raise HTTPException(
-#                 status_code=status.HTTP_403_FORBIDDEN,
-#                 detail=f"Requires {permission} permission"
-#             )
-#         return current_user
-#     return dependency
+def require_permission(permission: str):
+    def dependency(
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        if not has_permission(db, current_user.id, permission):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Requires {permission} permission"
+            )
+        return current_user
+    return dependency
 
 @router.post("/signup", response_model=UserOut)
 def register(user: UserCreate, db: Session = Depends(get_db)):
