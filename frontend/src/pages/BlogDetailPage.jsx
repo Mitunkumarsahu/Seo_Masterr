@@ -12,6 +12,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import { default as COLORS, default as style } from "../styles/Styles";
+import {
+  FacebookShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+} from "react-share";
+import {
+  FacebookIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  WhatsappIcon,
+} from "react-share";
 
 const BlogDetailPage = () => {
   const { slug } = useParams();
@@ -19,12 +31,7 @@ const BlogDetailPage = () => {
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
 
-  const {
-    apiCall: getBlogDetail,
-    data,
-    loading,
-    error,
-  } = useApi();
+  const { apiCall: getBlogDetail, data, loading, error } = useApi();
   const decodeHTML = (html) => {
     const parser = new DOMParser();
     return parser.parseFromString(html, "text/html").body.textContent || "";
@@ -32,13 +39,17 @@ const BlogDetailPage = () => {
 
   // Fetch blog post by slug
   useEffect(() => {
-    getBlogDetail(`https://lemonchiffon-curlew-159892.hostingersite.com/wp-json/wp/v2/posts?slug=${slug}&_embed`);
+    getBlogDetail(
+      import.meta.env.VITE_APP_BACKEND_URL +
+        `/wp-json/wp/v2/posts?slug=${slug}&_embed`
+    );
   }, [slug]);
 
   // Transform blog data and fetch related posts
   useEffect(() => {
     if (data && Array.isArray(data) && data.length > 0) {
       const wpPost = data[0];
+      console.log("Fetched WP Post:", wpPost);
       const transformedPost = {
         id: wpPost.id,
         title: decodeHTML(wpPost.title.rendered),
@@ -67,14 +78,15 @@ const BlogDetailPage = () => {
   const fetchRelatedPosts = async (currentPostId, categoryParams) => {
     try {
       const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL+`/wp-json/wp/v2/posts?_embed&per_page=5&categories=${categoryParams}&exclude=${currentPostId}`
+        import.meta.env.VITE_APP_BACKEND_URL +
+          `/wp-json/wp/v2/posts?_embed&per_page=5&categories=${categoryParams}&exclude=${currentPostId}`
       );
       const posts = await response.json();
-
       const transformed = posts.map((post) => ({
         id: post.id,
         title: decodeHTML(post.title.rendered),
-        meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, "").slice(0, 80) + "...",
+        meta_description:
+          post.excerpt.rendered.replace(/<[^>]+>/g, "").slice(0, 80) + "...",
         slug: post.slug,
         featured_image:
           post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
@@ -104,7 +116,6 @@ const BlogDetailPage = () => {
       </Container>
     );
   }
-
   return (
     <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh", py: 4 }}>
       <Container>
@@ -126,6 +137,34 @@ const BlogDetailPage = () => {
           <Typography variant="body2" color="text.secondary">
             • {new Date(post.published_at).toLocaleDateString()}
           </Typography>
+        </Box>
+        {/* Social Share Buttons */}
+        <Box
+          sx={{
+            position: "",
+            top: 12,
+            right: 12,
+            marginBottom: "10px",
+            display: "flex",
+            flexDirection: "row",
+            gap: "6px",
+          }}
+        >
+          <FacebookShareButton url={window.location.href} quote={post.title}>
+            <FacebookIcon size={32} round />
+          </FacebookShareButton>
+
+          <LinkedinShareButton url={window.location.href} title={post.title}>
+            <LinkedinIcon size={32} round />
+          </LinkedinShareButton>
+
+          <TwitterShareButton url={window.location.href} title={post.title}>
+            <TwitterIcon size={32} round />
+          </TwitterShareButton>
+
+          <WhatsappShareButton url={window.location.href}>
+            <WhatsappIcon size={32} round />
+          </WhatsappShareButton>
         </Box>
 
         <Box

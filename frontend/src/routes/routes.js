@@ -4,6 +4,7 @@ import BlogPage from "../pages/BlogPage";
 import ContactUsPage from "../pages/ContactUsPage";
 import Dashboard from "../pages/Dashboard";
 import Home from "../pages/Home";
+import NotFound from "../pages/NotFound";
 import ServiceDetail from "../pages/ServiceDetail";
 import Services from "../pages/Services";
 

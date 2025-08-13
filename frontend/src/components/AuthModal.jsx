@@ -37,6 +37,8 @@ const AuthModal = ({
   const { login, loading } = useAuth();
   const { apiCall } = useApi();
   const navigate = useNavigate();
+  
+  const {handleGoogleOauth} = useAuth();
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -86,13 +88,17 @@ const AuthModal = ({
           showSnackbar(result.error || "Login failed", "error");
         }
       } else {
-        await apiCall(import.meta.env.VITE_BACKEND_URL+"/auth/signup", "POST", {
-          username: form.username,
-          email: form.email,
-          password: form.password,
-          permissions: [],
-          is_editor: false,
-        });
+        await apiCall(
+          import.meta.env.VITE_BACKEND_URL + "/auth/signup",
+          "POST",
+          {
+            username: form.username,
+            email: form.email,
+            password: form.password,
+            permissions: [],
+            is_editor: false,
+          }
+        );
         showSnackbar("Signup successful", "success");
         closeModal();
         onSuccess?.();
@@ -104,22 +110,26 @@ const AuthModal = ({
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
-    const payload = JSON.parse(atob(credentialResponse.credential.split(".")[1]));
-    const email = payload.email;
-    const username = payload.name.replace(/\s/g, "");
-
     try {
-      await apiCall(import.meta.env.VITE_BACKEND_URL+"/auth/signup", "POST", {
-        username,
-        email,
-        password: "",
-        permissions: [],
-        is_editor: false,
-      });
+      // Google sends a JWT credential
+      const googleToken = credentialResponse.credential;
+
+      // Send the Google token to your backend
+      const res = await apiCall(
+        import.meta.env.VITE_BACKEND_URL + "/auth/google-login",
+        "POST",
+        { token: googleToken }
+      );
+
+      // Save your backend JWT
+      localStorage.setItem("authToken", res.access_token);
+
       showSnackbar("Google login successful", "success");
       closeModal();
       onSuccess?.();
+      handleGoogleOauth();
       setTimeout(() => navigate(redirectTo), 300);
+
     } catch (err) {
       setError("Google Auth failed");
       showSnackbar("Google Auth failed", "error");
@@ -157,7 +167,10 @@ const AuthModal = ({
           {/* Private Mode Warning */}
           {mode === "private" && (
             <Box mb={2}>
-              <Typography variant="body1" sx={{ color: "#b91c1c", fontWeight: "bold", mb: 1 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: "#b91c1c", fontWeight: "bold", mb: 1 }}
+              >
                 ⚠ You must be logged in to continue
               </Typography>
               <Button
@@ -171,7 +184,10 @@ const AuthModal = ({
                   mb: 2,
                   color: COLORS.primary,
                   borderColor: "#0a2b4c",
-                  "&:hover": { backgroundColor: COLORS.primary, color: COLORS.secondary },
+                  "&:hover": {
+                    backgroundColor: COLORS.primary,
+                    color: COLORS.secondary,
+                  },
                 }}
               >
                 Go to Home
@@ -207,8 +223,14 @@ const AuthModal = ({
               mb: 2,
             }}
           >
-            <Tab label="Login" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
-            <Tab label="Sign Up" sx={{ color: COLORS.secondary, fontWeight: 600 }} />
+            <Tab
+              label="Login"
+              sx={{ color: COLORS.secondary, fontWeight: 600 }}
+            />
+            <Tab
+              label="Sign Up"
+              sx={{ color: COLORS.secondary, fontWeight: 600 }}
+            />
           </Tabs>
 
           {/* Form */}

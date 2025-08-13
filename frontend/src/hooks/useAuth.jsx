@@ -50,9 +50,21 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
   };
+   const handleGoogleOauth = () =>{
+    const authToken = localStorage.getItem("authToken");
+    if (authToken) {
+      try {
+        const decoded = jwtDecode(authToken);
+        setUser(decoded);
+        setIsAuthenticated(true);
+      } catch (e) {
+        localStorage.removeItem("authToken");
+      }
+    }
+   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout,handleGoogleOauth}}>
       {children}
     </AuthContext.Provider>
   );

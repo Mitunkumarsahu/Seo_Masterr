@@ -4,11 +4,25 @@ import {
   Container,
   Divider,
   Typography,
+  Tooltip,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import style, { COLORS } from "../styles/Styles";
+import {
+  FacebookShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+} from "react-share";
+import {
+  FacebookIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  WhatsappIcon,
+} from "react-share";
 
 const ServiceDetail = () => {
   const { slug } = useParams(); // now using slug instead of id
@@ -20,17 +34,14 @@ const ServiceDetail = () => {
     return parser.parseFromString(html, "text/html").body.textContent || "";
   };
 
-
-  const {
-    apiCall: fetchService,
-    data: serviceData,
-    loading,
-    error,
-  } = useApi();
+  const { apiCall: fetchService, data: serviceData, loading, error } = useApi();
 
   useEffect(() => {
     if (slug) {
-      fetchService(import.meta.env.VITE_BACKEND_URL+`/wp-json/wp/v2/service?slug=${slug}&_embed`);
+      fetchService(
+        import.meta.env.VITE_APP_BACKEND_URL +
+          `/wp-json/wp/v2/service?slug=${slug}&_embed`
+      );
     }
   }, [slug]);
 
@@ -40,9 +51,11 @@ const ServiceDetail = () => {
 
       const serviceDetail = {
         id: post.id,
-        title:decodeHTML(post.title.rendered),
-        content:decodeHTML(post.content.rendered),
-        meta_description: decodeHTML(post.excerpt.rendered.replace(/<[^>]+>/g, "")),
+        title: decodeHTML(post.title.rendered),
+        content: decodeHTML(post.content.rendered),
+        meta_description: decodeHTML(
+          post.excerpt.rendered.replace(/<[^>]+>/g, "")
+        ),
         image_url:
           post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
           "https://via.placeholder.com/1200x600",
@@ -101,6 +114,60 @@ const ServiceDetail = () => {
             {service.title}
           </Typography>
         </Box>
+      </Box>
+      <Tooltip title="Copy link" arrow>
+        <Button
+          size="small"
+          variant="contained"
+          sx={{
+            position: "absolute",
+            right: 0,
+            textAlign: "right",
+            minWidth: "unset",
+            padding: "6px",
+            borderRadius: "50%",
+            background: "#FF6D00",
+            color: "white",
+            margin: 2,
+            boxShadow: 3,
+            "&:hover": {
+              backgroundColor: "#FF6D00",
+            },
+          }}
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link copied to clipboard!");
+          }}
+        >
+          <ContentCopyIcon fontSize="small" />
+        </Button>
+      </Tooltip>
+      <Box
+        sx={{
+          position: "",
+          top: 12,
+          right: 12,
+          margin: 2,
+          display: "flex",
+          flexDirection: "row",
+          gap: "6px",
+        }}
+      >
+        <FacebookShareButton url={window.location.href} quote={service.title}>
+          <FacebookIcon size={32} round />
+        </FacebookShareButton>
+
+        <LinkedinShareButton url={window.location.href} title={service.title}>
+          <LinkedinIcon size={32} round />
+        </LinkedinShareButton>
+
+        <TwitterShareButton url={window.location.href} title={service.title}>
+          <TwitterIcon size={32} round />
+        </TwitterShareButton>
+
+        <WhatsappShareButton url={window.location.href}>
+          <WhatsappIcon size={32} round />
+        </WhatsappShareButton>
       </Box>
 
       {/* Content Section */}

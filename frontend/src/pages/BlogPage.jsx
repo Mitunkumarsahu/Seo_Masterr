@@ -5,13 +5,17 @@ import {
   Container,
   Pagination,
   Typography,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import useApi from "../hooks/useApi"; // Ensure this path is correct
-import style, { COLORS } from "../styles/Styles"; // Ensure this path is correct
+import useApi from "../hooks/useApi";
+import style, { COLORS } from "../styles/Styles";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE =6 ;
 
 const BlogPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -20,81 +24,68 @@ const BlogPage = () => {
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
-
+  const blogsCache = useRef({}); // ✅ cache to avoid re-fetch
   const navigate = useNavigate();
 
-  // Blog Fetch
+  // API hooks
   const {
     apiCall: getBlogs,
     data: blogsData,
     headers: blogsHeaders,
-    loading: blogsLoading,
+    loading: blogsLoading
   } = useApi();
-
-  // Categories Fetch
   const {
     apiCall: getCategories,
     data: categoryData,
-    loading: categoriesLoading,
+    loading: categoriesLoading
   } = useApi();
-
-  // Tags Fetch
   const { apiCall: getTags, data: tagData } = useApi();
 
-  // Fetch categories and tags on mount
+  // Initial categories & tags fetch
   useEffect(() => {
-    getCategories(
-      import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/categories"
-    );
-    getTags(
-      import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/tags?per_page=100"
-    );
+    getCategories(`${import.meta.env.VITE_APP_BACKEND_URL}/wp-json/wp/v2/categories`);
+    getTags(`${import.meta.env.VITE_APP_BACKEND_URL}/wp-json/wp/v2/tags?per_page=100`);
   }, []);
 
-  // Store categories
   useEffect(() => {
-    if (Array.isArray(categoryData)) {
-      setCategories(categoryData);
-    }
+    if (Array.isArray(categoryData)) setCategories(categoryData);
   }, [categoryData]);
 
-  // Store tags
   useEffect(() => {
-    if (Array.isArray(tagData)) {
-      setTags(tagData);
-    }
+    if (Array.isArray(tagData)) setTags(tagData);
   }, [tagData]);
 
-  // Fetch blogs
+  // Fetch blogs if not cached
   useEffect(() => {
-    let url = import.meta.env.VITE_BACKEND_URL+`/wp-json/wp/v2/posts?_embed&per_page=${ITEMS_PER_PAGE}&page=${currentPage}`;
-    if (selectedCategory !== "all") {
-      url += `&categories=${selectedCategory}`;
+    const cacheKey = `${selectedCategory}-${currentPage}`;
+    if (blogsCache.current[cacheKey]) {
+      // Load from cache
+      setBlogs(blogsCache.current[cacheKey].blogs);
+      setTotalPages(blogsCache.current[cacheKey].totalPages);
+      return;
     }
+
+    let url = `${import.meta.env.VITE_APP_BACKEND_URL}/wp-json/wp/v2/posts?_embed`;
+    if (selectedCategory !== "all") url += `&categories=${selectedCategory}`;
     getBlogs(url);
   }, [selectedCategory, currentPage]);
 
-  // Transform blog data
+  // Transform and cache blogs
   useEffect(() => {
     if (Array.isArray(blogsData)) {
+      const parser = new DOMParser();
+      const decode = (html) => parser.parseFromString(html, "text/html").body.textContent || "";
+
       const transformed = blogsData.map((post) => {
-        const parser = new DOMParser();
-
-        const decode = (html) =>
-          parser.parseFromString(html, "text/html").body.textContent || "";
-
         const tagNames = post.tags
-          .map((tagId) => tags.find((tag) => tag.id === tagId)?.name)
+          .map((tagId) => tags.find((t) => t.id === tagId)?.name)
           .filter(Boolean);
-
         return {
           id: post.id,
-          title: decode(post.title.rendered), // 👈 fix here
+          title: decode(post.title.rendered),
           author: post._embedded?.author?.[0]?.name || "Unknown",
           published_at: post.date,
-          meta_description: decode(
-            post.excerpt.rendered.replace(/<[^>]+>/g, "")
-          ), // 👈 also decode excerpt
+          meta_description: decode(post.excerpt.rendered.replace(/<[^>]+>/g, "")),
           slug: post.slug,
           featured_image:
             post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
@@ -103,16 +94,15 @@ const BlogPage = () => {
         };
       });
 
-      setBlogs(transformed);
       const total = Number(blogsHeaders?.["x-wp-totalpages"] || 1);
+      const cacheKey = `${selectedCategory}-${currentPage}`;
+      blogsCache.current[cacheKey] = { blogs: transformed, totalPages: total };
+      setBlogs(transformed);
       setTotalPages(total);
     }
   }, [blogsData, blogsHeaders, tags]);
 
-  const handlePageChange = (_, value) => {
-    setCurrentPage(value);
-  };
-
+  const handlePageChange = (_, value) => setCurrentPage(value);
   const handleCategoryChange = (catId) => {
     setSelectedCategory(catId);
     setCurrentPage(1);
@@ -131,34 +121,18 @@ const BlogPage = () => {
           Our Blogs
         </Typography>
 
-        {/* Category Tabs */}
-        <Box
-          display="flex"
-          justifyContent="center"
-          flexWrap="wrap"
-          gap={2}
-          mb={4}
-        >
+        {/* Categories */}
+        <Box display="flex" justifyContent="center" flexWrap="wrap" gap={2} mb={4}>
           <Button
             variant="outlined"
             size="small"
             sx={{
-              backgroundColor:
-                selectedCategory === "all" ? COLORS.primary : "#ffffff",
+              backgroundColor: selectedCategory === "all" ? COLORS.primary : "#fff",
               color: selectedCategory === "all" ? "#fff" : COLORS.primary,
               border: `1px solid ${COLORS.primary}`,
               fontWeight: 700,
-              fontSize: "0.75rem",
               borderRadius: "20px",
-              px: 2.5,
-              py: 0.75,
-              textTransform: "capitalize",
-              minWidth: "auto",
-              "&:hover": {
-                backgroundColor:
-                  selectedCategory === "all" ? COLORS.primary : "#e0eaff",
-                borderColor: "#0C2F58",
-              },
+              "&:hover": { backgroundColor: selectedCategory === "all" ? COLORS.primary : "#e0eaff" }
             }}
             onClick={() => handleCategoryChange("all")}
           >
@@ -175,22 +149,13 @@ const BlogPage = () => {
                   key={cat.id}
                   size="small"
                   sx={{
-                    backgroundColor: isSelected ? COLORS.primary : "#ffffff",
+                    backgroundColor: isSelected ? COLORS.primary : "#fff",
                     color: isSelected ? "#fff" : COLORS.primary,
                     border: `1px solid ${COLORS.primary}`,
                     fontWeight: 700,
-                    fontSize: "0.75rem",
                     borderRadius: "20px",
-                    px: 2.5,
-                    py: 0.75,
-                    textTransform: "capitalize",
-                    minWidth: "auto",
-                    "&:hover": {
-                      backgroundColor: isSelected ? COLORS.primary : "#e0eaff",
-                      borderColor: "#0C2F58",
-                    },
+                    "&:hover": { backgroundColor: isSelected ? COLORS.primary : "#e0eaff" }
                   }}
-                  variant="outlined"
                   onClick={() => handleCategoryChange(cat.id)}
                 >
                   {cat.name}
@@ -200,119 +165,58 @@ const BlogPage = () => {
           )}
         </Box>
 
-        {/* Blog List */}
-        {blogsLoading ? (
+        {/* Blog Cards */}
+        {blogsLoading && !blogs.length ? (
           <Box display="flex" justifyContent="center" mt={6}>
             <CircularProgress />
           </Box>
         ) : blogs.length === 0 ? (
-          <Typography textAlign="center" mt={4}>
-            No blogs found.
-          </Typography>
+          <Typography textAlign="center" mt={4}>No blogs found.</Typography>
         ) : (
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-              px: { xs: 2, sm: 4, md: 30 },
-              py: 4,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: 3
             }}
           >
             {blogs.map((blog) => (
-              <Box
-                key={blog.id}
-                sx={{
-                  display: "flex",
-                  gap: 3,
-                  borderBottom: "1px solid #ddd",
-                  pb: 3,
-                }}
-              >
-                {/* Thumbnail */}
-                <Box
-                  sx={{
-                    width: { xs: 40, sm: 60 },
-                    height: { xs: 40, sm: 60 },
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    flexShrink: 0,
-                  }}
-                >
-                  <img
-                    src={blog.featured_image}
-                    alt={blog.title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
-
-                {/* Content */}
-                <Box sx={{ flex: 1 }}>
+              <Card key={blog.id} sx={{ borderRadius: 3, overflow: "hidden", boxShadow: 3 }}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={blog.featured_image}
+                  alt={blog.title}
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/blog/${blog.slug}`)}
+                />
+                <CardContent>
                   <Typography
                     variant="h6"
-                    sx={{
-                      color: COLORS.primary,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      },
-                    }}
+                    fontWeight="bold"
+                    color={COLORS.primary}
+                    sx={{ cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
                     onClick={() => navigate(`/blog/${blog.slug}`)}
                   >
                     {blog.title}
                   </Typography>
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontStyle: "italic",
-                      color: "text.secondary",
-                      mb: 1,
-                    }}
-                  >
-                    By {blog.author} •{" "}
-                    {new Date(blog.published_at).toLocaleDateString("en-IN", {
-                      weekday: "short",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </Typography>
-
-                  <Typography variant="body2" sx={{ color: "text.primary" }}>
-                    {blog.meta_description.length > 150
-                      ? blog.meta_description.slice(0, 150) + "..."
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    {blog.meta_description.length > 120
+                      ? blog.meta_description.slice(0, 120) + "..."
                       : blog.meta_description}
                   </Typography>
-
-                  {/* Tags */}
-                  {blog.tags?.length > 0 && (
-                    <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
-                      {blog.tags.map((tag, idx) => (
-                        <Box
-                          key={idx}
-                          sx={{
-                            backgroundColor: "#f0f0f0",
-                            color: "#333",
-                            px: 1,
-                            py: 0.25,
-                            fontSize: "0.7rem",
-                            borderRadius: "4px",
-                            fontWeight: 500,
-                          }}
-                        >
-                          #{tag}
-                        </Box>
-                      ))}
-                    </Box>
-                  )}
-                </Box>
-              </Box>
+                </CardContent>
+                <CardActions sx={{ px: 2, pb: 2 }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                    By {blog.author} •{" "}
+                    {new Date(blog.published_at).toLocaleDateString("en-IN", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric"
+                    })}
+                  </Typography>
+                </CardActions>
+              </Card>
             ))}
           </Box>
         )}
@@ -326,18 +230,6 @@ const BlogPage = () => {
               onChange={handlePageChange}
               shape="rounded"
               color="primary"
-              sx={{
-                "& .MuiPaginationItem-root": {
-                  color: "#000",
-                },
-                "& .Mui-selected": {
-                  backgroundColor: COLORS.secondary,
-                  color: "#fff",
-                  "&:hover": {
-                    backgroundColor: COLORS.secondary,
-                  },
-                },
-              }}
             />
           </Box>
         )}

@@ -1,11 +1,11 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   Typography,
   useMediaQuery,
   useTheme,
-  CircularProgress,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,8 +43,8 @@ const Services = () => {
 
   // Fetch services and types on mount
   useEffect(() => {
-    getServices(import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/service?_embed&per_page=100");
-    getServiceTypes(import.meta.env.VITE_BACKEND_URL+"/wp-json/wp/v2/service_type?per_page=100");
+    getServices(import.meta.env.VITE_APP_BACKEND_URL+"/wp-json/wp/v2/service?_embed&per_page=100");
+    getServiceTypes(import.meta.env.VITE_APP_BACKEND_URL+"/wp-json/wp/v2/service_type?per_page=100");
   }, []);
 
   // Transform and set services data
