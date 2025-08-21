@@ -12,8 +12,8 @@ def send_email(
     """Send email using SMTP server"""
     smtp_server = os.getenv("SMTP_SERVER", "smtp.hostinger.com")
     smtp_port = int(os.getenv("SMTP_PORT", 587))
-    smtp_user = os.getenv("SMTP_USER", "xyz@seomasterr.com")
-    smtp_password = os.getenv("SMTP_PASSWORD")
+    smtp_user = os.getenv("SMTP_USER", "ramakanta@seomasterr.com")
+    smtp_password = os.getenv("SMTP_PASSWORD","Ram@1999AS")
     
     msg = MIMEMultipart()
     msg['From'] = smtp_user

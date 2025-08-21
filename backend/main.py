@@ -52,6 +52,8 @@ from starlette_admin import action
 import threading
 from fastapi.responses import RedirectResponse
 from fastapi import BackgroundTasks
+from fastapi.responses import JSONResponse
+
 
 
 
@@ -453,6 +455,7 @@ class SubscriptionView(BaseModelView):
         text="Send Bulk Email",
         confirmation="Send email to ALL subscribers?",
         submit_btn_text="Send",
+        custom_response=True,
         form="""
             <form>
                 <div>
@@ -478,11 +481,10 @@ class SubscriptionView(BaseModelView):
         )
         thread.start()
         
-        return RedirectResponse(
-            url=request.url_for("admin:list", identity=self.identity),
-            status_code=303
-        )
-    
+        return JSONResponse({
+            "status": "success",
+            "msg": f"Bulk email job started. Subject: {subject}"
+        })
     def send_bulk_emails(self, subject: str, body: str):
         db = SessionLocal()
         try:
