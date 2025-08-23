@@ -17,8 +17,6 @@ import {
   LinkedinShareButton,
   TwitterShareButton,
   WhatsappShareButton,
-} from "react-share";
-import {
   FacebookIcon,
   LinkedinIcon,
   TwitterIcon,
@@ -30,8 +28,11 @@ const BlogDetailPage = () => {
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
+  const [toc, setToc] = useState([]);
+  const [processedContent, setProcessedContent] = useState("");
 
   const { apiCall: getBlogDetail, data, loading, error } = useApi();
+
   const decodeHTML = (html) => {
     const parser = new DOMParser();
     return parser.parseFromString(html, "text/html").body.textContent || "";
@@ -49,7 +50,6 @@ const BlogDetailPage = () => {
   useEffect(() => {
     if (data && Array.isArray(data) && data.length > 0) {
       const wpPost = data[0];
-      console.log("Fetched WP Post:", wpPost);
       const transformedPost = {
         id: wpPost.id,
         title: decodeHTML(wpPost.title.rendered),
@@ -74,7 +74,7 @@ const BlogDetailPage = () => {
     }
   }, [data]);
 
-  // Fetch related posts from same categories
+  // Fetch related posts
   const fetchRelatedPosts = async (currentPostId, categoryParams) => {
     try {
       const response = await fetch(
@@ -92,12 +92,33 @@ const BlogDetailPage = () => {
           post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcPgqm575oc2CiJLcYCo75HYrrQatuUSZ3KA&s",
       }));
-
       setRelatedPosts(transformed);
     } catch (error) {
       console.error("Failed to fetch related posts", error);
     }
   };
+
+  // Build TOC when post content is available
+  useEffect(() => {
+    if (post?.content) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(post.content, "text/html");
+
+      const headings = Array.from(doc.querySelectorAll("h2, h3"));
+      const tocItems = headings.map((heading, index) => {
+        const id = `heading-${index}`;
+        heading.setAttribute("id", id);
+        return {
+          id,
+          text: heading.textContent,
+          level: heading.tagName,
+        };
+      });
+
+      setToc(tocItems);
+      setProcessedContent(doc.body.innerHTML); // use updated content with ids
+    }
+  }, [post]);
 
   if (loading) {
     return (
@@ -116,9 +137,11 @@ const BlogDetailPage = () => {
       </Container>
     );
   }
+
   return (
     <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh", py: 4 }}>
       <Container>
+        {/* Title */}
         <Typography
           variant="h4"
           align="center"
@@ -129,7 +152,7 @@ const BlogDetailPage = () => {
           {post.title}
         </Typography>
 
-        {/* Author and Date */}
+        {/* Author + Date */}
         <Box display="flex" justifyContent="center" gap={1} mb={3}>
           <Typography variant="body2" color="text.secondary">
             By {post.author}
@@ -138,35 +161,31 @@ const BlogDetailPage = () => {
             • {new Date(post.published_at).toLocaleDateString()}
           </Typography>
         </Box>
-        {/* Social Share Buttons */}
+
+        {/* Social Share */}
         <Box
           sx={{
-            position: "",
-            top: 12,
-            right: 12,
             marginBottom: "10px",
             display: "flex",
-            flexDirection: "row",
+            justifyContent: "center",
             gap: "6px",
           }}
         >
           <FacebookShareButton url={window.location.href} quote={post.title}>
             <FacebookIcon size={32} round />
           </FacebookShareButton>
-
           <LinkedinShareButton url={window.location.href} title={post.title}>
             <LinkedinIcon size={32} round />
           </LinkedinShareButton>
-
           <TwitterShareButton url={window.location.href} title={post.title}>
             <TwitterIcon size={32} round />
           </TwitterShareButton>
-
           <WhatsappShareButton url={window.location.href}>
             <WhatsappIcon size={32} round />
           </WhatsappShareButton>
         </Box>
 
+        {/* Main Layout */}
         <Box
           sx={{
             display: "flex",
@@ -174,6 +193,53 @@ const BlogDetailPage = () => {
             gap: 4,
           }}
         >
+          {/* TOC Sidebar */}
+          <Box
+            sx={{
+              flex: 1,
+              backgroundColor: "#fff",
+              minHeight: "200px",
+              maxHeight: "600px",
+              p: 2,
+              borderRadius: 2,
+              overflowY: "auto",
+              boxShadow: 1,
+              alignSelf: "flex-start",
+              position: "sticky",
+              top: 80,
+            }}
+          >
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              Table of Contents
+            </Typography>
+            {toc.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No headings found.
+              </Typography>
+            ) : (
+              toc.map((item, index) => (
+                <Typography
+                  key={index}
+                  variant="body2"
+                  sx={{
+                    pl: item.level === "H2" ? 1 : item.level === "H3" ? 3 : 0,
+                    cursor: "pointer",
+                    color: COLORS.primary,
+                    mb: 1,
+                    "&:hover": { textDecoration: "underline" },
+                  }}
+                  onClick={() => {
+                    document.getElementById(item.id)?.scrollIntoView({
+                      behavior: "smooth",
+                    });
+                  }}
+                >
+                  {item.text}
+                </Typography>
+              ))
+            )}
+          </Box>
+
           {/* Blog Content */}
           <Box
             sx={{
@@ -184,7 +250,7 @@ const BlogDetailPage = () => {
               boxShadow: 1,
             }}
           >
-            {/* Featured Image + Share */}
+            {/* Featured Image + Copy Button */}
             <Box sx={{ position: "relative", mb: 2 }}>
               <Box
                 component="img"
@@ -224,7 +290,7 @@ const BlogDetailPage = () => {
             <Box
               sx={{
                 wordBreak: "break-word",
-                overflowWrap: "break-word",
+                "& h2, & h3": { scrollMarginTop: "80px" },
                 "& img": {
                   maxWidth: "100%",
                   height: "auto",
@@ -239,13 +305,8 @@ const BlogDetailPage = () => {
                   overflowX: "auto",
                   display: "block",
                 },
-                "& table, & th, & td": {
-                  border: "1px solid #ddd",
-                },
-                "& th, & td": {
-                  padding: "8px",
-                  textAlign: "left",
-                },
+                "& table, & th, & td": { border: "1px solid #ddd" },
+                "& th, & td": { padding: "8px", textAlign: "left" },
                 "& iframe, & video": {
                   maxWidth: "100%",
                   height: "auto",
@@ -269,11 +330,8 @@ const BlogDetailPage = () => {
                   fontSize: "0.9rem",
                   overflowX: "auto",
                 },
-                "& *": {
-                  boxSizing: "border-box",
-                },
               }}
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: processedContent }}
             />
 
             <Divider sx={{ my: 2 }} />
@@ -296,7 +354,6 @@ const BlogDetailPage = () => {
             <Typography variant="h6" fontWeight="bold" mb={2}>
               Related Posts
             </Typography>
-
             {relatedPosts.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
                 No related posts found.
@@ -315,9 +372,7 @@ const BlogDetailPage = () => {
                     p: 1,
                     borderRadius: 1,
                     transition: "0.2s",
-                    "&:hover": {
-                      backgroundColor: "#f5f5f5",
-                    },
+                    "&:hover": { backgroundColor: "#f5f5f5" },
                   }}
                 >
                   <Box

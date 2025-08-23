@@ -1,0 +1,80 @@
+{
+    "https://seomasterr.com/api/testimonials": [
+      {
+        "client_name": "John doe",
+        "client_title": "john",
+        "company": "Test company",
+        "content": "he website has a clean and modern layout, making it easy for visitors to navigate. Key services are clearly highlighted, which helps in guiding users.",
+        "image_url": "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+        "is_active": true,
+        "order": 1,
+        "id": 1
+      },
+      {
+        "client_name": "William",
+        "client_title": "william",
+        "company": "Test company",
+        "content": "The content is informative and relevant to your SEO, Ads, and SMO services. Consider adding more case studies or client testimonials to build trust",
+        "image_url": "https://st3.depositphotos.com/15648834/17930/v/450/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg",
+        "is_active": true,
+        "order": 2,
+        "id": 2
+      }
+    ],
+    "https://seomasterr.com/api/home-features": [
+      {
+        "position": 1,
+        "heading": "Boost Your Online Presence with Expert SEO, SMO & PPC Services",
+        "description": "Drive more traffic, generate leads, and grow your business with our result-driven SEO, social media optimization, and paid advertising strategies.",
+        "image_url": "https://images.unsplash.com/photo-1709281847981-73a69aa6f770?q=80&w=1632&auto=format&fit=crop",
+        "id": 1
+      }
+    ],
+    "https://seomasterr.com/api/faqs": [
+      {
+        "question": "What is SEO and why is it important for my website?",
+        "answer": "SEO (Search Engine Optimization) improves your website’s visibility on search engines like Google. Higher visibility means more traffic.",
+        "order": 1,
+        "is_active": true,
+        "id": 1
+      }
+    ],
+    "https://seomasterr.com/api/best-works": [
+      {
+        "title": "Best work1",
+        "image_url": "https://plus.unsplash.com/premium_photo-1684357277527-f6e5708ccdb4?q=80&w=2070&auto=format&fit=crop",
+        "description": "Explore our works and discover the projects that showcase our creativity, expertise, and dedication.",
+        "order": 1,
+        "is_active": true,
+        "id": 1
+      }
+    ],
+    "https://seomasterr.com/api/process-steps": [
+      {
+        "heading": "Keyword Research & Analysis",
+        "description": "Identify relevant keywords your audience is searching for.",
+        "order": 1,
+        "is_active": true,
+        "id": 1
+      }
+    ],
+    "https://seomasterr.com/api/about-hero": [
+      {
+        "title": "Seo Masterr – Boost Your Online Presence with Expert SEO Solutions",
+        "description": "Seo Masterr helps businesses grow online through advanced SEO, SMO, and PPC strategies.",
+        "image_url": "https://plus.unsplash.com/premium_photo-1685283298465-e52e933a3312?q=80&w=1025&auto=format&fit=crop",
+        "is_active": true,
+        "id": 1
+      }
+    ],
+    "https://seomasterr.com/api/contact-hero": [
+      {
+        "title": "Get in Touch with Seo Masterr",
+        "description": "Have questions or need expert SEO guidance? Reach out to our team today.",
+        "image_url": "https://plus.unsplash.com/premium_photo-1685208166973-558684d8d822?q=80&w=1470&auto=format&fit=crop",
+        "is_active": true,
+        "id": 1
+      }
+    ]
+  }
+  
