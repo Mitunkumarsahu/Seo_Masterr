@@ -22,6 +22,7 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from "react-share";
+import TableOfContents from "../components/TableOfContents.jsx"
 
 const BlogDetailPage = () => {
   const { slug } = useParams();
@@ -194,51 +195,7 @@ const BlogDetailPage = () => {
           }}
         >
           {/* TOC Sidebar */}
-          <Box
-            sx={{
-              flex: 1,
-              backgroundColor: "#fff",
-              minHeight: "200px",
-              maxHeight: "600px",
-              p: 2,
-              borderRadius: 2,
-              overflowY: "auto",
-              boxShadow: 1,
-              alignSelf: "flex-start",
-              position: "sticky",
-              top: 80,
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold" mb={2}>
-              Table of Contents
-            </Typography>
-            {toc.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
-                No headings found.
-              </Typography>
-            ) : (
-              toc.map((item, index) => (
-                <Typography
-                  key={index}
-                  variant="body2"
-                  sx={{
-                    pl: item.level === "H2" ? 1 : item.level === "H3" ? 3 : 0,
-                    cursor: "pointer",
-                    color: COLORS.primary,
-                    mb: 1,
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                  onClick={() => {
-                    document.getElementById(item.id)?.scrollIntoView({
-                      behavior: "smooth",
-                    });
-                  }}
-                >
-                  {item.text}
-                </Typography>
-              ))
-            )}
-          </Box>
+          <TableOfContents toc={toc} />
 
           {/* Blog Content */}
           <Box
@@ -349,6 +306,11 @@ const BlogDetailPage = () => {
               overflowY: "auto",
               boxShadow: 1,
               alignSelf: "flex-start",
+              width: {
+                xs: "100%",  // mobile
+                sm: "100%",  // tablet
+                md: "400px", // laptop/desktop and above
+              },
             }}
           >
             <Typography variant="h6" fontWeight="bold" mb={2}>

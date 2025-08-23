@@ -127,10 +127,17 @@ const ContactUsPage = () => {
         justifyContent="center"
         alignItems="stretch"
         margin={"0 auto"}
-        width={"80%"}
+        // width={"80%"}
         gap={4}
         mt={6}
         px={2}
+        sx={{
+          width: {
+            xs: "95%", // mobile
+            sm: "95%", // tablet
+            md: "80%", // desktop and larger
+          },
+        }}
       >
         {/* Contact Info Box */}
         <Paper
@@ -150,6 +157,10 @@ const ContactUsPage = () => {
             borderRadius: 3,
             backgroundColor: "#fff",
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            "& *": {
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+            },
           }}
         >
           <Typography
