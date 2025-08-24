@@ -447,13 +447,11 @@ class SubscriptionView(BaseModelView):
         fields.StringField("email"),
         fields.DateTimeField("created_at"),
     ]
-    
-    actions = ["send_bulk_email"]
-    
+
     @action(
         name="send_bulk_email",
         text="Send Bulk Email",
-        confirmation="Send email to ALL subscribers?",
+        confirmation="Send email to selected subscribers?",
         submit_btn_text="Send",
         custom_response=True,
         form="""
@@ -463,46 +461,57 @@ class SubscriptionView(BaseModelView):
                     <input type='text' name='subject' required />
                 </div>
                 <div>
-                    <label for='body'>Body</label>
-                    <textarea name='body' required></textarea>
+                    <label for="type">Type</label>
+                    <select name="type" id="type" required>
+                        <option value="">-- Select Type --</option>
+                        <option value="blogs">Blogs</option>
+                        <option value="services">Services</option>
+                    </select>
+                </div>
+                <div>
+                    <label for='url'>Url</label>
+                    <textarea name='url' required></textarea>
                 </div>
             </form>
         """,
     )
     async def send_bulk_email_action(self, request: Request, data: dict):
-        """Handle bulk email action"""
+        """Handle bulk email action for selected rows only"""
         form = await request.form()
         subject = form.get("subject")
-        body = form.get("body")
-        
+        url = form.get("url")
+        type = form.get("type")
+
+        selected_ids = data or []   # 👈 now it's a list, not dict
+
         thread = threading.Thread(
             target=self.send_bulk_emails,
-            args=(subject, body)
+            args=(selected_ids, subject, url, type),
         )
         thread.start()
-        
-        return JSONResponse({
-            "status": "success",
-            "msg": f"Bulk email job started. Subject: {subject}"
-        })
-    def send_bulk_emails(self, subject: str, body: str):
+
+        return RedirectResponse(url=str(request.headers.get("referer", "/")), status_code=303)
+
+
+    def send_bulk_emails(self, ids: list, subject: str, url: str, type: str):
         db = SessionLocal()
         try:
-            subscriptions = db.query(Subscription).all()
+            subscriptions = db.query(Subscription).filter(Subscription.id.in_(ids)).all()
+            print(f"Sending emails to {len(subscriptions)} subscribers...")
             for subscription in subscriptions:
                 try:
                     send_email(
                         recipient=subscription.email,
                         subject=subject,
-                        body=body
+                        email_temp="subscribed",
+                        data={"email":subscription.email,"url": url, "type": type}
                     )
-                    print(f"Sent email to {subscription.email}")
                 except Exception as e:
                     print(f"Failed to send to {subscription.email}: {str(e)}")
         finally:
             db.close()
 
-    
+
 
 class ContactInfoView(BaseModelView):
     identity = "contact_info"

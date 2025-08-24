@@ -3,6 +3,7 @@ from models.user import User, Permission
 from schemas.user import UserCreate
 from utils.auth import hash_password, verify_password
 from sqlalchemy.orm import selectinload
+from utils.email import send_email
 
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
@@ -23,6 +24,13 @@ def create_user(db: Session, user_data: UserCreate, is_google=False, is_super_ad
         is_super_admin=is_super_admin,  
         is_editor=user_data.is_editor,
         permissions=permission_objs
+    )
+    
+    send_email(
+        recipient=user_data.email,
+        subject="Welcome to Seomasterr",
+        email_temp= "welcome",
+        data={"name": user_data.username}
     )
     
     db.add(user)
