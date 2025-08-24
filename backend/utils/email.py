@@ -96,9 +96,13 @@ def send_email(
     smtp_port = int(os.getenv("SMTP_PORT", 587))
     smtp_user = os.getenv("SMTP_USER", "ramakanta@seomasterr.com")
     smtp_password = os.getenv("SMTP_PASSWORD", "Ram@1999AS")
+    print(f"smtp_server: {smtp_server}, smtp_port: {smtp_port}, smtp_user: {smtp_user}")
+    print(f"🔗 Sending email to {recipient} with subject '{subject}' using template '{email_temp}'")
 
     # Load template with data
     body = load_template(email_temp, data)
+    print(f"2.smtp_server: {smtp_server}, smtp_port: {smtp_port}, smtp_user: {smtp_user}")
+    print(f"🔗 2.Sending email to {recipient} with subject '{subject}' using template '{email_temp}'")
 
     msg = MIMEMultipart()
     msg["From"] = smtp_user
@@ -109,10 +113,14 @@ def send_email(
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
+            print(f"3.smtp_server: {smtp_server}, smtp_port: {smtp_port}, smtp_user: {smtp_user}")
+            print(f"🔗 3.Sending email to {recipient} with subject '{subject}' using template '{email_temp}'")
             server.login(smtp_user, smtp_password)
             server.sendmail(smtp_user, recipient, msg.as_string())
         print(f"✅ Email sent to {recipient} with subject '{subject}'")
         return True
     except Exception as e:
         print(f"❌ Failed to send to {recipient}: {e}")
+        print(f"4.smtp_server: {smtp_server}, smtp_port: {smtp_port}, smtp_user: {smtp_user}")
+        print(f"🔗 4.Sending email to {recipient} with subject '{subject}' using template '{email_temp}'")
         return False
