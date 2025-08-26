@@ -44,7 +44,7 @@ export default function Home() {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
         <HeroSection data={position1Data} />
@@ -53,7 +53,7 @@ export default function Home() {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
         <HomeServiceCards />
@@ -62,7 +62,7 @@ export default function Home() {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
         <FeatureSection />
@@ -71,7 +71,7 @@ export default function Home() {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
         <HomeAboutusSection data={position2Data} />
@@ -80,7 +80,7 @@ export default function Home() {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
         <TestimonialSection />
@@ -89,7 +89,7 @@ export default function Home() {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
         <HomeFooterSearch />

@@ -18,6 +18,7 @@ import React, { useEffect, useState } from "react";
 import useApi from "../hooks/useApi";
 import style, { COLORS } from '../styles/Styles';
 import HeroSection from "../components/HeroSection";
+import Loader from "../components/Loader";
 
 
 const ContactUsPage = () => {
@@ -330,7 +331,8 @@ const ContactUsPage = () => {
               whileHover={{ scale: 1.03 }}
             >
               {submitting ? (
-                <CircularProgress size={20} sx={{ color: "#fff" }} />
+                // <CircularProgress size={20} sx={{ color: "#fff" }} />
+                <Loader/>
               ) : (
                 "SUBMIT"
               )}

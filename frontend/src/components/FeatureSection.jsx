@@ -2,6 +2,7 @@ import { Avatar, Box, Grid, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import useApi from "../hooks/useApi";
 import style from "../styles/Styles";
+import Loader from "./Loader";
 
 export default function FeatureSection() {
   const styles = style.featureSection;
@@ -71,7 +72,8 @@ export default function FeatureSection() {
   if (loading || !Array.isArray(items)) {
     return (
       <Box sx={styles.wrapper}>
-        <Typography align="center">Loading achievements...</Typography>
+        {/* <Typography align="center">Loading achievements...</Typography> */}
+        <Loader/>
       </Box>
     );
   }

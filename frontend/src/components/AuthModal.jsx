@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import { useAuth } from "../hooks/useAuth";
 import { COLORS } from "../styles/Styles";
+import Loader from "./Loader";
 
 const AuthModal = ({
   open,
@@ -123,12 +124,14 @@ const AuthModal = ({
 
       // Save your backend JWT
       localStorage.setItem("authToken", res.access_token);
-
+      handleGoogleOauth();
       showSnackbar("Google login successful", "success");
       closeModal();
+      console.log({redirectTo});
       onSuccess?.();
-      handleGoogleOauth();
+      document.body.classList.remove("body-blur");
       setTimeout(() => navigate(redirectTo), 300);
+
 
     } catch (err) {
       setError("Google Auth failed");
@@ -286,7 +289,8 @@ const AuthModal = ({
               disabled={loading}
             >
               {loading ? (
-                <CircularProgress size={22} color="inherit" />
+                // <CircularProgress size={22} color="inherit" />
+                <Loader/>
               ) : tab === 0 ? (
                 "Login"
               ) : (

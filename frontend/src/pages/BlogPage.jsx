@@ -14,6 +14,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import style, { COLORS } from "../styles/Styles";
+import Loader from "../components/Loader";
 
 const ITEMS_PER_PAGE =6 ;
 
@@ -140,7 +141,8 @@ const BlogPage = () => {
           </Button>
 
           {categoriesLoading ? (
-            <CircularProgress size={24} />
+            // <CircularProgress size={24} />
+            <Loader/>
           ) : (
             categories.map((cat) => {
               const isSelected = selectedCategory === cat.id;
@@ -168,7 +170,8 @@ const BlogPage = () => {
         {/* Blog Cards */}
         {blogsLoading && !blogs.length ? (
           <Box display="flex" justifyContent="center" mt={6}>
-            <CircularProgress />
+            {/* <CircularProgress /> */}
+            <Loader/>
           </Box>
         ) : blogs.length === 0 ? (
           <Typography textAlign="center" mt={4}>No blogs found.</Typography>

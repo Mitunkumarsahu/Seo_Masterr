@@ -19,12 +19,14 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PinterestIcon from "@mui/icons-material/Pinterest";
 import TikTokIcon from "@mui/icons-material/MusicNote"; // TikTok alternative icon
-import SnapchatIcon from "@mui/icons-material/Chat";     // Snapchat alternative icon
-
+import SnapchatIcon from "@mui/icons-material/Chat"; // Snapchat alternative icon
 
 const Footer = () => {
   const { apiCall: getSocialIcons, loading, error, data } = useApi();
   const { apiCall: fetchInfo, data: infoData } = useApi();
+  const { apiCall: fetchBlogsCategories, data: blogsCategories } = useApi();
+  const { apiCall: fetchServicesCategories, data: servicesCategories } =
+    useApi();
 
   useEffect(() => {
     const fetchSocialIcons = async () => {
@@ -35,16 +37,24 @@ const Footer = () => {
         console.error("Failed to fetch home features:", error);
       }
     };
-
     fetchSocialIcons();
   }, []);
 
   useEffect(() => {
-    fetchInfo(import.meta.env.VITE_BACKEND_URL+"/contact-info/");
+    fetchInfo(import.meta.env.VITE_BACKEND_URL + "/contact-info/");
   }, []);
+
+  useEffect(() => {
+    fetchBlogsCategories(
+      `${import.meta.env.VITE_APP_BACKEND_URL}/wp-json/wp/v2/categories`
+    );
+    fetchServicesCategories(
+      import.meta.env.VITE_APP_BACKEND_URL +
+        "/wp-json/wp/v2/service_type?per_page=100"
+    );
+  }, []);
+
   const contactInfo = infoData?.find((item) => item.is_active);
-
-
 
   return (
     <Box sx={{ bgcolor: COLORS.primary, color: "white", mt: 0, pt: 6, pb: 2 }}>
@@ -99,7 +109,7 @@ const Footer = () => {
                     sx={{
                       bgcolor: "#f0f0f0",
                       color: "#000",
-                      "&:hover": { bgcolor: COLORS.secondary},
+                      "&:hover": { bgcolor: COLORS.secondary },
                     }}
                   >
                     {IconComponent}
@@ -139,7 +149,14 @@ const Footer = () => {
           <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
             Our Services
           </Typography>
-          <Typography variant="body2">
+          {servicesCategories?.map((service) => (
+            <Typography key={service.id} variant="body2">
+              {service.name}
+
+              <br />
+            </Typography>
+          ))}
+          {/* <Typography variant="body2">
             SEO Optimization
             <br />
             PPC Advertising
@@ -147,23 +164,20 @@ const Footer = () => {
             Social Media Marketing
             <br />
             Website Development
-          </Typography>
+          </Typography> */}
         </Grid>
 
         {/* Company */}
         <Grid item xs={6} md={2}>
           <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-            Company
+            Our Blogs
           </Typography>
-          <Typography variant="body2">
-            Empowering brands with data-driven strategies
-            <br />
-            Trusted by startups and enterprises
-            <br />
-            Customized growth plans
-            <br />
-            Transparent communication
-          </Typography>
+          {blogsCategories?.map((category) => (
+            <Typography key={category.id} variant="body2">
+              {category.name}
+              <br />
+            </Typography>
+          ))}
         </Grid>
 
         {/* Contact Info */}
@@ -193,11 +207,11 @@ const Footer = () => {
       {/* Centered Paragraph */}
       <Box sx={{ my: 3, mx: { xs: 3, md: 10 }, mt: 7 }}>
         <Typography variant="body2" sx={{ textAlign: "left" }}>
-          At Smile, we specialize in delivering measurable digital growth. From
-          driving traffic through expert SEO practices to generating qualified
-          leads via PPC and social media campaigns, we’re here to turn your
-          online presence into real business results. Read our blogs to stay
-          updated with digital trends, or explore our services to take your
+          At Seomasterr, we specialize in delivering measurable digital growth.
+          From driving traffic through expert SEO practices to generating
+          qualified leads via PPC and social media campaigns, we’re here to turn
+          your online presence into real business results. Read our blogs to
+          stay updated with digital trends, or explore our services to take your
           brand to the next level.
         </Typography>
       </Box>

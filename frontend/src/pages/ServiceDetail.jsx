@@ -23,6 +23,7 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from "react-share";
+import Loader from "../components/Loader";
 
 const ServiceDetail = () => {
   const { slug } = useParams(); // now using slug instead of id
@@ -68,9 +69,10 @@ const ServiceDetail = () => {
 
   if (loading)
     return (
-      <Typography textAlign="center" mt={10}>
-        Loading service...
-      </Typography>
+      // <Typography textAlign="center" mt={10}>
+      //   Loading service...
+      // </Typography>
+      <Loader/>
     );
   if (error)
     return (

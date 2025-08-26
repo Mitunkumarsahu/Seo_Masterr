@@ -8,6 +8,7 @@ import {
 import React from "react";
 import style from "../styles/Styles";
 import { useLocation, useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 export default function HeroSection({ data }) {
   const location = useLocation();
@@ -17,7 +18,10 @@ export default function HeroSection({ data }) {
 
   const navigate = useNavigate();
 
-  if (!data) return null; // or loading UI
+  if (!data) return(
+    <Loader/>
+
+  ); // or loading UI
 
   return (
     <Box sx={styles.heroContainer}>

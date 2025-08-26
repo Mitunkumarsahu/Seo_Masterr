@@ -16,6 +16,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import useApi from "../hooks/useApi";
 import style from "../styles/Styles";
+import Loader from "./Loader";
 
 export default function TestimonialSection() {
   const { apiCall: getTestimonials, data, loading, error } = useApi();
@@ -66,7 +67,8 @@ export default function TestimonialSection() {
 
       {loading ? (
         <Box mt={4}>
-          <CircularProgress />
+          {/* <CircularProgress /> */}
+          <Loader/>
         </Box>
       ) : error ? (
         <Typography color="error" mt={4}>

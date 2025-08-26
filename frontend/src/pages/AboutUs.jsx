@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import useApi from '../hooks/useApi';
 import style from '../styles/Styles';
 import HeroSection from "../components/HeroSection";
+import Loader from '../components/Loader';
 
 const MotionBox = motion(Box)
 const MotionTypography = motion(Typography);
@@ -83,7 +84,8 @@ const AboutUs = () => {
     if (loading || !heroData) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <CircularProgress />
+          {/* <CircularProgress /> */}
+          <Loader/>
         </Box>
       );
     }
@@ -122,7 +124,8 @@ const AboutUs = () => {
     if (loading) {
       return (
         <Box sx={{ py: 10, textAlign: 'center' }}>
-          <CircularProgress />
+          {/* <CircularProgress /> */}
+          <Loader/>
         </Box>
       );
     }
@@ -222,7 +225,8 @@ const AboutUs = () => {
     if (loading) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
-          <CircularProgress />
+          {/* <CircularProgress /> */}
+          <Loader/>
         </Box>
       );
     }
@@ -350,7 +354,8 @@ const AboutUs = () => {
 
             {loading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <CircularProgress />
+                {/* <CircularProgress /> */}
+                <Loader/>
               </Box>
             ) : (
               <motion.div

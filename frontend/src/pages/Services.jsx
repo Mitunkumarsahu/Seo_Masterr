@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import HomeFooterSearch from "../components/HomeFooterSearch";
 import useApi from "../hooks/useApi";
 import style, { COLORS } from "../styles/Styles";
+import Loader from "../components/Loader";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -144,7 +145,8 @@ const Services = () => {
         >
           {loading ? (
             <Box sx={{ textAlign: "center", py: 4 }}>
-              <CircularProgress />
+              {/* <CircularProgress /> */}
+              <Loader/>
             </Box>
           ) : error ? (
             <Typography color="error" textAlign="center">

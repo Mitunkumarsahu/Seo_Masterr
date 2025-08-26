@@ -23,6 +23,7 @@ import {
   WhatsappIcon,
 } from "react-share";
 import TableOfContents from "../components/TableOfContents.jsx"
+import Loader from "../components/Loader.jsx";
 
 const BlogDetailPage = () => {
   const { slug } = useParams();
@@ -124,7 +125,8 @@ const BlogDetailPage = () => {
   if (loading) {
     return (
       <Box sx={{ py: 6, display: "flex", justifyContent: "center" }}>
-        <CircularProgress />
+        {/* <CircularProgress /> */}
+        <Loader/>
       </Box>
     );
   }

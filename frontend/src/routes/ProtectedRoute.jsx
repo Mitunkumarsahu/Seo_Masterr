@@ -4,6 +4,7 @@ import { useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import AuthModal from "../components/AuthModal"; // your modal component
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -19,9 +20,10 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
-      </div>
+      // <div className="flex justify-center items-center min-h-screen">
+      //   <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+      // </div>
+      <Loader/>
     );
   }
 

@@ -10,6 +10,7 @@ import {
 import React, { useEffect } from "react";
 import useApi from "../hooks/useApi";
 import style from "../styles/Styles";
+import Loader from "./Loader";
 
 const HomeServiceCards = () => {
   const styles = style.homeServiceCards;
@@ -22,7 +23,7 @@ const HomeServiceCards = () => {
 
   const activeCards = data?.filter((item) => item.is_active) || [];
 
-  if (loading) return <Typography align="center">Loading...</Typography>;
+  if (loading) return <Loader/>;
   if (error)
     return (
       <Typography align="center" color="error">
@@ -93,12 +94,12 @@ const HomeServiceCards = () => {
               </CardContent>
             </Box>
 
-            <Box sx={{textAlign: "center", zIndex: 2, position: "relative" }}>
+            {/* <Box sx={{textAlign: "center", zIndex: 2, position: "relative" }}>
               <Link href="#" underline="none" className="card-link" sx={styles.link}>
                 Learn More{" "}
                 <ArrowForwardIcon className="arrow" sx={styles.arrowIcon} />
               </Link>
-            </Box>
+            </Box> */}
           </Card>
         ))}
       </Box>
