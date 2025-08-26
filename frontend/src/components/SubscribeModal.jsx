@@ -63,7 +63,11 @@ const SubscribeModal = ({
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading ? <Loader /> : "Submit"}
+            {loading ? (
+              "loading..."
+            ) : (
+              "Submit"
+            )}
           </Button>
         </Box>
       </Fade>

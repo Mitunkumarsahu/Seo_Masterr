@@ -22,6 +22,12 @@ def create_subscription(db: Session, subscription: SubscriptionCreate):
     db.add(db_subscription)
     db.commit()
     db.refresh(db_subscription)
+    send_email(
+      recipient=subscription.email,
+      subject="Welcome to Seomasterr",
+      email_temp="subscribed",
+      data={"email":subscription.email}                  
+    )
     return db_subscription
 
 def get_subscription(db: Session, subscription_id: int):

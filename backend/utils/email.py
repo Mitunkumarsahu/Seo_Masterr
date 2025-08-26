@@ -72,13 +72,16 @@ def load_template(template_name: str, data: dict = None) -> str:
 
     # For subscribed email → decide button text and link
     if template_name == "subscribed":
-        type_ = data.get("type", "blogs")  # default blogs
+        type_ = data.get("type")  # default blogs
+        data["btn_text"] = "Explore"
+        data["url"] = "https://seomasterr.com"
         if type_ == "services":
             data["btn_text"] = "Explore Services"
             data["url"] = data.get("url", "https://seomasterr.com/services")
-        else:
+        elif type_ == "blogs":
             data["btn_text"] = "Explore Blogs"
             data["url"] = data.get("url", "https://seomasterr.com/blogs")
+        print(f"Subscription email data: {data}")
 
     template = templates.get(template_name, "")
     return template.format_map(defaultdict(str, data))
