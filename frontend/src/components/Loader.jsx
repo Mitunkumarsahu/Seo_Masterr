@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import { COLORS } from "../styles/Styles";
+
 
 const Loader = ({
   text = "Loading",
@@ -44,7 +46,7 @@ const Loader = ({
             width: dotSize,
             height: dotSize,
             borderRadius: "50%",
-            bgcolor: blueColors[0],
+            bgcolor:COLORS.primary,
             top: 0,
             left: "50%",
             transform: "translate(-50%, 0)",
@@ -57,7 +59,7 @@ const Loader = ({
             width: dotSize,
             height: dotSize,
             borderRadius: "50%",
-            bgcolor: blueColors[1],
+            bgcolor: COLORS.secondary,
             top: "50%",
             right: 0,
             transform: "translate(0, -50%)",
@@ -70,7 +72,7 @@ const Loader = ({
             width: dotSize,
             height: dotSize,
             borderRadius: "50%",
-            bgcolor: blueColors[2],
+            bgcolor: COLORS.primary,
             bottom: 0,
             left: "50%",
             transform: "translate(-50%, 0)",
@@ -83,7 +85,7 @@ const Loader = ({
             width: dotSize,
             height: dotSize,
             borderRadius: "50%",
-            bgcolor: blueColors[3],
+            bgcolor: COLORS.secondary,
             top: "50%",
             left: 0,
             transform: "translate(0, -50%)",
