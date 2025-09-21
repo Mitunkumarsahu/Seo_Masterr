@@ -5,12 +5,14 @@ import { useAuth } from "../hooks/useAuth";
 import AuthModal from "../components/AuthModal"; // your modal component
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
+import UnderConstruction from "../pages/UnderConstruction";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const navigate = useNavigate();
+  return <UnderConstruction />;
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
