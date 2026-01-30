@@ -12,7 +12,6 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const navigate = useNavigate();
-  return <UnderConstruction />;
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
