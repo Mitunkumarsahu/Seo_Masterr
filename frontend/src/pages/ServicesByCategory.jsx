@@ -1,27 +1,21 @@
 import {
   Box,
   Button,
-  CircularProgress,
   Container,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import HomeFooterSearch from "../components/HomeFooterSearch";
 import useApi from "../hooks/useApi";
 import style, { COLORS } from "../styles/Styles";
 import Loader from "../components/Loader";
 
-const Services = () => {
+const ServicesByCategory = () => {
   const [services, setServices] = useState([]);
-  const [filteredServices, setFilteredServices] = useState([]);
-  const [serviceTypes, setServiceTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState("all");
+  const [categoryInfo, setCategoryInfo] = useState(null);
+  const { categorySlug } = useParams();
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
   const decodeHTML = (html) => {
@@ -40,95 +34,90 @@ const Services = () => {
     apiCall: getServiceTypes,
     data: typesData,
     loading: typesLoading,
-    error: typesError,
   } = useApi();
 
-  // Fetch services and types on mount
+  // Fetch service types to find the category ID
   useEffect(() => {
-    getServices(import.meta.env.VITE_APP_BACKEND_URL+"/wp-json/wp/v2/service?_embed&per_page=100");
     getServiceTypes(import.meta.env.VITE_APP_BACKEND_URL+"/wp-json/wp/v2/service_type?per_page=100");
   }, []);
 
-  // Transform and set services data
+  // Find category by slug and fetch services
+  useEffect(() => {
+    if (Array.isArray(typesData) && categorySlug) {
+      const category = typesData.find((type) => type.slug === categorySlug);
+      
+      if (category) {
+        setCategoryInfo(category);
+        // Fetch services filtered by this category
+        getServices(
+          import.meta.env.VITE_APP_BACKEND_URL+
+          `/wp-json/wp/v2/service?_embed&per_page=100&service_type=${category.id}`
+        );
+      }
+    }
+  }, [typesData, categorySlug]);
+
+  // Transform services data
   useEffect(() => {
     if (Array.isArray(servicesData)) {
       const transformed = servicesData.map((post) => {
-        const typeId = post.service_type?.[0]; // Assuming one service_type
-
         return {
           id: post.id,
-          title:decodeHTML(post.title.rendered),
+          title: decodeHTML(post.title.rendered),
           meta_description: post.excerpt.rendered.replace(/<[^>]+>/g, ""),
           slug: post.slug,
           image_url:
             post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
             "https://via.placeholder.com/300x200",
-          service_type: typeId,
         };
       });
 
       setServices(transformed);
-      setFilteredServices(transformed);
     }
   }, [servicesData]);
 
-  // Set available service types
-  useEffect(() => {
-    if (Array.isArray(typesData)) {
-      setServiceTypes(typesData);
-    }
-  }, [typesData]);
-
-  // Filter services by selected type
-  useEffect(() => {
-    if (selectedType === "all") {
-      setFilteredServices(services);
-    } else {
-      setFilteredServices(
-        services.filter((s) => s.service_type === selectedType)
-      );
-    }
-  }, [selectedType, services]);
-
   const loading = servicesLoading || typesLoading;
-  const error = servicesError || typesError;
+  const error = servicesError;
 
   return (
-    <Box sx={{ backgroundColor: "#f9f9f9" }}>
+    <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "80vh" }}>
       <Container maxWidth="xl" sx={{ py: 8 }}>
-        <Typography
-          variant="h3"
-          fontWeight="bold"
-          textAlign="center"
-          sx={style?.testimonialSection?.headline}
-          mb={5}
-        >
-          Our Services
-        </Typography>
+        {/* Category Header */}
+        <Box sx={{ textAlign: "center", mb: 6 }}>
+          <Typography
+            variant="h3"
+            fontWeight="bold"
+            sx={style?.testimonialSection?.headline}
+            mb={2}
+          >
+            {categoryInfo?.name || "Services"}
+          </Typography>
+          
+          {categoryInfo?.description && (
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: 700, mx: "auto", mb: 3 }}
+            >
+              {decodeHTML(categoryInfo.description)}
+            </Typography>
+          )}
 
-        {/* Filter Tabs */}
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            justifyContent: "center",
-            mb: 6,
-          }}
-        >
-          <TabButton
-            label="All"
-            selected={selectedType === "all"}
-            onClick={() => setSelectedType("all")}
-          />
-          {serviceTypes.map((type) => (
-            <TabButton
-              key={type.id}
-              label={type.name}
-              selected={false}
-              onClick={() => navigate(`/services/${type.slug}`)}
-            />
-          ))}
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/services")}
+            sx={{
+              borderColor: COLORS.primary,
+              color: COLORS.primary,
+              fontWeight: 600,
+              "&:hover": {
+                backgroundColor: COLORS.primary,
+                color: "white",
+              },
+            }}
+          >
+            ← View All Services
+          </Button>
         </Box>
 
         {/* Services Grid */}
@@ -145,18 +134,34 @@ const Services = () => {
           }}
         >
           {loading ? (
-            <Box sx={{ textAlign: "center", py: 4 }}>
-              {/* <CircularProgress /> */}
-              <Loader/>
+            <Box sx={{ textAlign: "center", py: 4, gridColumn: "1 / -1" }}>
+              <Loader />
             </Box>
           ) : error ? (
-            <Typography color="error" textAlign="center">
+            <Typography color="error" textAlign="center" sx={{ gridColumn: "1 / -1" }}>
               {error}
             </Typography>
-          ) : filteredServices.length === 0 ? (
-            <Typography textAlign="center">No services found.</Typography>
+          ) : services.length === 0 ? (
+            <Box sx={{ textAlign: "center", py: 8, gridColumn: "1 / -1" }}>
+              <Typography variant="h6" color="text.secondary">
+                No services found in this category.
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={() => navigate("/services")}
+                sx={{
+                  mt: 3,
+                  backgroundColor: COLORS.primary,
+                  "&:hover": {
+                    backgroundColor: COLORS.secondary,
+                  },
+                }}
+              >
+                Browse All Services
+              </Button>
+            </Box>
           ) : (
-            filteredServices.map((service) => (
+            services.map((service) => (
               <ServiceCard key={service.id} post={service} />
             ))
           )}
@@ -167,32 +172,6 @@ const Services = () => {
     </Box>
   );
 };
-
-const TabButton = ({ label, selected, onClick }) => (
-  <Button
-    onClick={onClick}
-    variant="outlined"
-    size="small"
-    sx={{
-      backgroundColor: selected ? COLORS.primary : "#ffffff",
-      color: selected ? "#ffffff" : COLORS.primary,
-      border: `1px solid ${COLORS.primary}`,
-      fontWeight: 700,
-      fontSize: "0.75rem",
-      borderRadius: "20px",
-      px: 2.5,
-      py: 0.75,
-      textTransform: "capitalize",
-      minWidth: "auto",
-      "&:hover": {
-        backgroundColor: selected ? COLORS.primary : "#e0eaff",
-        borderColor: "#0C2F58",
-      },
-    }}
-  >
-    {label.toUpperCase()}
-  </Button>
-);
 
 const ServiceCard = ({ post }) => {
   const navigate = useNavigate();
@@ -254,4 +233,4 @@ const ServiceCard = ({ post }) => {
   );
 };
 
-export default Services;
+export default ServicesByCategory;

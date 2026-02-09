@@ -16,9 +16,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Menu as MenuIcon } from "lucide-react";
+import { Menu as MenuIcon, ChevronDown, Grid3x3, CheckCircle2 } from "lucide-react";
 import React, { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import { useAuth } from "../hooks/useAuth";
 import AuthModal from "./AuthModal";
@@ -38,6 +38,7 @@ export default function NavBar() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
+  const [servicesMenuAnchorEl, setServicesMenuAnchorEl] = useState(null);
   const [email, setEmail] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -45,14 +46,31 @@ export default function NavBar() {
     severity: "success",
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [serviceTypes, setServiceTypes] = useState([]);
 
   const { apiCall: postSubscription, loading } = useApi();
+  const { apiCall: getServiceTypes, data: typesData } = useApi();
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
 
   const toggleDrawer = () => setMobileDrawerOpen((prev) => !prev);
   const handleMenuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
   const handleMenuClose = () => setUserMenuAnchorEl(null);
+  const handleServicesMenuOpen = (event) => setServicesMenuAnchorEl(event.currentTarget);
+  const handleServicesMenuClose = () => setServicesMenuAnchorEl(null);
+
+  // Fetch service types on mount
+  React.useEffect(() => {
+    getServiceTypes(import.meta.env.VITE_APP_BACKEND_URL+"/wp-json/wp/v2/service_type?per_page=100");
+  }, []);
+
+  // Set service types from API
+  React.useEffect(() => {
+    if (Array.isArray(typesData)) {
+      setServiceTypes(typesData);
+    }
+  }, [typesData]);
 
   const handleSubmit = async () => {
     if (!email || !email.includes("@")) {
@@ -87,7 +105,7 @@ export default function NavBar() {
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Blog", to: "/blogs" },
-    { label: "Services", to: "/services" },
+    { label: "Services", to: "/services", hasDropdown: true },
     { label: "About Us", to: "/about-us" },
     { label: "Contact Us", to: "/contact-us" },
   ];
@@ -148,10 +166,151 @@ export default function NavBar() {
               mr: 4,
             }}
           >
-            {navLinks.map(({ label, to }) => (
-              <NavLink key={label} to={to} style={{ textDecoration: "none" }}>
-                <Button sx={getLinkStyle(to)}>{label}</Button>
-              </NavLink>
+            {navLinks.map(({ label, to, hasDropdown }) => (
+              hasDropdown ? (
+                <Box key={label} sx={{ position: "relative" }}>
+                  <Button 
+                    sx={{
+                      ...getLinkStyle(to),
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        color: "#FF6D00",
+                        transform: "translateY(-2px)",
+                      },
+                    }}
+                    onClick={handleServicesMenuOpen}
+                    endIcon={
+                      <ChevronDown 
+                        size={16} 
+                        style={{ 
+                          transition: "transform 0.3s ease",
+                          transform: Boolean(servicesMenuAnchorEl) ? "rotate(180deg)" : "rotate(0deg)"
+                        }} 
+                      />
+                    }
+                  >
+                    {label}
+                  </Button>
+                  <Menu
+                    anchorEl={servicesMenuAnchorEl}
+                    open={Boolean(servicesMenuAnchorEl)}
+                    onClose={handleServicesMenuClose}
+                    PaperProps={{ 
+                      sx: { 
+                        mt: 1.5, 
+                        minWidth: 240, 
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                        borderRadius: 2,
+                        maxHeight: 450,
+                        overflowY: "auto",
+                        border: "1px solid rgba(0,0,0,0.08)",
+                        "&::-webkit-scrollbar": {
+                          width: "6px",
+                        },
+                        "&::-webkit-scrollbar-track": {
+                          background: "#f1f1f1",
+                          borderRadius: "10px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          background: COLOR.primary,
+                          borderRadius: "10px",
+                          "&:hover": {
+                            background: COLOR.secondary,
+                          },
+                        },
+                      } 
+                    }}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                    transformOrigin={{ vertical: "top", horizontal: "left" }}
+                    TransitionProps={{
+                      timeout: 300,
+                    }}
+                  >
+                    <MenuItem 
+                      onClick={() => {
+                        navigate("/services");
+                        handleServicesMenuClose();
+                      }}
+                      sx={{ 
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                        py: 1.5,
+                        px: 2.5,
+                        color: COLOR.primary,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        transition: "all 0.2s ease",
+                        "&:hover": {
+                          backgroundColor: `${COLOR.primary}15`,
+                          color: COLOR.secondary,
+                          transform: "translateX(4px)",
+                        },
+                      }}
+                    >
+                      <Grid3x3 size={18} />
+                      All Services
+                    </MenuItem>
+                    <Divider sx={{ my: 1, borderColor: "rgba(0,0,0,0.08)" }} />
+                    {serviceTypes.map((type, index) => (
+                      <MenuItem
+                        key={type.id}
+                        onClick={() => {
+                          navigate(`/services/${type.slug}`);
+                          handleServicesMenuClose();
+                        }}
+                        sx={{
+                          py: 1.2,
+                          px: 2.5,
+                          fontSize: "0.9rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1.5,
+                          transition: "all 0.2s ease",
+                          animation: `fadeIn 0.3s ease ${index * 0.05}s both`,
+                          "@keyframes fadeIn": {
+                            from: {
+                              opacity: 0,
+                              transform: "translateY(-10px)",
+                            },
+                            to: {
+                              opacity: 1,
+                              transform: "translateY(0)",
+                            },
+                          },
+                          "&:hover": {
+                            backgroundColor: `${COLOR.primary}10`,
+                            color: COLOR.primary,
+                            transform: "translateX(4px)",
+                            "& .service-icon": {
+                              color: COLOR.secondary,
+                              transform: "scale(1.2)",
+                            },
+                          },
+                        }}
+                      >
+                        <CheckCircle2 
+                          size={16} 
+                          className="service-icon"
+                          style={{ 
+                            transition: "all 0.2s ease",
+                            color: COLOR.primary,
+                            opacity: 0.6,
+                          }} 
+                        />
+                        {type.name}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+              ) : (
+                <NavLink key={label} to={to} style={{ textDecoration: "none" }}>
+                  <Button sx={getLinkStyle(to)}>{label}</Button>
+                </NavLink>
+              )
             ))}
           </Box>
 
@@ -270,20 +429,90 @@ export default function NavBar() {
           </Typography>
           <Divider sx={{ borderColor: COLORS.slate700, mb: 2 }} />
           <List>
-            {navLinks.map(({ label, to }) => (
-              <ListItem key={label} disablePadding>
-                <ListItemButton
-                  component={NavLink}
-                  to={to}
-                  onClick={toggleDrawer}
-                  sx={{
-                    "&.active": { bgcolor: COLORS.slate700 },
-                    "&:hover": { bgcolor: COLORS.slate700 },
-                  }}
-                >
-                  <ListItemText primary={label} />
-                </ListItemButton>
-              </ListItem>
+            {navLinks.map(({ label, to, hasDropdown }) => (
+              <React.Fragment key={label}>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={hasDropdown ? "div" : NavLink}
+                    to={hasDropdown ? undefined : to}
+                    onClick={() => {
+                      if (!hasDropdown) {
+                        toggleDrawer();
+                      }
+                    }}
+                    sx={{
+                      "&.active": { bgcolor: COLORS.slate700 },
+                      "&:hover": { bgcolor: COLORS.slate700 },
+                      borderRadius: 1,
+                      mb: 0.5,
+                    }}
+                  >
+                    <ListItemText primary={label} />
+                  </ListItemButton>
+                </ListItem>
+                {hasDropdown && (
+                  <Box sx={{ 
+                    pl: 2, 
+                    py: 1,
+                    mb: 1,
+                    borderLeft: `3px solid ${COLOR.secondary}`,
+                    ml: 1,
+                  }}>
+                    <ListItem disablePadding>
+                      <ListItemButton
+                        onClick={() => {
+                          navigate("/services");
+                          toggleDrawer();
+                        }}
+                        sx={{
+                          py: 0.8,
+                          borderRadius: 1,
+                          "&:hover": { 
+                            bgcolor: COLORS.slate700,
+                            transform: "translateX(4px)",
+                            transition: "all 0.2s ease",
+                          },
+                        }}
+                      >
+                        <Grid3x3 size={16} style={{ marginRight: 8, opacity: 0.8 }} />
+                        <ListItemText 
+                          primary="All Services" 
+                          primaryTypographyProps={{ 
+                            fontSize: "0.9rem", 
+                            fontWeight: 700,
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                    <Divider sx={{ borderColor: COLORS.slate700, my: 1, opacity: 0.5 }} />
+                    {serviceTypes.map((type) => (
+                      <ListItem key={type.id} disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            navigate(`/services/${type.slug}`);
+                            toggleDrawer();
+                          }}
+                          sx={{
+                            py: 0.7,
+                            borderRadius: 1,
+                            "&:hover": { 
+                              bgcolor: COLORS.slate700,
+                              transform: "translateX(4px)",
+                              transition: "all 0.2s ease",
+                            },
+                          }}
+                        >
+                          <CheckCircle2 size={14} style={{ marginRight: 8, opacity: 0.6 }} />
+                          <ListItemText 
+                            primary={type.name}
+                            primaryTypographyProps={{ fontSize: "0.85rem" }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </Box>
+                )}
+              </React.Fragment>
             ))}
           </List>
           <Divider sx={{ borderColor: COLORS.slate700, my: 2 }} />

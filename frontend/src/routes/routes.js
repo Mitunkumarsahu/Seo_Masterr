@@ -7,6 +7,7 @@ import Home from "../pages/Home";
 import NotFound from "../pages/NotFound";
 import ServiceDetail from "../pages/ServiceDetail";
 import Services from "../pages/Services";
+import ServicesByCategory from "../pages/ServicesByCategory";
 
 const routes = {
   "routes": [
@@ -36,6 +37,11 @@ const routes = {
       "component":Services,
       "type":"private"
 
+    },
+    {
+      "path": "/services/:categorySlug",
+      "component": ServicesByCategory,
+      "type": "private"
     },
     {
       "path": "/blog/:slug",
