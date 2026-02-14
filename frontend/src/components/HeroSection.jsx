@@ -9,6 +9,8 @@ import React from "react";
 import style from "../styles/Styles";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loader from "./Loader";
+import ConsultationModal from "./ConsultationModal";
+import { Headset, LayoutGrid } from "lucide-react";
 
 export default function HeroSection({ data }) {
   const location = useLocation();
@@ -17,6 +19,7 @@ export default function HeroSection({ data }) {
   const styles = style.heroSection;
 
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = React.useState(false);
 
   if (!data) return(
     <Loader/>
@@ -34,14 +37,28 @@ export default function HeroSection({ data }) {
         <Typography sx={styles.description}>
           {data.description}
         </Typography>
-        {path == '/'?
-        <Button variant="contained" sx={styles.button} onClick={()=>{
-          navigate('/about-us')
-        }}>
-          Learn More
-        </Button>
-        :""
+        {path == '/' ?
+          <Box sx={{ display: "flex", gap: 2, mt: 4, flexWrap: "wrap" }}>
+            <Button
+              variant="contained"
+              sx={styles.buttonOrange}
+              startIcon={<Headset size={20} />}
+              onClick={() => setModalOpen(true)}
+            >
+              Speak to Expert
+            </Button>
+            <Button
+              variant="outlined"
+              sx={styles.buttonOutline}
+              startIcon={<LayoutGrid size={20} />}
+              onClick={() => navigate('/services')}
+            >
+              Our Services
+            </Button>
+          </Box>
+          : ""
         }
+        <ConsultationModal open={modalOpen} onClose={() => setModalOpen(false)} />
       </Box>
 
       {/* Right Section */}

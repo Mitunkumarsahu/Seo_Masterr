@@ -1,17 +1,15 @@
 // routes/RoleBasedRoute.jsx
-import { Navigate, useLocation } from 'react-router-dom'
-import  {useAuth}  from '../hooks/useAuth'
-import Loader from '../components/Loader'
+// import { Navigate, useLocation } from 'react-router-dom' // Commented out for public access
+// import { useAuth } from '../hooks/useAuth' // Commented out for public access
+// import Loader from '../components/Loader' // Commented out for public access
 
 const RoleBasedRoute = ({ children, requiredRoles }) => {
+  /* Commenting out role logic for public access
   const { isAuthenticated, user, loading } = useAuth()
   const location = useLocation()
 
   if (loading) {
     return (
-      // <div className="flex justify-center items-center min-h-screen">
-      //   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      // </div>
       <Loader/>
     )
   }
@@ -35,6 +33,7 @@ const RoleBasedRoute = ({ children, requiredRoles }) => {
       />
     )
   }
+  */
 
   return children
 }

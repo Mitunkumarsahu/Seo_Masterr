@@ -22,6 +22,15 @@ import useApi from "../hooks/useApi";
 import { useAuth } from "../hooks/useAuth";
 import { COLORS } from "../styles/Styles";
 import Loader from "./Loader";
+import {
+  LogIn,
+  UserPlus,
+  Home,
+  User,
+  Mail,
+  Lock
+} from "lucide-react";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const AuthModal = ({
   open,
@@ -35,11 +44,9 @@ const AuthModal = ({
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [error, setError] = useState("");
-  const { login, loading } = useAuth();
+  const { login, loading, handleGoogleOauth } = useAuth();
   const { apiCall } = useApi();
   const navigate = useNavigate();
-  
-  const {handleGoogleOauth} = useAuth();
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -89,17 +96,13 @@ const AuthModal = ({
           showSnackbar(result.error || "Login failed", "error");
         }
       } else {
-        await apiCall(
-          import.meta.env.VITE_BACKEND_URL + "/auth/signup",
-          "POST",
-          {
-            username: form.username,
-            email: form.email,
-            password: form.password,
-            permissions: [],
-            is_editor: false,
-          }
-        );
+        await apiCall(import.meta.env.VITE_BACKEND_URL + "/auth/signup", "POST", {
+          username: form.username,
+          email: form.email,
+          password: form.password,
+          permissions: [],
+          is_editor: false,
+        });
         showSnackbar("Signup successful", "success");
         closeModal();
         onSuccess?.();
@@ -123,16 +126,36 @@ const AuthModal = ({
       );
 
       // Save your backend JWT
-      localStorage.setItem("authToken", res.access_token);
-      handleGoogleOauth();
+      if (res && res.access_token) {
+        localStorage.setItem("authToken", res.access_token);
+        handleGoogleOauth();
+      }
+
+      const payload = JSON.parse(
+        atob(credentialResponse.credential.split(".")[1])
+      );
+      const email = payload.email;
+      const username = payload.name.replace(/\s/g, "");
+
+      try {
+        await apiCall(import.meta.env.VITE_BACKEND_URL + "/auth/signup", "POST", {
+          username,
+          email,
+          password: "",
+          permissions: [],
+          is_editor: false,
+        });
+      } catch (signupErr) {
+        // Ignore signup error if user already exists
+        console.log("Signup check/fallback:", signupErr);
+      }
+
       showSnackbar("Google login successful", "success");
       closeModal();
-      console.log({redirectTo});
+      console.log({ redirectTo });
       onSuccess?.();
       document.body.classList.remove("body-blur");
       setTimeout(() => navigate(redirectTo), 300);
-
-
     } catch (err) {
       setError("Google Auth failed");
       showSnackbar("Google Auth failed", "error");
@@ -192,6 +215,7 @@ const AuthModal = ({
                     color: COLORS.secondary,
                   },
                 }}
+                startIcon={<Home size={18} />}
               >
                 Go to Home
               </Button>
@@ -246,6 +270,13 @@ const AuthModal = ({
                 margin="dense"
                 onChange={handleChange}
                 value={form.username}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <User size={18} color={COLORS.primary} />
+                    </InputAdornment>
+                  ),
+                }}
               />
             )}
 
@@ -257,6 +288,13 @@ const AuthModal = ({
               margin="dense"
               onChange={handleChange}
               value={form.email}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Mail size={18} color={COLORS.primary} />
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <TextField
@@ -267,6 +305,13 @@ const AuthModal = ({
               margin="dense"
               onChange={handleChange}
               value={form.password}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock size={18} color={COLORS.primary} />
+                  </InputAdornment>
+                ),
+              }}
             />
 
             {error && (
@@ -290,11 +335,17 @@ const AuthModal = ({
             >
               {loading ? (
                 // <CircularProgress size={22} color="inherit" />
-                <Loader/>
+                <Loader />
               ) : tab === 0 ? (
-                "Login"
+                <>
+                  <LogIn size={18} style={{ marginRight: 8 }} />
+                  Login
+                </>
               ) : (
-                "Sign Up"
+                <>
+                  <UserPlus size={18} style={{ marginRight: 8 }} />
+                  Sign Up
+                </>
               )}
             </Button>
 

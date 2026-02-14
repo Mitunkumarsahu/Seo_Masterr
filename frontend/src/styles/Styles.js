@@ -47,7 +47,7 @@ const style = {
       justifyContent: "center",
     },
     title: {
-       fontSize: { xs: "32px", md: "48px" },
+      fontSize: { xs: "32px", md: "48px" },
       fontWeight: "bold",
       lineHeight: 1.1,
       mb: 3,
@@ -118,6 +118,42 @@ const style = {
         transform: "translateY(-1px) scale(1.02)",
       },
     },
+    buttonOrange: {
+      bgcolor: COLORS.secondary,
+      color: COLORS.white,
+      fontSize: "14px",
+      fontWeight: 600,
+      px: 4,
+      py: 1.8,
+      textTransform: "uppercase",
+      borderRadius: 50,
+      width: "fit-content",
+      transition: "all 0.4s ease",
+      "&:hover": {
+        bgcolor: "#e65100",
+        transform: "translateY(-3px)",
+        boxShadow: "0 10px 20px rgba(255, 109, 0, 0.3)",
+      },
+    },
+    buttonOutline: {
+      bgcolor: "transparent",
+      color: COLORS.white,
+      fontSize: "14px",
+      fontWeight: 600,
+      px: 4,
+      py: 1.8,
+      textTransform: "uppercase",
+      borderRadius: 50,
+      width: "fit-content",
+      border: `2px solid ${COLORS.white}`,
+      transition: "all 0.4s ease",
+      "&:hover": {
+        bgcolor: COLORS.white,
+        color: COLORS.primary,
+        transform: "translateY(-3px)",
+        boxShadow: "0 10px 20px rgba(255, 255, 255, 0.1)",
+      },
+    },
     rightSection: {
       backgroundColor: COLORS.primary,
       flex: 1,
@@ -150,7 +186,7 @@ const style = {
     heading: {
       color: "#1A1A1A",
       fontWeight: "bold",
-      fontSize:  { xs: "32px", md: "48px" },
+      fontSize: { xs: "32px", md: "48px" },
       background: `linear-gradient(135deg, ${COLORS.primary} 46%, #FF6D00 20%)`,
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
@@ -192,7 +228,7 @@ const style = {
       flexDirection: "column",
       justifyContent: "space-between",
       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  
+
       "&::after": {
         content: '""',
         position: "absolute",
@@ -206,15 +242,15 @@ const style = {
         zIndex: 1,
         transition: "bottom 0.5s ease-in-out",
       },
-  
+
       "&:hover::after": {
         bottom: "0%",
       },
-  
+
       "&:hover": {
         transform: "translateY(-8px) scale(1.02)",
         boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
-  
+
         "& .avatar": {
           transform: "scale(1.1) rotate(5deg)",
         },
@@ -295,7 +331,7 @@ const style = {
       transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     },
   },
-  
+
   /* ───────────────────── Feature Section ─────────────────── */
   featureSection: {
     wrapper: {
@@ -308,7 +344,7 @@ const style = {
     heading: {
       fontSize: { xs: "32px", md: "48px" },
       fontWeight: "bold",
-      textAlign:"center",
+      textAlign: "center",
       lineHeight: 1.1,
       mb: 3,
       background: "linear-gradient(135deg, #ffff 50%, #FF6D00 50%, #ffff 100%)",
@@ -340,9 +376,9 @@ const style = {
   /* ─────────────────── Home About Section ────────────────── */
   homeAboutSection: {
     wrapper: {
-      background:COLORS.primary,
+      background: COLORS.primary,
       mt: 0,
-      mb:3,
+      mb: 3,
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
       minHeight: { xs: "auto", md: 500 },
@@ -511,28 +547,28 @@ const style = {
     wrapper: {
       py: { xs: 8, md: 12 },
       px: { xs: 2, md: 4 },
-    background: `linear-gradient(135deg, #F0F0F0 0%, #F0F0F1 100%)`,
+      background: `linear-gradient(135deg, #F0F0F0 0%, #F0F0F1 100%)`,
       position: "relative",
       overflow: "hidden",
     },
     headline: {
-        fontSize: { xs: "32px", md: "48px" },
-       fontWeight: "bold",
-       lineHeight: 1.1,
-       mb: 3,
-       background: `linear-gradient(135deg, ${COLORS.primary} 50%, #FF6D00 20%)`,
-       backgroundClip: "text",
-       WebkitBackgroundClip: "text",
-       WebkitTextFillColor: "transparent",
-       position: "relative",
-       animation: "textGlow 2s ease-in-out infinite alternate",
-       textAlign:"center",     
+      fontSize: { xs: "32px", md: "48px" },
+      fontWeight: "bold",
+      lineHeight: 1.1,
+      mb: 3,
+      background: `linear-gradient(135deg, ${COLORS.primary} 50%, #FF6D00 20%)`,
+      backgroundClip: "text",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      position: "relative",
+      animation: "textGlow 2s ease-in-out infinite alternate",
+      textAlign: "center",
       letterSpacing: "-0.02em",
     },
     paper: {
       p: { xs: 2, md: 2.5 },
       height: "100%",
-      color:"#fff",
+      color: "#fff",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -650,7 +686,7 @@ const style = {
       zIndex: 2,
     },
     title: {
-      fontSize:  { xs: "14px", md: "16px" },
+      fontSize: { xs: "14px", md: "16px" },
       color: "#000",
       mb: 1.5,
       position: "relative",
@@ -719,8 +755,8 @@ const style = {
       WebkitTextFillColor: "transparent",
       position: "relative",
       animation: "textGlow 2s ease-in-out infinite alternate",
-      textAlign:"center",     
-     letterSpacing: "-0.02em",
+      textAlign: "center",
+      letterSpacing: "-0.02em",
     },
     inputStack: {
       flexDirection: { xs: "column", sm: "row" },
@@ -869,7 +905,7 @@ const style = {
       fontWeight: 400,
       "&:hover": { bgcolor: "#07a764" },
     },
-    
+
   },
   circleFeatureSection: {
     sectionWrapper: {
@@ -980,7 +1016,7 @@ const style = {
       "&:hover": { bgcolor: "#07a764" }
     }
   }
-  
+
 };
 
 /* Animation variant reused by Testimonial cards */

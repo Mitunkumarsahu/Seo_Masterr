@@ -16,14 +16,28 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Menu as MenuIcon, ChevronDown, Grid3x3, CheckCircle2 } from "lucide-react";
+import {
+  Menu as MenuIcon, ChevronDown, Grid3x3, CheckCircle2,
+  Home,
+  BookOpen,
+  Server,
+  Info,
+  Phone,
+  Bell,
+  Mail,
+  ArrowRight,
+  // LogIn,
+  // UserPlus,
+  // LogOut
+} from "lucide-react";
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
-import { useAuth } from "../hooks/useAuth";
-import AuthModal from "./AuthModal";
+// import { useAuth } from "../hooks/useAuth"; // Commented out for public access
+// import AuthModal from "./AuthModal"; // Commented out for public access
+import ServicesMegaMenu from "./ServicesMegaMenu";
+import { COLORS as COLOR } from "../styles/Styles"
 import SubscribeModal from "./SubscribeModal";
-import {COLORS as COLOR} from "../styles/Styles"
 const COLORS = {
   blue800: "#1e3a8a",
   green400: "#34d399",
@@ -36,8 +50,9 @@ const COLORS = {
 
 export default function NavBar() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  // const [authModalOpen, setAuthModalOpen] = useState(false); // Commented out for public access
+  // const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null); // Commented out for public access
   const [servicesMenuAnchorEl, setServicesMenuAnchorEl] = useState(null);
   const [email, setEmail] = useState("");
   const [snackbar, setSnackbar] = useState({
@@ -50,20 +65,24 @@ export default function NavBar() {
 
   const { apiCall: postSubscription, loading } = useApi();
   const { apiCall: getServiceTypes, data: typesData } = useApi();
+  const { apiCall: fetchContactInfo, data: contactInfoData } = useApi();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
+  // const { isAuthenticated, user, logout } = useAuth(); // Commented out for public access
 
   const toggleDrawer = () => setMobileDrawerOpen((prev) => !prev);
-  const handleMenuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setUserMenuAnchorEl(null);
+  // const handleMenuOpen = (event) => setUserMenuAnchorEl(event.currentTarget); // Commented out for public access
+  // const handleMenuClose = () => setUserMenuAnchorEl(null); // Commented out for public access
   const handleServicesMenuOpen = (event) => setServicesMenuAnchorEl(event.currentTarget);
   const handleServicesMenuClose = () => setServicesMenuAnchorEl(null);
 
-  // Fetch service types on mount
+  // Fetch service types and contact info on mount
   React.useEffect(() => {
-    getServiceTypes(import.meta.env.VITE_APP_BACKEND_URL+"/wp-json/wp/v2/service_type?per_page=100");
+    getServiceTypes(import.meta.env.VITE_APP_BACKEND_URL + "/wp-json/wp/v2/service_type?per_page=100");
+    fetchContactInfo(import.meta.env.VITE_BACKEND_URL + "/contact-info/");
   }, []);
+
+  const contactInfo = contactInfoData?.find((item) => item.is_active);
 
   // Set service types from API
   React.useEffect(() => {
@@ -83,7 +102,7 @@ export default function NavBar() {
     }
 
     try {
-      await postSubscription(import.meta.env.VITE_BACKEND_URL+"/subscriptions/", "POST", {
+      await postSubscription(import.meta.env.VITE_BACKEND_URL + "/subscriptions/", "POST", {
         email,
       });
       setSnackbar({
@@ -103,11 +122,11 @@ export default function NavBar() {
   };
 
   const navLinks = [
-    { label: "Home", to: "/" },
-    { label: "Blog", to: "/blogs" },
-    { label: "Services", to: "/services", hasDropdown: true },
-    { label: "About Us", to: "/about-us" },
-    { label: "Contact Us", to: "/contact-us" },
+    { label: "Home", to: "/", icon: <Home size={18} /> },
+    { label: "Blog", to: "/blogs", icon: <BookOpen size={18} /> },
+    { label: "Services", to: "/services", hasDropdown: true, icon: <Server size={18} /> },
+    { label: "About Us", to: "/about-us", icon: <Info size={18} /> },
+    { label: "Contact Us", to: "/contact-us", icon: <Phone size={18} /> },
   ];
 
   const getLinkStyle = (to) => {
@@ -126,7 +145,53 @@ export default function NavBar() {
 
   return (
     <>
-      <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#2E2E2E" }}>
+      {/* Top Bar - Scrolls away */}
+      <Box
+        sx={{
+          bgcolor: "#f5f5f5",
+          py: 1,
+          px: { xs: 2, md: 8 },
+          display: { xs: "none", md: "flex" },
+          justifyContent: "flex-end",
+          alignItems: "center",
+          gap: 4,
+          borderBottom: "1px solid #e0e0e0",
+          fontSize: "0.875rem",
+          color: COLORS.slate700,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Phone size={16} color={COLOR.secondary} />
+          <Typography variant="body2" fontWeight={500}>
+            {contactInfo?.phone_numbers || "+91 12345 67890"}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Mail size={16} color={COLOR.secondary} />
+          <Typography variant="body2" fontWeight={500}>
+            {contactInfo?.email || "seomasterr@gmail.com"}
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => navigate("/contact-us")}
+          endIcon={<ArrowRight size={16} />}
+          sx={{
+            bgcolor: COLOR.secondary,
+            minWidth: "auto",
+            px: 2,
+            py: 0.5,
+            borderRadius: 0,
+            textTransform: "none",
+            "&:hover": { bgcolor: COLOR.primary },
+          }}
+        >
+          Request a Call
+        </Button>
+      </Box>
+
+      <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#2E2E2E", top: 0 }}>
         <Toolbar sx={{ minHeight: 64 }}>
           {/* Logo */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
@@ -141,7 +206,7 @@ export default function NavBar() {
                 justifyContent: "center",
               }}
             > */}
-              {/* <Typography
+            {/* <Typography
                 variant="h6"
                 component="span"
                 sx={{ color: COLORS.blue800, fontWeight: "bold" }}
@@ -166,149 +231,55 @@ export default function NavBar() {
               mr: 4,
             }}
           >
-            {navLinks.map(({ label, to, hasDropdown }) => (
+            {navLinks.map(({ label, to, hasDropdown, icon }) => (
               hasDropdown ? (
-                <Box key={label} sx={{ position: "relative" }}>
-                  <Button 
+                <Box
+                  key={label}
+                  sx={{ position: "static", height: '100%', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                  onMouseEnter={() => {
+                    if (label === 'Services') setIsServicesOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    if (label === 'Services') setIsServicesOpen(false);
+                  }}
+                >
+                  <Button
                     sx={{
                       ...getLinkStyle(to),
                       display: "flex",
                       alignItems: "center",
                       gap: 0.5,
                       transition: "all 0.3s ease",
+                      height: '100%',
                       "&:hover": {
                         color: "#FF6D00",
                         transform: "translateY(-2px)",
                       },
                     }}
-                    onClick={handleServicesMenuOpen}
+                    startIcon={icon}
                     endIcon={
-                      <ChevronDown 
-                        size={16} 
-                        style={{ 
+                      <ChevronDown
+                        size={16}
+                        style={{
                           transition: "transform 0.3s ease",
-                          transform: Boolean(servicesMenuAnchorEl) ? "rotate(180deg)" : "rotate(0deg)"
-                        }} 
+                          transform: (label === 'Services' && isServicesOpen) ? "rotate(180deg)" : "rotate(0deg)"
+                        }}
                       />
                     }
                   >
                     {label}
                   </Button>
-                  <Menu
-                    anchorEl={servicesMenuAnchorEl}
-                    open={Boolean(servicesMenuAnchorEl)}
-                    onClose={handleServicesMenuClose}
-                    PaperProps={{ 
-                      sx: { 
-                        mt: 1.5, 
-                        minWidth: 240, 
-                        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-                        borderRadius: 2,
-                        maxHeight: 450,
-                        overflowY: "auto",
-                        border: "1px solid rgba(0,0,0,0.08)",
-                        "&::-webkit-scrollbar": {
-                          width: "6px",
-                        },
-                        "&::-webkit-scrollbar-track": {
-                          background: "#f1f1f1",
-                          borderRadius: "10px",
-                        },
-                        "&::-webkit-scrollbar-thumb": {
-                          background: COLOR.primary,
-                          borderRadius: "10px",
-                          "&:hover": {
-                            background: COLOR.secondary,
-                          },
-                        },
-                      } 
-                    }}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-                    transformOrigin={{ vertical: "top", horizontal: "left" }}
-                    TransitionProps={{
-                      timeout: 300,
-                    }}
-                  >
-                    <MenuItem 
-                      onClick={() => {
-                        navigate("/services");
-                        handleServicesMenuClose();
-                      }}
-                      sx={{ 
-                        fontWeight: 700,
-                        fontSize: "0.95rem",
-                        py: 1.5,
-                        px: 2.5,
-                        color: COLOR.primary,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
-                        transition: "all 0.2s ease",
-                        "&:hover": {
-                          backgroundColor: `${COLOR.primary}15`,
-                          color: COLOR.secondary,
-                          transform: "translateX(4px)",
-                        },
-                      }}
-                    >
-                      <Grid3x3 size={18} />
-                      All Services
-                    </MenuItem>
-                    <Divider sx={{ my: 1, borderColor: "rgba(0,0,0,0.08)" }} />
-                    {serviceTypes.map((type, index) => (
-                      <MenuItem
-                        key={type.id}
-                        onClick={() => {
-                          navigate(`/services/${type.slug}`);
-                          handleServicesMenuClose();
-                        }}
-                        sx={{
-                          py: 1.2,
-                          px: 2.5,
-                          fontSize: "0.9rem",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1.5,
-                          transition: "all 0.2s ease",
-                          animation: `fadeIn 0.3s ease ${index * 0.05}s both`,
-                          "@keyframes fadeIn": {
-                            from: {
-                              opacity: 0,
-                              transform: "translateY(-10px)",
-                            },
-                            to: {
-                              opacity: 1,
-                              transform: "translateY(0)",
-                            },
-                          },
-                          "&:hover": {
-                            backgroundColor: `${COLOR.primary}10`,
-                            color: COLOR.primary,
-                            transform: "translateX(4px)",
-                            "& .service-icon": {
-                              color: COLOR.secondary,
-                              transform: "scale(1.2)",
-                            },
-                          },
-                        }}
-                      >
-                        <CheckCircle2 
-                          size={16} 
-                          className="service-icon"
-                          style={{ 
-                            transition: "all 0.2s ease",
-                            color: COLOR.primary,
-                            opacity: 0.6,
-                          }} 
-                        />
-                        {type.name}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+
+                  {label === 'Services' && isServicesOpen && (
+                    <ServicesMegaMenu
+                      serviceTypes={serviceTypes}
+                      onClose={() => setIsServicesOpen(false)}
+                    />
+                  )}
                 </Box>
               ) : (
                 <NavLink key={label} to={to} style={{ textDecoration: "none" }}>
-                  <Button sx={getLinkStyle(to)}>{label}</Button>
+                  <Button sx={getLinkStyle(to)} startIcon={icon}>{label}</Button>
                 </NavLink>
               )
             ))}
@@ -326,81 +297,21 @@ export default function NavBar() {
             <Button
               variant="outlined"
               onClick={() => setModalOpen(true)}
+              startIcon={<Bell size={18} />}
               sx={{
                 color: "white",
                 borderColor: "white",
+                borderRadius: "50px",
+                px: 3,
                 "&:hover": { bgcolor: "white", color: COLORS.blue800 },
               }}
             >
               Subscribe
             </Button>
 
-            {isAuthenticated ? (
-              <>
-                <Tooltip title="Account">
-                  <IconButton onClick={handleMenuOpen} size="small">
-                    <Avatar
-                      sx={{
-                        bgcolor: COLORS.green500,
-                        width: 32,
-                        height: 32,
-                        fontSize: 14,
-                      }}
-                    >
-                      {user?.sub?.[0]?.toUpperCase() || "U"}
-                    </Avatar>
-                  </IconButton>
-                </Tooltip>
 
-                <Menu
-                  anchorEl={userMenuAnchorEl}
-                  open={Boolean(userMenuAnchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{ sx: { mt: 1.5, minWidth: 180, boxShadow: 3 } }}
-                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                  transformOrigin={{ vertical: "top", horizontal: "right" }}
-                >
-                  <MenuItem disabled>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {user?.sub}
-                    </Typography>
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem
-                    onClick={() => {
-                      logout();
-                      handleMenuClose();
-                    }}
-                  >
-                    Logout
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAuthModalOpen(true)}
-                  sx={{
-                    color: "white",
-                    borderColor: "white",
-                    "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-                  }}
-                >
-                  Login
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => setAuthModalOpen(true)}
-                  sx={{
-                    bgcolor: COLOR.secondary,
-                    "&:hover": { bgcolor: COLOR.primary },
-                  }}
-                >
-                  Sign&nbsp;Up
-                </Button>
-              </>
-            )}
+
+            {/* Desktop authentication section removed - making all routes public */}
           </Box>
 
           {/* Mobile Toggle */}
@@ -411,17 +322,18 @@ export default function NavBar() {
           >
             <MenuIcon size={24} />
           </IconButton>
-        </Toolbar>
-      </AppBar>
+        </Toolbar >
+      </AppBar >
 
       {/* Mobile Drawer */}
-      <Drawer
+      < Drawer
         anchor="left"
         open={mobileDrawerOpen}
         onClose={toggleDrawer}
         PaperProps={{
           sx: { width: 260, bgcolor: COLOR.primary, color: "white" },
-        }}
+        }
+        }
       >
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
@@ -429,7 +341,7 @@ export default function NavBar() {
           </Typography>
           <Divider sx={{ borderColor: COLORS.slate700, mb: 2 }} />
           <List>
-            {navLinks.map(({ label, to, hasDropdown }) => (
+            {navLinks.map(({ label, to, hasDropdown, icon }) => (
               <React.Fragment key={label}>
                 <ListItem disablePadding>
                   <ListItemButton
@@ -447,12 +359,13 @@ export default function NavBar() {
                       mb: 0.5,
                     }}
                   >
+                    <Box sx={{ mr: 2, display: "flex", alignItems: "center" }}>{icon}</Box>
                     <ListItemText primary={label} />
                   </ListItemButton>
                 </ListItem>
                 {hasDropdown && (
-                  <Box sx={{ 
-                    pl: 2, 
+                  <Box sx={{
+                    pl: 2,
                     py: 1,
                     mb: 1,
                     borderLeft: `3px solid ${COLOR.secondary}`,
@@ -467,7 +380,7 @@ export default function NavBar() {
                         sx={{
                           py: 0.8,
                           borderRadius: 1,
-                          "&:hover": { 
+                          "&:hover": {
                             bgcolor: COLORS.slate700,
                             transform: "translateX(4px)",
                             transition: "all 0.2s ease",
@@ -475,10 +388,10 @@ export default function NavBar() {
                         }}
                       >
                         <Grid3x3 size={16} style={{ marginRight: 8, opacity: 0.8 }} />
-                        <ListItemText 
-                          primary="All Services" 
-                          primaryTypographyProps={{ 
-                            fontSize: "0.9rem", 
+                        <ListItemText
+                          primary="All Services"
+                          primaryTypographyProps={{
+                            fontSize: "0.9rem",
                             fontWeight: 700,
                           }}
                         />
@@ -495,7 +408,7 @@ export default function NavBar() {
                           sx={{
                             py: 0.7,
                             borderRadius: 1,
-                            "&:hover": { 
+                            "&:hover": {
                               bgcolor: COLORS.slate700,
                               transform: "translateX(4px)",
                               transition: "all 0.2s ease",
@@ -503,7 +416,7 @@ export default function NavBar() {
                           }}
                         >
                           <CheckCircle2 size={14} style={{ marginRight: 8, opacity: 0.6 }} />
-                          <ListItemText 
+                          <ListItemText
                             primary={type.name}
                             primaryTypographyProps={{ fontSize: "0.85rem" }}
                           />
@@ -534,71 +447,22 @@ export default function NavBar() {
               Subscribe
             </Button>
 
-            {isAuthenticated ? (
-              <>
-                <Typography sx={{ fontWeight: 600, mb: 1 }}>
-                  {user?.sub}
-                </Typography>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => {
-                    logout();
-                    toggleDrawer();
-                  }}
-                  sx={{
-                    color: "white",
-                    borderColor: "white",
-                    "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-                  }}
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => {
-                    setAuthModalOpen(true);
-                    toggleDrawer();
-                  }}
-                  sx={{
-                    color: "white",
-                    borderColor: "white",
-                    "&:hover": { bgcolor: "white", color: COLORS.blue800 },
-                  }}
-                >
-                  Login
-                </Button>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={() => {
-                    setAuthModalOpen(true);
-                    toggleDrawer();
-                  }}
-                  sx={{
-                    bgcolor: COLOR.secondary,
-                    "&:hover": { bgcolor: COLORS.primary },
-                  }}
-                >
-                  Sign&nbsp;Up
-                </Button>
-              </>
-            )}
+
+            {/* Mobile authentication section removed - making all routes public */}
           </Box>
         </Box>
-      </Drawer>
+      </Drawer >
 
       {/* Auth & Subscribe Modals */}
+      {/* AuthModal removed - making all routes public */}
+      {/*
       <AuthModal
         open={authModalOpen}
         handleClose={() => setAuthModalOpen(false)}
         onSuccess={() => setAuthModalOpen(false)}
         redirectTo={"/"}
       />
+      */}
 
       <SubscribeModal
         open={modalOpen}

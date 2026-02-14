@@ -6,19 +6,13 @@ import {
   Modal,
   Fade,
   Backdrop,
+  InputAdornment,
 } from "@mui/material";
 import React from "react";
 import style from "../styles/Styles";
-import Loader from "./Loader";
+import { Mail, Bell } from "lucide-react";
 
-const SubscribeModal = ({
-  open,
-  onClose,
-  email,
-  setEmail,
-  loading,
-  handleSubmit,
-}) => {
+const SubscribeModal = ({ open, onClose, email, setEmail, loading, handleSubmit }) => {
   return (
     <Modal
       open={open}
@@ -54,6 +48,13 @@ const SubscribeModal = ({
             size="small"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Mail size={18} />
+                </InputAdornment>
+              ),
+            }}
           />
 
           <Button
@@ -62,12 +63,9 @@ const SubscribeModal = ({
             variant="contained"
             onClick={handleSubmit}
             disabled={loading}
+            startIcon={!loading && <Bell size={18} />}
           >
-            {loading ? (
-              "loading..."
-            ) : (
-              "Submit"
-            )}
+            {loading ? "Subscribing..." : "Submit"}
           </Button>
         </Box>
       </Fade>

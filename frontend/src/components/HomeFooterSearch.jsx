@@ -9,6 +9,7 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
+import { Bell } from "lucide-react";
 import useApi from "../hooks/useApi";
 import style from "../styles/Styles";
 import SubscribeModal from "./SubscribeModal"; // ✅ Import modal component
@@ -31,7 +32,7 @@ export default function HomeFooterSearch() {
     }
 
     try {
-      await postSubscription(import.meta.env.VITE_BACKEND_URL+"/subscriptions/", "POST", { email });
+      await postSubscription(import.meta.env.VITE_BACKEND_URL + "/subscriptions/", "POST", { email });
       setSnackbar({ open: true, message: "Subscribed successfully!", severity: "success" });
       setEmail("");
       setModalOpen(false);
@@ -90,7 +91,7 @@ export default function HomeFooterSearch() {
       />
 
       <Stack spacing={2} alignItems="center" position="relative" zIndex={2}>
-     
+
         <Typography
           variant="body2"
           sx={styles.heading}
@@ -102,6 +103,7 @@ export default function HomeFooterSearch() {
           variant="contained"
           size="small"
           sx={style?.heroSection?.button}
+          startIcon={<Bell size={18} />}
           onClick={() => setModalOpen(true)}
         >
           Subscribe

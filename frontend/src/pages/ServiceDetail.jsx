@@ -24,6 +24,7 @@ import {
   WhatsappIcon,
 } from "react-share";
 import Loader from "../components/Loader";
+import { Mail } from "lucide-react";
 
 const ServiceDetail = () => {
   const { slug } = useParams(); // now using slug instead of id
@@ -295,6 +296,7 @@ const ServiceDetail = () => {
               variant="contained"
               onClick={() => navigate("/contact-us")}
               sx={style.heroSection.button}
+              startIcon={<Mail size={20} />}
             >
               Contact Us
             </Button>

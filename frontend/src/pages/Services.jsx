@@ -13,6 +13,7 @@ import HomeFooterSearch from "../components/HomeFooterSearch";
 import useApi from "../hooks/useApi";
 import style, { COLORS } from "../styles/Styles";
 import Loader from "../components/Loader";
+import { Layers, ArrowRight } from "lucide-react";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -119,6 +120,7 @@ const Services = () => {
           <TabButton
             label="All"
             selected={selectedType === "all"}
+            icon={<Layers size={16} />}
             onClick={() => setSelectedType("all")}
           />
           {serviceTypes.map((type) => (
@@ -168,11 +170,12 @@ const Services = () => {
   );
 };
 
-const TabButton = ({ label, selected, onClick }) => (
+const TabButton = ({ label, selected, onClick, icon }) => (
   <Button
     onClick={onClick}
     variant="outlined"
     size="small"
+    startIcon={icon}
     sx={{
       backgroundColor: selected ? COLORS.primary : "#ffffff",
       color: selected ? "#ffffff" : COLORS.primary,
@@ -238,6 +241,7 @@ const ServiceCard = ({ post }) => {
         </Typography>
         <Button
           onClick={() => navigate(`/service/${post.slug}`)}
+          endIcon={<ArrowRight size={18} />}
           sx={{
             mt: 2,
             fontWeight: 600,
@@ -247,7 +251,7 @@ const ServiceCard = ({ post }) => {
             },
           }}
         >
-          LEARN MORE →
+          LEARN MORE
         </Button>
       </Box>
     </Box>

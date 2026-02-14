@@ -57,7 +57,7 @@ const fadeInUp = {
 
 const AboutUs = () => {
 
-  
+
   const theme = useTheme();
 
   const styles = style.aboutUsSection;
@@ -70,7 +70,7 @@ const AboutUs = () => {
     useEffect(() => {
       const fetchHero = async () => {
         try {
-          const res = await apiCall(import.meta.env.VITE_BACKEND_URL+'/about-hero/?active_only=true');
+          const res = await apiCall(import.meta.env.VITE_BACKEND_URL + '/about-hero/?active_only=true');
           if (res && res.length > 0) {
             setHeroData(res[0]);
           }
@@ -85,7 +85,7 @@ const AboutUs = () => {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
           {/* <CircularProgress /> */}
-          <Loader/>
+          <Loader />
         </Box>
       );
     }
@@ -106,7 +106,7 @@ const AboutUs = () => {
 
     const fetchSteps = async () => {
       try {
-        const res = await fetch(import.meta.env.VITE_BACKEND_URL+'/process-steps/?active_only=true');
+        const res = await fetch(import.meta.env.VITE_BACKEND_URL + '/process-steps/?active_only=true');
         const json = await res.json();
         const sorted = json.sort((a, b) => a.order - b.order);
         setSteps(sorted);
@@ -125,7 +125,7 @@ const AboutUs = () => {
       return (
         <Box sx={{ py: 10, textAlign: 'center' }}>
           {/* <CircularProgress /> */}
-          <Loader/>
+          <Loader />
         </Box>
       );
     }
@@ -163,8 +163,8 @@ const AboutUs = () => {
                   flex: isMd
                     ? '0 1 calc(33.333% - 32px)'
                     : isSm
-                    ? '0 1 calc(50% - 16px)'
-                    : '0 1 100%',
+                      ? '0 1 calc(50% - 16px)'
+                      : '0 1 100%',
                   position: 'relative',
                   padding: '8px',
                 }}
@@ -206,7 +206,7 @@ const AboutUs = () => {
 
     const fetchData = async () => {
       try {
-        const res = await fetch(import.meta.env.VITE_BACKEND_URL+'/why-choose-us/');
+        const res = await fetch(import.meta.env.VITE_BACKEND_URL + '/why-choose-us/');
         const json = await res.json();
         if (json.length) {
           setData(json[0]);
@@ -226,7 +226,7 @@ const AboutUs = () => {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
           {/* <CircularProgress /> */}
-          <Loader/>
+          <Loader />
         </Box>
       );
     }
@@ -325,86 +325,18 @@ const AboutUs = () => {
   };
 
 
-  const FAQSection = () => {
-    const { apiCall, loading } = useApi();
-    const [faqs, setFaqs] = useState([]);
-
-    useEffect(() => {
-      const fetchFaqs = async () => {
-        try {
-          const res = await apiCall(import.meta.env.VITE_BACKEND_URL+'/faqs/?active_only=true');
-          if (res && Array.isArray(res)) {
-            const sortedFaqs = res.sort((a, b) => a.order - b.order);
-            setFaqs(sortedFaqs);
-          }
-        } catch (err) {
-          console.error('Failed to fetch FAQs:', err);
-        }
-      };
-      fetchFaqs();
-    }, [apiCall]);
-
-    return (
-      <Box sx={styles.container}>
-        <Fade in={true} timeout={800}>
-          <Box>
-            <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center" sx={style?.testimonialSection?.headline}>
-              Frequently Asked Questions
-            </Typography>
-
-            {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                {/* <CircularProgress /> */}
-                <Loader/>
-              </Box>
-            ) : (
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                variants={containerVariants}
-              >
-                {faqs.map((faq, index) => (
-                  <motion.div
-                    key={faq.id}
-                    variants={fadeInUp}
-                    custom={0.2 + index * 0.1}
-                  >
-                    <Accordion
-                      TransitionProps={{ unmountOnExit: true }}
-                      sx={styles.accordion}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={styles.summary}>
-                        <Typography fontWeight="bold">{faq.question}</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography>{faq.answer}</Typography>
-                      </AccordionDetails>
-                    </Accordion>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </Box>
-        </Fade>
-      </Box>
-    );
-  };
-
 
 
   return (
     <>
 
-    <HeroSection1 />
+      <HeroSection1 />
 
-    <ProcessSteps />
+      <ProcessSteps />
 
-    <WhyChooseUs />
+      <WhyChooseUs />
 
-    <FAQSection />
-
-  </>
+    </>
   );
 };
 

@@ -2,8 +2,8 @@
 import { Routes, Route } from 'react-router-dom'
 import { useMemo } from 'react'
 import routesConfig from './routes'
-import ProtectedRoute from './ProtectedRoute'
-import RoleBasedRoute from './RoleBasedRoute'
+// import ProtectedRoute from './ProtectedRoute' // Commented out for public access
+// import RoleBasedRoute from './RoleBasedRoute' // Commented out for public access
 import NotFound from '../pages/NotFound'
 
 const RouteGenerator = () => {
@@ -16,6 +16,17 @@ const RouteGenerator = () => {
       console.warn(`Component ${route.component} not found`)
       return null
     }
+
+    // Making all routes public for now as requested
+    return (
+      <Route
+        key={index}
+        path={route.path}
+        element={<Component />}
+      />
+    )
+
+    /* Commenting out private/role-based logic
     if (route.type === 'public') {
       return (
         <Route 
@@ -55,13 +66,14 @@ const RouteGenerator = () => {
     }
     
     return null
+    */
   }
 
   return (
     <Routes>
       {routesConfig.routes.map((route, index) => renderRoute(route, index))}
-      <Route 
-        path="*" 
+      <Route
+        path="*"
         element={<NotFound />}
       />
     </Routes>

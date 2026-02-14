@@ -1,13 +1,14 @@
 // ProtectedRoute.jsx
-import { useEffect, useState } from "react";
-import { useLocation, Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import AuthModal from "../components/AuthModal"; // your modal component
-import { useNavigate } from "react-router-dom";
-import Loader from "../components/Loader";
-import UnderConstruction from "../pages/UnderConstruction";
+// import { useEffect, useState } from "react"; // Commented out for public access
+// import { useLocation, Navigate } from "react-router-dom"; // Commented out for public access
+// import { useAuth } from "../hooks/useAuth"; // Commented out for public access
+// import AuthModal from "../components/AuthModal"; // Commented out for public access
+// import { useNavigate } from "react-router-dom"; // Commented out for public access
+// import Loader from "../components/Loader"; // Commented out for public access
+// import UnderConstruction from "../pages/UnderConstruction"; // Commented out for public access
 
 const ProtectedRoute = ({ children }) => {
+  /* Commenting out auth logic for public access
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -21,9 +22,6 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      // <div className="flex justify-center items-center min-h-screen">
-      //   <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
-      // </div>
       <Loader/>
     );
   }
@@ -43,6 +41,7 @@ const ProtectedRoute = ({ children }) => {
       </>
     );
   }
+  */
 
   return children;
 };

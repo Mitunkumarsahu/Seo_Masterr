@@ -19,6 +19,8 @@ import useApi from "../hooks/useApi";
 import style, { COLORS } from '../styles/Styles';
 import HeroSection from "../components/HeroSection";
 import Loader from "../components/Loader";
+import ConsultationForm from "../components/ConsultationForm";
+import { PhoneCall } from "lucide-react";
 
 
 const ContactUsPage = () => {
@@ -33,7 +35,7 @@ const ContactUsPage = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        await getHomeFeatures(backendUrl+"/home-features/");
+        await getHomeFeatures(backendUrl + "/home-features/");
       } catch (error) {
         console.error("Failed to fetch home features:", error);
       }
@@ -45,37 +47,13 @@ const ContactUsPage = () => {
   const position1Data = data?.find((item) => item.position === 1);
   const position2Data = data?.find((item) => item.position === 2);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
-  const [submitted, setSubmitted] = useState(false);
-
   useEffect(() => {
-    fetchHero(import.meta.env.VITE_BACKEND_URL+"/contact-hero/?active_only=false");
-    fetchInfo(import.meta.env.VITE_BACKEND_URL+"/contact-info/");
+    fetchHero(import.meta.env.VITE_BACKEND_URL + "/contact-hero/?active_only=false");
+    fetchInfo(import.meta.env.VITE_BACKEND_URL + "/contact-info/");
   }, []);
-
   const contactHero = heroData?.find((item) => item.is_active);
   const contactInfo = infoData?.find((item) => item.is_active);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
-    await submitForm(
-      import.meta.env.VITE_BACKEND_URL+"/contact-inquiries/",
-      "POST",
-      formData
-    );
-    setFormData({ name: "", email: "", phone: "", message: "" });
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-  };
 
   return (
     <Box sx={{ backgroundColor: "#f9f9ff", pb: 8 }}>
@@ -118,7 +96,7 @@ const ContactUsPage = () => {
       </Box> */}
 
 
-        <HeroSection data={contactHero} />
+      <HeroSection data={contactHero} />
 
 
       {/* Main Content Section */}
@@ -202,12 +180,12 @@ const ContactUsPage = () => {
           </Box>
 
           <Box mt={2}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{color:COLORS.primary}}>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{ color: COLORS.primary }}>
               Call us Toll-Free
             </Typography>
             <Typography
               variant="h5"
-              sx={{ color:COLORS.primary, fontWeight: "bold" }}
+              sx={{ color: COLORS.primary, fontWeight: "bold" }}
             >
               {contactInfo?.toll_free}
             </Typography>
@@ -249,6 +227,7 @@ const ContactUsPage = () => {
               onClick={() => window.open(`tel:${contactInfo?.toll_free || ""}`)}
               component={motion.button}
               whileTap={{ scale: 0.97 }}
+              startIcon={<PhoneCall size={20} />}
             >
               CALL NOW
             </Button>
@@ -272,72 +251,11 @@ const ContactUsPage = () => {
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           }}
         >
-          <Typography variant="h5" fontWeight="bold" mb={3}             sx={style?.testimonialSection?.headline}>
-            Request Free Consultation
+          <Typography variant="h5" fontWeight="bold" mb={3} sx={style?.testimonialSection?.headline}>
+            Request Consultation
           </Typography>
 
-          <Box display="flex" flexDirection="column" gap={2}>
-            <TextField
-              fullWidth
-              label="Your Name *"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              label="Your Email *"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              label="Phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Your Message *"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-            />
-            <AnimatePresence>
-              {submitted && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <Typography color="green" fontWeight={500}>
-                    ✅ Message sent successfully!
-                  </Typography>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={submitting}
-              sx={{ borderRadius: 2, bgcolor: COLORS.primary, color: "#fff" }}
-              component={motion.button}
-              whileTap={{ scale: 0.97 }}
-              whileHover={{ scale: 1.03 }}
-            >
-              {submitting ? (
-                // <CircularProgress size={20} sx={{ color: "#fff" }} />
-                <Loader/>
-              ) : (
-                "SUBMIT"
-              )}
-            </Button>
-          </Box>
+          <ConsultationForm />
 
           {/* Map */}
           {contactInfo?.map_embed && (
