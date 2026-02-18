@@ -9,14 +9,12 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import FeatureSection from "../components/FeatureSection";
 import HeroSection from "../components/HeroSection";
 import ServiceCategoryBar from "../components/ServiceCategoryBar";
 import HomeAboutusSection from "../components/HomeAboutusSection";
 import HomeFooterSearch from "../components/HomeFooterSearch";
-import HomeServiceCards from "../components/HomeServiceCards";
 import LatestBlogs from "../components/LatestBlogs";
-import TestimonialSection from "../components/TestimonialSection";
+import ServicesWeProvide from "../components/ServicesWeProvide";
 import Loader from '../components/Loader';
 import useApi from "../hooks/useApi";
 import style from '../styles/Styles';
@@ -66,7 +64,7 @@ const styles = {
 };
 
 export default function Home() {
-  const { apiCall: getHomeFeatures, loading, error, data } = useApi();
+  const { apiCall: getHomeFeatures, data } = useApi();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
@@ -103,38 +101,21 @@ export default function Home() {
         viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
-        <HomeServiceCards />
-      </motion.div>
-
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={fadeInUp}
-      >
-        <FeatureSection />
-      </motion.div>
-
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={fadeInUp}
-      >
         <HomeAboutusSection data={position2Data} />
       </motion.div>
 
-      {/* <motion.div
+      {/* Latest Blogs Section */}
+      <LatestBlogs />
+
+      {/* Services We Provide Section */}
+      <motion.div
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
       >
-        <TestimonialSection />
-      </motion.div> */}
-
-      {/* Latest Blogs Section */}
-      <LatestBlogs />
+        <ServicesWeProvide />
+      </motion.div>
 
       {/* FAQ Section */}
       <motion.div

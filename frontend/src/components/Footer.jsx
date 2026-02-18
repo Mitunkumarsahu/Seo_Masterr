@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
+import EmailIcon from "@mui/icons-material/Email";
 import { COLORS } from "../styles/Styles";
 import useApi from "../hooks/useApi";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -193,13 +194,64 @@ const Footer = () => {
               India - 751003
             </Typography>
           </Box>
+          
+          {/* Phone Numbers - Clickable for SMS */}
           <Box sx={{ display: "flex", alignItems: "start", gap: 1, mt: 1 }}>
             <PhoneIcon fontSize="small" />
-            <Typography variant="body2">
-              {contactInfo?.phone_numbers || "+91 12345 67890"}
-              <br />
+            <Box>
+              {contactInfo?.phone_numbers ? (
+                // contactInfo.phone_numbers.split('\n').map((phone, index) => (
+                  <Link
+                    key={contactInfo?.phone_numbers}
+                    href={`sms:${contactInfo?.phone_numbers}`}
+                    color="inherit"
+                    underline="hover"
+                    sx={{
+                      display: "block",
+                      fontSize: "0.875rem",
+                      "&:hover": {
+                        color: COLORS.secondary,
+                      },
+                    }}
+                  >
+                    {contactInfo?.phone_numbers}
+                  </Link>
+                // ))
+              ) : (
+                <Link
+                  href="sms:+911234567890"
+                  color="inherit"
+                  underline="hover"
+                  sx={{
+                    display: "block",
+                    fontSize: "0.875rem",
+                    "&:hover": {
+                      color: COLORS.secondary,
+                    },
+                  }}
+                >
+                  +91 12345 67890
+                </Link>
+              )}
+            </Box>
+          </Box>
+
+          {/* Email - Clickable for Gmail */}
+          <Box sx={{ display: "flex", alignItems: "start", gap: 1, mt: 1 }}>
+            <EmailIcon fontSize="small" />
+            <Link
+              href={`mailto:${contactInfo?.email || "seomasterr@gmail.com"}`}
+              color="inherit"
+              underline="hover"
+              sx={{
+                fontSize: "0.875rem",
+                "&:hover": {
+                  color: COLORS.secondary,
+                },
+              }}
+            >
               {contactInfo?.email || "seomasterr@gmail.com"}
-            </Typography>
+            </Link>
           </Box>
         </Grid>
       </Grid>

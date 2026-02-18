@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Avatar,
   Box,
   Button,
   Divider,
@@ -10,10 +9,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Menu,
-  MenuItem,
   Toolbar,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -26,18 +22,15 @@ import {
   Bell,
   Mail,
   ArrowRight,
-  // LogIn,
-  // UserPlus,
-  // LogOut
 } from "lucide-react";
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
-// import { useAuth } from "../hooks/useAuth"; // Commented out for public access
-// import AuthModal from "./AuthModal"; // Commented out for public access
 import ServicesMegaMenu from "./ServicesMegaMenu";
+import BlogsMegaMenu from "./BlogsMegaMenu";
 import { COLORS as COLOR } from "../styles/Styles"
 import SubscribeModal from "./SubscribeModal";
+import { useDropdownData } from "../contexts/DropdownDataContext";
 const COLORS = {
   blue800: "#1e3a8a",
   green400: "#34d399",
@@ -51,53 +44,46 @@ const COLORS = {
 export default function NavBar() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
-  // const [authModalOpen, setAuthModalOpen] = useState(false); // Commented out for public access
-  // const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null); // Commented out for public access
-  const [servicesMenuAnchorEl, setServicesMenuAnchorEl] = useState(null);
+  const [isBlogsOpen, setIsBlogsOpen] = useState(false);
   const [email, setEmail] = useState("");
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
   const [modalOpen, setModalOpen] = useState(false);
-  const [serviceTypes, setServiceTypes] = useState([]);
 
   const { apiCall: postSubscription, loading } = useApi();
-  const { apiCall: getServiceTypes, data: typesData } = useApi();
   const { apiCall: fetchContactInfo, data: contactInfoData } = useApi();
   const location = useLocation();
   const navigate = useNavigate();
-  // const { isAuthenticated, user, logout } = useAuth(); // Commented out for public access
+
+  // Use dropdown data context
+  const { serviceTypes, blogCategories } = useDropdownData();
 
   const toggleDrawer = () => setMobileDrawerOpen((prev) => !prev);
-  // const handleMenuOpen = (event) => setUserMenuAnchorEl(event.currentTarget); // Commented out for public access
-  // const handleMenuClose = () => setUserMenuAnchorEl(null); // Commented out for public access
-  const handleServicesMenuOpen = (event) => setServicesMenuAnchorEl(event.currentTarget);
-  const handleServicesMenuClose = () => setServicesMenuAnchorEl(null);
 
-  // Fetch service types and contact info on mount
+  // Fetch contact info on mount
   React.useEffect(() => {
-    getServiceTypes(import.meta.env.VITE_APP_BACKEND_URL + "/wp-json/wp/v2/service_type?per_page=100");
     fetchContactInfo(import.meta.env.VITE_BACKEND_URL + "/contact-info/");
   }, []);
 
   const contactInfo = contactInfoData?.find((item) => item.is_active);
 
-  // Set service types from API
+  // Close dropdowns when clicking outside
   React.useEffect(() => {
-    if (Array.isArray(typesData)) {
-      setServiceTypes(typesData);
-    }
-  }, [typesData]);
+    const handleClickOutside = (event) => {
+      // Check if click is outside the navbar
+      const navbar = document.querySelector('[data-navbar]');
+      if (navbar && !navbar.contains(event.target)) {
+        setIsServicesOpen(false);
+        setIsBlogsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSubmit = async () => {
     if (!email || !email.includes("@")) {
-      setSnackbar({
-        open: true,
-        message: "Please enter a valid email.",
-        severity: "error",
-      });
       return;
     }
 
@@ -105,25 +91,16 @@ export default function NavBar() {
       await postSubscription(import.meta.env.VITE_BACKEND_URL + "/subscriptions/", "POST", {
         email,
       });
-      setSnackbar({
-        open: true,
-        message: "Subscribed successfully!",
-        severity: "success",
-      });
       setEmail("");
       setModalOpen(false);
     } catch (err) {
-      setSnackbar({
-        open: true,
-        message: "Subscription failed.",
-        severity: "error",
-      });
+      console.error("Subscription failed:", err);
     }
   };
 
   const navLinks = [
     { label: "Home", to: "/", icon: <Home size={18} /> },
-    { label: "Blog", to: "/blogs", icon: <BookOpen size={18} /> },
+    { label: "Blog", to: "/blogs", hasDropdown: true, icon: <BookOpen size={18} /> },
     { label: "Services", to: "/services", hasDropdown: true, icon: <Server size={18} /> },
     { label: "About Us", to: "/about-us", icon: <Info size={18} /> },
     { label: "Contact Us", to: "/contact-us", icon: <Phone size={18} /> },
@@ -162,16 +139,40 @@ export default function NavBar() {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Phone size={16} color={COLOR.secondary} />
-          <Typography variant="body2" fontWeight={500}>
+          <Typography
+            component="a"
+            href={`tel:${contactInfo?.phone_numbers || "+911234567890"}`}
+            variant="body2"
+            fontWeight={500}
+            sx={{
+              textDecoration: "none",
+              color: "inherit",
+              "&:hover": { textDecoration: "underline" },
+              cursor: "pointer"
+            }}
+          >
             {contactInfo?.phone_numbers || "+91 12345 67890"}
           </Typography>
         </Box>
+
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Mail size={16} color={COLOR.secondary} />
-          <Typography variant="body2" fontWeight={500}>
+          <Typography
+            component="a"
+            href={`mailto:${contactInfo?.email || "seomasterr@gmail.com"}`}
+            variant="body2"
+            fontWeight={500}
+            sx={{
+              textDecoration: "none",
+              color: "inherit",
+              "&:hover": { textDecoration: "underline" },
+              cursor: "pointer"
+            }}
+          >
             {contactInfo?.email || "seomasterr@gmail.com"}
           </Typography>
         </Box>
+
         <Button
           variant="contained"
           size="small"
@@ -191,7 +192,7 @@ export default function NavBar() {
         </Button>
       </Box>
 
-      <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#2E2E2E", top: 0 }}>
+      <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#2E2E2E", top: 0 }} data-navbar>
         <Toolbar sx={{ minHeight: 64 }}>
           {/* Logo */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
@@ -236,12 +237,6 @@ export default function NavBar() {
                 <Box
                   key={label}
                   sx={{ position: "static", height: '100%', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-                  onMouseEnter={() => {
-                    if (label === 'Services') setIsServicesOpen(true);
-                  }}
-                  onMouseLeave={() => {
-                    if (label === 'Services') setIsServicesOpen(false);
-                  }}
                 >
                   <Button
                     sx={{
@@ -262,10 +257,19 @@ export default function NavBar() {
                         size={16}
                         style={{
                           transition: "transform 0.3s ease",
-                          transform: (label === 'Services' && isServicesOpen) ? "rotate(180deg)" : "rotate(0deg)"
+                          transform: ((label === 'Services' && isServicesOpen) || (label === 'Blog' && isBlogsOpen)) ? "rotate(180deg)" : "rotate(0deg)"
                         }}
                       />
                     }
+                    onClick={() => {
+                      if (label === 'Services') {
+                        setIsServicesOpen(!isServicesOpen);
+                        setIsBlogsOpen(false);
+                      } else if (label === 'Blog') {
+                        setIsBlogsOpen(!isBlogsOpen);
+                        setIsServicesOpen(false);
+                      }
+                    }}
                   >
                     {label}
                   </Button>
@@ -274,6 +278,13 @@ export default function NavBar() {
                     <ServicesMegaMenu
                       serviceTypes={serviceTypes}
                       onClose={() => setIsServicesOpen(false)}
+                    />
+                  )}
+
+                  {label === 'Blog' && isBlogsOpen && (
+                    <BlogsMegaMenu
+                      blogCategories={blogCategories}
+                      onClose={() => setIsBlogsOpen(false)}
                     />
                   )}
                 </Box>
